@@ -5,19 +5,22 @@
  *      Author: lorenzocioni
  */
 
-#ifndef CLASSIFIERS_CLASSIFIER_H_
-#define CLASSIFIERS_CLASSIFIER_H_
+#ifndef CLASSIFIERS_WEAKCLASSIFIER_H_
+#define CLASSIFIERS_WEAKCLASSIFIER_H_
 
-class Classifier {
+class WeakClassifier {
 
 private:
 	double error;
 
 
 public:
+	void evaluate();
+
+
 	double getError() const;
 	void setError(double error);
 };
 
 
-#endif /* CLASSIFIERS_CLASSIFIER_H_ */
+#endif /* CLASSIFIERS_WEAKCLASSIFIER_H_ */

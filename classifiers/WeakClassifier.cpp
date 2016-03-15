@@ -5,12 +5,12 @@
  *      Author: lorenzocioni
  */
 
-#include "Classifier.h"
+#include "WeakClassifier.h"
 
-double Classifier::getError() const {
+double WeakClassifier::getError() const {
 	return error;
 }
 
-void Classifier::setError(double error) {
+void WeakClassifier::setError(double error) {
 	this->error = error;
 }
