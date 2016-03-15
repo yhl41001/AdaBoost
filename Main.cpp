@@ -23,7 +23,7 @@ int main( int argc, char** argv ){
 	features.push_back(*f);
 
 	AdaBoost* boost = new AdaBoost(features, vector<int>(1, 1), 20);
-	boost->test();
+	boost->train();
 
 
 	delete boost;

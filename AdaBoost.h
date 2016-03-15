@@ -10,7 +10,8 @@
 
 #include <string>
 #include <vector>
-
+#include <math.h>
+#include "classifiers/WeakClassifier.h"
 #include "features/Feature.h"
 
 using namespace std;
@@ -24,13 +25,16 @@ private:
 	vector<Feature> features;
 	vector<int> labels;
 
+	WeakClassifier* trainWeakClassifier();
+	void updateWeights(WeakClassifier* weakClassifier);
+
 public:
 	AdaBoost(vector<Feature> features, vector<int> labels, int iterations);
 	int getIterations() const;
 	void setIterations(int iterations);
 
-	//TODO remove after test
-	void test();
+	void train();
+	void predict();
 	~AdaBoost();
 };
 
