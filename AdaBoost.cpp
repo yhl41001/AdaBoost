@@ -3,10 +3,12 @@
  *
  *  Created on: 15/mar/2016
  *      Author: lorenzocioni
+ *
+ *      Decision stump: Single axis-parallel partition of space
  */
 
 #include "AdaBoost.h"
-#include <iostream>
+
 using namespace std;
 
 AdaBoost::AdaBoost(vector<Feature> features, vector<int> labels, int iterations) :
@@ -50,9 +52,7 @@ void AdaBoost::train(){
 			cout << "stop" << endl;
 		}
 	}
-
 }
-
 
 void AdaBoost::updateWeights(WeakClassifier* weakClassifier){
 	for(int i = 0; i < this->features.size(); ++i){
@@ -66,6 +66,22 @@ void AdaBoost::updateWeights(WeakClassifier* weakClassifier){
 
 WeakClassifier* AdaBoost::trainWeakClassifier(){
 	WeakClassifier* weakClassifier = new WeakClassifier();
+	if(this->features.size() > 0){
+		//Feature vector dimension
+		int size = this->features[0].getFeatures().size();
+		//Iterate through dimensions
+		for(int i = 0; i < size; ++i){
+
+		//	sort(this->features.begin(), this->features.end());
+		}
+
+		for(int j = 0; j < this->features.size(); ++j){
+			this->features[j].print();
+		}
+
+
+	}
+
 
 	//TODO training of classifier
 	return weakClassifier;

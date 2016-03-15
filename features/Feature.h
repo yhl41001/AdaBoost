@@ -9,6 +9,7 @@
 #define FEATURE_FEATURES_H_
 
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
@@ -17,8 +18,11 @@ private:
 	vector<double> features;
 
 public:
-	Feature(vector<double> features): features(features){}
-	~Feature(){};
+	Feature(vector<double> features);
+	~Feature();
+	void print();
+	const vector<double>& getFeatures() const;
+	void setFeatures(const vector<double>& features);
 };
 
 #endif /* FEATURES_FEATURE_H_ */

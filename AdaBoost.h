@@ -11,8 +11,9 @@
 #include <string>
 #include <vector>
 #include <math.h>
+#include <iostream>
+#include <algorithm>
 #include "classifiers/WeakClassifier.h"
-#include "features/Feature.h"
 
 using namespace std;
 
