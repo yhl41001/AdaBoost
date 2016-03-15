@@ -14,12 +14,8 @@ using namespace std;
 
 int main( int argc, char** argv ){
 
-	String filename = "/Applications/MAMP/htdocs/watss/calibration/calibExtr_1.yaml";
-    Mat myMat;
-    FileStorage fs(filename,FileStorage::READ);
-    fs["Rotation"] >> myMat;
+	cout << "AdaBoost classifier" << endl;
 
-    cout << myMat << endl;
-
+	cout << "Funziona!" << endl;
     return 0;
 }
