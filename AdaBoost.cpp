@@ -53,13 +53,12 @@ void AdaBoost::train(){
 			weakClassifier->setAlpha(alpha);
 			updateWeights(weakClassifier);
 			weakClassifier->printInfo();
-
 			classifiers.push_back(*weakClassifier);
 		} else {
-			cout << "stop" << endl;
+			cout << "Error: weak classifier with error > 0.5." << endl;
 		}
 	}
-
+	//showFeatures();
 	//Create strong classifier
 	strongClassifier.setClassifiers(classifiers);
 	strongClassifier.setTrained(true);
@@ -101,8 +100,6 @@ void AdaBoost::updateWeights(WeakClassifier* weakClassifier){
 		//Normalize such that wt+1 is a prob. distribution
 		features[i].setWeight((double) features[i].getWeight()/norm);
 	}
-
-
 }
 
 /***
@@ -174,6 +171,12 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 	return bestWeakClass;
 }
 
+
+void AdaBoost::showFeatures(){
+	for(int i = 0; i < features.size(); ++i){
+		features[i].print();
+	}
+}
 
 int AdaBoost::getIterations() const {
 	return iterations;

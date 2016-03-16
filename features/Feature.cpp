@@ -29,10 +29,10 @@ void Feature::print(){
 	for(int i = 0; i < features.size(); ++i){
 		cout << features[i];
 		if(i < features.size() - 1){
-			cout << ",";
+			cout << ", ";
 		}
 	}
-	cout << "]" << endl;
+	cout << "] (label: " << label << ", weight: " << weight << ")" << endl;
 }
 
 const vector<double>& Feature::getFeatures() const {

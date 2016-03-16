@@ -37,6 +37,7 @@ public:
 	void setIterations(int iterations);
 	void train();
 	int predict(Feature x);
+	void showFeatures();
 	~AdaBoost();
 };
 
