@@ -19,17 +19,17 @@ int main( int argc, char** argv ){
 
 	vector<Feature> features = {
 		*(new Feature(vector<double>{1, 1}, 1)),
-		*(new Feature(vector<double>{1, 2}, 1)),
-		*(new Feature(vector<double>{2, 1.5}, 1)),
-		*(new Feature(vector<double>{3, 2}, 1)),
-		*(new Feature(vector<double>{2.8, 4}, -1)),
-		*(new Feature(vector<double>{3.2, 1}, -1)),
-		*(new Feature(vector<double>{3, 3.5}, -1)),
-		*(new Feature(vector<double>{4, 1.5}, 1)),
-		*(new Feature(vector<double>{4.2, 4}, 1))
+		*(new Feature(vector<double>{1, 2}, 1))
+//		*(new Feature(vector<double>{2, 1.5}, 1)),
+//		*(new Feature(vector<double>{3, 2}, 1)),
+//		*(new Feature(vector<double>{2.8, 4}, -1)),
+//		*(new Feature(vector<double>{3.2, 1}, -1)),
+//		*(new Feature(vector<double>{3, 3.5}, -1)),
+//		*(new Feature(vector<double>{4, 1.5}, 1)),
+//		*(new Feature(vector<double>{4.2, 4}, 1))
 	};
 
-	AdaBoost* boost = new AdaBoost(features, 3);
+	AdaBoost* boost = new AdaBoost(features, 20);
 	boost->train();
 
 	int p = boost->predict(*(new Feature(vector<double>{5, 4})));

@@ -54,6 +54,10 @@ void AdaBoost::train(){
 			updateWeights(weakClassifier);
 			weakClassifier->printInfo();
 			classifiers.push_back(*weakClassifier);
+			//If error is 0, classification is perfect (lineraly separable data)
+			if(error == 0){
+				break;
+			}
 		} else {
 			cout << "Error: weak classifier with error > 0.5." << endl;
 		}
