@@ -17,7 +17,8 @@ using namespace std;
  */
 AdaBoost::AdaBoost(vector<Feature> data, int iterations) :
 	iterations(iterations),
-	features(data){
+	features(data),
+	strongClassifier(*(new StrongClassifier(vector<WeakClassifier>{}))){
 	int size = features.size();
 	cout << "Initializing AdaBoost with " << iterations << " iterations" << endl;
 	cout << "Training size: " << size << "\n" << endl;
@@ -28,14 +29,18 @@ AdaBoost::AdaBoost(vector<Feature> data, int iterations) :
  * with the iteration attributes.
  */
 void AdaBoost::train(){
-	 clock_t c_start = clock();
-	 auto t_start = chrono::high_resolution_clock::now();
+	clock_t c_start = clock();
+	auto t_start = chrono::high_resolution_clock::now();
+
+	//Reinitialize classifier
+	strongClassifier.setTrained(false);
 
 	//Initialize weights
 	for(int m = 0; m < features.size(); ++m){
 		features[m].setWeight((double) 1/features.size());
 	}
 
+	//The vector of weak classifiers
 	vector<WeakClassifier> classifiers;
 
 	//Iterate for the specified iterations
@@ -55,6 +60,10 @@ void AdaBoost::train(){
 		}
 	}
 
+	//Create strong classifier
+	strongClassifier.setClassifiers(classifiers);
+	strongClassifier.setTrained(true);
+
     clock_t c_end = clock();
     auto t_end = chrono::high_resolution_clock::now();
 
@@ -65,6 +74,12 @@ void AdaBoost::train(){
          << " ms\n\n";
 }
 
+/**
+ * Updates features weights according to their errors
+ * Weights of training examples misclassified are increased by ht (x) and
+ * weights of the examples correctly classified are decreased by ht (x) .
+ * In this way, AdaBoost focuses on the most informative or difficult examples.
+ */
 void AdaBoost::updateWeights(WeakClassifier* weakClassifier){
 	for(int i = 0; i < features.size(); ++i){
 		double num = (features[i].getWeight() * exp(-weakClassifier->getAlpha()

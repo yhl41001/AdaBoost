@@ -16,11 +16,16 @@ class StrongClassifier {
 
 private:
 	vector<WeakClassifier> classifiers;
+	bool trained;
 
 public:
-	StrongClassifier();
+	StrongClassifier(vector<WeakClassifier> classifiers);
 	int predict(Feature x);
 	~StrongClassifier();
+	const vector<WeakClassifier>& getClassifiers() const;
+	void setClassifiers(const vector<WeakClassifier>& classifiers);
+	bool isTrained() const;
+	void setTrained(bool trained);
 };
 
 

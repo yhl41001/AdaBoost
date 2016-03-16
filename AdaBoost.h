@@ -17,6 +17,7 @@
 #include <ctime>
 #include "classifiers/WeakClassifier.h"
 #include "features/FeatureComparator.h"
+#include "classifiers/StrongClassifier.h"
 
 using namespace std;
 
@@ -26,7 +27,7 @@ private:
 	int iterations;
 	//Features and labels vector (must be the same size)
 	vector<Feature> features;
-
+	StrongClassifier strongClassifier;
 	WeakClassifier* trainWeakClassifier();
 	void updateWeights(WeakClassifier* weakClassifier);
 
