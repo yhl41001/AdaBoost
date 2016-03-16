@@ -11,6 +11,10 @@
 
 using namespace std;
 
+/**
+ * Initialize a new adaboost object with a vector of training samples (features)
+ * and a given number of iterations
+ */
 AdaBoost::AdaBoost(vector<Feature> data, int iterations) :
 	iterations(iterations),
 	features(data){
@@ -19,14 +23,10 @@ AdaBoost::AdaBoost(vector<Feature> data, int iterations) :
 	cout << "Training size: " << size << "\n" << endl;
 }
 
-int AdaBoost::getIterations() const {
-	return iterations;
-}
-
-void AdaBoost::setIterations(int iterations) {
-	this->iterations = iterations;
-}
-
+/**
+ * Train the AdaBoost classifier with a number of weak classifier specified
+ * with the iteration attributes.
+ */
 void AdaBoost::train(){
 	 clock_t c_start = clock();
 	 auto t_start = chrono::high_resolution_clock::now();
@@ -35,6 +35,8 @@ void AdaBoost::train(){
 	for(int m = 0; m < features.size(); ++m){
 		features[m].setWeight((double) 1/features.size());
 	}
+
+	vector<WeakClassifier> classifiers;
 
 	//Iterate for the specified iterations
 	for (int i = 0; i < this->iterations; ++i) {
@@ -46,6 +48,8 @@ void AdaBoost::train(){
 			weakClassifier->setAlpha(alpha);
 			updateWeights(weakClassifier);
 			weakClassifier->printInfo();
+
+			classifiers.push_back(*weakClassifier);
 		} else {
 			cout << "stop" << endl;
 		}
@@ -65,7 +69,7 @@ void AdaBoost::updateWeights(WeakClassifier* weakClassifier){
 	for(int i = 0; i < features.size(); ++i){
 		double num = (features[i].getWeight() * exp(-weakClassifier->getAlpha()
 				* features[i].getLabel() * weakClassifier->predict(this->features[i])));
-		double normalisation = 1;
+		double normalisation = 1;//FIXME weights are not normalized
 		//Normalize such that wt+1 is a prob. distribution
 		features[i].setWeight(num/normalisation);
 	}
@@ -83,8 +87,6 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 
 		//Cumulative sums
 		vector<double> w;
-
-		//Best weak classifier
 
 		//Iterate through dimensions
 		for(int j = 0; j < size; ++j){
@@ -130,7 +132,6 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 			weakClassifier->setThreshold(threshold);
 
 			double error = weakClassifier->evaluateError(features);
-
 			if(error < bestWeakClass->getError()){
 				bestWeakClass->setError(error);
 				bestWeakClass->setDimension(j);
@@ -140,14 +141,22 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 			}
 		}
 	}
-
 	return bestWeakClass;
 }
 
+
+int AdaBoost::getIterations() const {
+	return iterations;
+}
+
+void AdaBoost::setIterations(int iterations) {
+	this->iterations = iterations;
+}
+
+/**
+ * Deconstructor: free memory
+ */
 AdaBoost::~AdaBoost(){
 	features.clear();
 	cout << "Removing AdaBoost from memory" << endl;
 }
-
-
-
