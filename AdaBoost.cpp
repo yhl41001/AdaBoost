@@ -11,18 +11,12 @@
 
 using namespace std;
 
-AdaBoost::AdaBoost(vector<Feature> features, vector<int> labels, int iterations) :
+AdaBoost::AdaBoost(vector<Feature> data, int iterations) :
 	iterations(iterations),
-	features(features),
-	labels(labels){
-
-	if(features.size() == labels.size()){
-		int size = features.size();
-		cout << "Initializing AdaBoost with " << iterations << " iterations" << endl;
-		cout << "Training size: " << size << endl;
-	} else {
-		cout << "Error: features and labels must be in equal number." << endl;
-	}
+	features(data){
+	int size = features.size();
+	cout << "Initializing AdaBoost with " << iterations << " iterations" << endl;
+	cout << "Training size: " << size << "\n" << endl;
 }
 
 int AdaBoost::getIterations() const {
@@ -34,68 +28,124 @@ void AdaBoost::setIterations(int iterations) {
 }
 
 void AdaBoost::train(){
+	 clock_t c_start = clock();
+	 auto t_start = chrono::high_resolution_clock::now();
+
 	//Initialize weights
-	int n = this->features.size();
-	this->weights = vector<double>(n, (double) 1/n);
+	for(int m = 0; m < features.size(); ++m){
+		features[m].setWeight((double) 1/features.size());
+	}
 
 	//Iterate for the specified iterations
 	for (int i = 0; i < this->iterations; ++i) {
+		cout << "Iteration: " << (i + 1) << " | ";
 		WeakClassifier* weakClassifier = trainWeakClassifier();
 		double error = weakClassifier->getError();
 		if(error < 0.5){
-			double alpha = 1/2 * log((1 - error)/error);
+			double alpha = 0.5 * log((1 - error)/error);
 			weakClassifier->setAlpha(alpha);
 			updateWeights(weakClassifier);
-
 			weakClassifier->printInfo();
 		} else {
 			cout << "stop" << endl;
 		}
 	}
+
+    clock_t c_end = clock();
+    auto t_end = chrono::high_resolution_clock::now();
+
+    cout << std::fixed << "\nCPU time used: "
+         << 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC << " ms\n"
+         << "Time: "
+         << chrono::duration<double, milli>(t_end - t_start).count()
+         << " ms\n\n";
 }
 
 void AdaBoost::updateWeights(WeakClassifier* weakClassifier){
-	for(int i = 0; i < this->features.size(); ++i){
-		double num = (this->weights[i] * exp(-weakClassifier->getAlpha()
-				* this->labels[i] * weakClassifier->predict(this->features[i])));
+	for(int i = 0; i < features.size(); ++i){
+		double num = (features[i].getWeight() * exp(-weakClassifier->getAlpha()
+				* features[i].getLabel() * weakClassifier->predict(this->features[i])));
 		double normalisation = 1;
 		//Normalize such that wt+1 is a prob. distribution
-		this->weights[i] = num/normalisation;
+		features[i].setWeight(num/normalisation);
 	}
 }
 
+/***
+ * Train weak classifier on training data choosing the one minimizing the error
+ */
 WeakClassifier* AdaBoost::trainWeakClassifier(){
+	WeakClassifier* bestWeakClass = new WeakClassifier();
 
-	for(int j = 0; j < this->features.size(); ++j){
-				this->features[j].print();
+	if(features.size() > 0){
+		//Feature vector dimension
+		int size = features[0].getFeatures().size();
+
+		//Cumulative sums
+		vector<double> w;
+
+		//Best weak classifier
+
+		//Iterate through dimensions
+		for(int j = 0; j < size; ++j){
+			WeakClassifier* weakClassifier = new WeakClassifier();
+			weakClassifier->setDimension(j);
+
+			//Sorts vector of features according to the j-th dimension
+			sort(features.begin(), features.end(), FeatureComparator(j));
+
+			w.clear();
+			double sum = 0;
+
+			//Iterates features
+			for(int i = 0; i < features.size(); ++i){
+				sum = sum + features[i].getWeight() * features[i].getLabel();
+				w.push_back(sum);
 			}
 
-	WeakClassifier* weakClassifier = new WeakClassifier();
-	if(this->features.size() > 0){
-		//Feature vector dimension
-		int size = this->features[0].getFeatures().size();
-		//Iterate through dimensions
-		for(int i = 0; i < size; ++i){
+			//Retrieving min and max of the sums
+			auto result = minmax_element(w.begin(), w.end());
+			double min = w[result.first - w.begin()];
+			double max = w[result.second - w.begin()];
+			int index;
+			double threshold;
 
-			sort(this->features.begin(), this->features.end(), FeatureComparator(i));
+			if(abs(min) > abs(max)){
+				//Negative values
+				index = result.first - w.begin();
+
+			} else {
+				//Positive values
+				index = result.second - w.begin();
+			}
+
+			if(w[index] > 0){
+				weakClassifier->setSign(POSITIVE);
+			} else {
+				weakClassifier->setSign(NEGATIVE);
+			}
+
+			//Setting threshold
+			threshold = (features[index]).getFeatures()[j];
+			weakClassifier->setThreshold(threshold);
+
+			double error = weakClassifier->evaluateError(features);
+
+			if(error < bestWeakClass->getError()){
+				bestWeakClass->setError(error);
+				bestWeakClass->setDimension(j);
+				bestWeakClass->setThreshold(threshold);
+				bestWeakClass->setMisclassified(weakClassifier->getMisclassified());
+				bestWeakClass->setSign(weakClassifier->getSign());
+			}
 		}
-
-		for(int j = 0; j < this->features.size(); ++j){
-			this->features[j].print();
-		}
-
-
 	}
 
-
-	//TODO training of classifier
-	return weakClassifier;
+	return bestWeakClass;
 }
 
 AdaBoost::~AdaBoost(){
-	weights.clear();
 	features.clear();
-	labels.clear();
 	cout << "Removing AdaBoost from memory" << endl;
 }
 

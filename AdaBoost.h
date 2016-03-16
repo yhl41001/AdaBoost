@@ -10,9 +10,11 @@
 
 #include <string>
 #include <vector>
-#include <math.h>
+#include <cmath>
 #include <iostream>
 #include <algorithm>
+#include <chrono>
+#include <ctime>
 #include "classifiers/WeakClassifier.h"
 #include "features/FeatureComparator.h"
 
@@ -22,16 +24,14 @@ class AdaBoost {
 
 private:
 	int iterations;
-	vector<double> weights;
 	//Features and labels vector (must be the same size)
 	vector<Feature> features;
-	vector<int> labels;
 
 	WeakClassifier* trainWeakClassifier();
 	void updateWeights(WeakClassifier* weakClassifier);
 
 public:
-	AdaBoost(vector<Feature> features, vector<int> labels, int iterations);
+	AdaBoost(vector<Feature> data, int iterations);
 	int getIterations() const;
 	void setIterations(int iterations);
 
@@ -39,6 +39,5 @@ public:
 	void predict();
 	~AdaBoost();
 };
-
 
 #endif /* ADABOOST_H_ */

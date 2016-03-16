@@ -17,17 +17,19 @@ int main( int argc, char** argv ){
 
 	cout << "AdaBoost classifier" << endl;
 
-	vector<Feature> features;
+	vector<Feature> features = {
+		*(new Feature(vector<double>{1, 1}, 1)),
+		*(new Feature(vector<double>{1, 2}, 1)),
+		*(new Feature(vector<double>{2, 1.5}, 1)),
+		*(new Feature(vector<double>{3, 2}, 1)),
+		*(new Feature(vector<double>{2.8, 4}, -1)),
+		*(new Feature(vector<double>{3.2, 1}, -1)),
+		*(new Feature(vector<double>{3, 3.5}, -1)),
+		*(new Feature(vector<double>{4, 1.5}, 1)),
+		*(new Feature(vector<double>{4.2, 4}, 1))
+	};
 
-	Feature* f2 = new Feature(vector<double>(3, 2));
-	Feature* f3 = new Feature(vector<double>(3, 4));
-	Feature* f = new Feature(vector<double>(3, 1));
-
-	features.push_back(*f2);
-	features.push_back(*f3);
-	features.push_back(*f);
-
-	AdaBoost* boost = new AdaBoost(features, vector<int>(3, 1), 20);
+	AdaBoost* boost = new AdaBoost(features, 1);
 	boost->train();
 
 

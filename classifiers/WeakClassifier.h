@@ -9,7 +9,11 @@
 #define CLASSIFIERS_WEAKCLASSIFIER_H_
 
 #include <iostream>
+#include <vector>
 #include "../features/Feature.h"
+#include "../utils/utils.h"
+
+using namespace std;
 
 class WeakClassifier {
 
@@ -18,10 +22,13 @@ private:
 	int dimension;
 	double threshold;
 	double alpha;
+	example sign;
+	int misclassified;
 
 public:
 	WeakClassifier();
 	int predict(Feature x);
+	double evaluateError(vector<Feature> features);
 	void printInfo();
 	double getError() const;
 	void setError(double error);
@@ -32,6 +39,11 @@ public:
 	double getAlpha() const;
 	void setAlpha(double alpha);
 	~WeakClassifier() {}
+
+	example getSign() const;
+	void setSign(example sign);
+	int getMisclassified() const;
+	void setMisclassified(int misclassified);
 };
 
 #endif /* CLASSIFIERS_WEAKCLASSIFIER_H_ */
