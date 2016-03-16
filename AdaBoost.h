@@ -14,6 +14,7 @@
 #include <iostream>
 #include <algorithm>
 #include "classifiers/WeakClassifier.h"
+#include "features/FeatureComparator.h"
 
 using namespace std;
 

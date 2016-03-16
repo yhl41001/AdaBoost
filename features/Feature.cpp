@@ -14,9 +14,11 @@ Feature::~Feature() {
 }
 
 void Feature::print(){
+	cout << "[";
 	for(std::vector<double>::iterator it = features.begin(); it != features.end(); ++it) {
-	    std::cout << *it;
+	    std::cout << *it << " ";
 	}
+	cout << "]" << endl;
 }
 
 const vector<double>& Feature::getFeatures() const {

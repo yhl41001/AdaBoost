@@ -65,6 +65,11 @@ void AdaBoost::updateWeights(WeakClassifier* weakClassifier){
 }
 
 WeakClassifier* AdaBoost::trainWeakClassifier(){
+
+	for(int j = 0; j < this->features.size(); ++j){
+				this->features[j].print();
+			}
+
 	WeakClassifier* weakClassifier = new WeakClassifier();
 	if(this->features.size() > 0){
 		//Feature vector dimension
@@ -72,7 +77,7 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 		//Iterate through dimensions
 		for(int i = 0; i < size; ++i){
 
-		//	sort(this->features.begin(), this->features.end());
+			sort(this->features.begin(), this->features.end(), FeatureComparator(i));
 		}
 
 		for(int j = 0; j < this->features.size(); ++j){
