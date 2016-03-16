@@ -29,7 +29,7 @@ int main( int argc, char** argv ){
 		*(new Feature(vector<double>{4.2, 4}, 1))
 	};
 
-	AdaBoost* boost = new AdaBoost(features, 1);
+	AdaBoost* boost = new AdaBoost(features, 3);
 	boost->train();
 
 	int p = boost->predict(*(new Feature(vector<double>{5, 4})));

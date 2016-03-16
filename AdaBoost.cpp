@@ -90,13 +90,19 @@ int AdaBoost::predict(Feature x){
  * In this way, AdaBoost focuses on the most informative or difficult examples.
  */
 void AdaBoost::updateWeights(WeakClassifier* weakClassifier){
+	double norm = 0;
 	for(int i = 0; i < features.size(); ++i){
 		double num = (features[i].getWeight() * exp(-weakClassifier->getAlpha()
 				* features[i].getLabel() * weakClassifier->predict(this->features[i])));
-		double normalisation = 1;//FIXME weights are not normalized
-		//Normalize such that wt+1 is a prob. distribution
-		features[i].setWeight(num/normalisation);
+		norm += num;
+		features[i].setWeight(num);
 	}
+	for(int i = 0; i < features.size(); ++i){
+		//Normalize such that wt+1 is a prob. distribution
+		features[i].setWeight((double) features[i].getWeight()/norm);
+	}
+
+
 }
 
 /***
