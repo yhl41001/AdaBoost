@@ -20,6 +20,7 @@ private:
 	double weight;
 
 public:
+	Feature(vector<double> features);
 	Feature(vector<double> features, int label);
 	~Feature();
 	void print();

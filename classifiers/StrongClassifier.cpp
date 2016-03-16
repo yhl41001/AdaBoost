@@ -12,7 +12,15 @@ StrongClassifier::StrongClassifier(vector<WeakClassifier> classifiers):
 	trained(false){}
 
 int StrongClassifier::predict(Feature x){
-	return 1;
+	double sum = 0;
+	for(int i = 0; i < classifiers.size(); ++i){
+		sum += classifiers[i].getAlpha() * classifiers[i].predict(x);
+	}
+	if(sum > 0){
+		return 1;
+	} else {
+		return -1;
+	}
 }
 
 const vector<WeakClassifier>& StrongClassifier::getClassifiers() const {

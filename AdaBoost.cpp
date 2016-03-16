@@ -74,6 +74,15 @@ void AdaBoost::train(){
          << " ms\n\n";
 }
 
+int AdaBoost::predict(Feature x){
+	if(strongClassifier.isTrained()){
+		return strongClassifier.predict(x);
+	} else {
+		cout << "The classifier is not trained. Please train the classifier first." << endl;
+		return 0;
+	}
+}
+
 /**
  * Updates features weights according to their errors
  * Weights of training examples misclassified are increased by ht (x) and

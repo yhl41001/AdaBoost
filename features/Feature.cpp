@@ -7,7 +7,15 @@
 
 #include "Feature.h"
 
-Feature::Feature(vector<double> features, int label): features(features), label(label), weight(0.){}
+Feature::Feature(vector<double> features, int label):
+	features(features),
+	label(label),
+	weight(0.){}
+
+Feature::Feature(vector<double> features):
+	features(features),
+	label(0),
+	weight(0.){}
 
 Feature::~Feature() {
 	features.clear();

@@ -32,7 +32,9 @@ int main( int argc, char** argv ){
 	AdaBoost* boost = new AdaBoost(features, 1);
 	boost->train();
 
+	int p = boost->predict(*(new Feature(vector<double>{5, 4})));
 
+	cout << p << endl;
 	delete boost;
     return 0;
 }

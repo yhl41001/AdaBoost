@@ -35,9 +35,8 @@ public:
 	AdaBoost(vector<Feature> data, int iterations);
 	int getIterations() const;
 	void setIterations(int iterations);
-
 	void train();
-	void predict();
+	int predict(Feature x);
 	~AdaBoost();
 };
 
