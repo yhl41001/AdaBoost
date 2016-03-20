@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
+#include <opencv2/core.hpp>
 #include "adaboost/AdaBoost.h"
 #include "features/Feature.h"
 
