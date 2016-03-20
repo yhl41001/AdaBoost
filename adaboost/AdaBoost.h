@@ -5,8 +5,8 @@
  *      Author: lorenzocioni
  */
 
-#ifndef ADABOOST_H_
-#define ADABOOST_H_
+#ifndef ADABOOST_ADABOOST_H_
+#define ADABOOST_ADABOOST_H_
 
 #include <string>
 #include <vector>
@@ -41,4 +41,4 @@ public:
 	~AdaBoost();
 };
 
-#endif /* ADABOOST_H_ */
+#endif /* ADABOOST_ADABOOST_H_ */

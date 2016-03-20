@@ -8,7 +8,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "AdaBoost.h"
+
+#include "adaboost/AdaBoost.h"
 #include "features/Feature.h"
 
 using namespace std;
