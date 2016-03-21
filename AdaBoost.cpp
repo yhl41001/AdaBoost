@@ -7,7 +7,7 @@
  *      Decision stump: Single axis-parallel partition of space
  */
 
-#include "adaboost/AdaBoost.h"
+#include "AdaBoost.h"
 
 using namespace std;
 

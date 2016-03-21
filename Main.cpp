@@ -9,12 +9,21 @@
 #include <string>
 #include <vector>
 #include <opencv2/core.hpp>
-#include "adaboost/AdaBoost.h"
+#include "AdaBoost.h"
+#include "opencv2/highgui/highgui.hpp"
 #include "features/Feature.h"
 
 using namespace std;
+using namespace cv;
 
 int main( int argc, char** argv ){
+
+	string imagesPath = "/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/images/addams-family.gif";
+
+	Mat img = imread(imagesPath);
+
+	cout << "test";
+	cout << img << endl;
 
 	cout << "AdaBoost classifier" << endl;
 
