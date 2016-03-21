@@ -10,7 +10,7 @@
 
 #include <vector>
 #include "WeakClassifier.h"
-#include "../features/Feature.h"
+#include "../features/Data.h"
 
 class StrongClassifier {
 
@@ -20,7 +20,7 @@ private:
 
 public:
 	StrongClassifier(vector<WeakClassifier> classifiers);
-	int predict(Feature x);
+	int predict(Data x);
 	~StrongClassifier();
 	const vector<WeakClassifier>& getClassifiers() const;
 	void setClassifiers(const vector<WeakClassifier>& classifiers);

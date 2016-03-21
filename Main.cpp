@@ -10,26 +10,27 @@
 #include <vector>
 #include <opencv2/core.hpp>
 #include "AdaBoost.h"
+#include "features/Data.h"
 #include "opencv2/highgui/highgui.hpp"
-#include "features/Feature.h"
+#include "utils/IntegralImage.h"
+
 
 using namespace std;
 using namespace cv;
 
 int main( int argc, char** argv ){
 
-	string imagesPath = "/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/images/addams-family.gif";
+	string imagesPath = "./images/2002/07/19/big/img_130.jpg";
 
-	Mat img = imread(imagesPath);
+	Mat img = imread(imagesPath, IMREAD_GRAYSCALE);
 
-	cout << "test";
-	cout << img << endl;
+	IntegralImage* intImage = new IntegralImage(img);
 
 	cout << "AdaBoost classifier" << endl;
 
-	vector<Feature> features = {
-		*(new Feature(vector<double>{1, 1}, 1)),
-		*(new Feature(vector<double>{1, 2}, 1))
+	vector<Data> features = {
+		*(new Data(vector<double>{1, 1}, 1)),
+		*(new Data(vector<double>{1, 2}, 1))
 //		*(new Feature(vector<double>{2, 1.5}, 1)),
 //		*(new Feature(vector<double>{3, 2}, 1)),
 //		*(new Feature(vector<double>{2.8, 4}, -1)),
@@ -42,7 +43,7 @@ int main( int argc, char** argv ){
 	AdaBoost* boost = new AdaBoost(features, 20);
 	boost->train();
 
-	int p = boost->predict(*(new Feature(vector<double>{5, 4})));
+	int p = boost->predict(*(new Data(vector<double>{5, 4})));
 
 	cout << p << endl;
 	delete boost;

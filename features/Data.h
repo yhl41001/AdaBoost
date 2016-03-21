@@ -1,28 +1,28 @@
 /*
- * Feature.h
+ * Data.h
  *
  *  Created on: 15/mar/2016
  *      Author: lorenzocioni
  */
 
-#ifndef FEATURE_FEATURES_H_
-#define FEATURE_FEATURES_H_
+#ifndef FEATURE_DATA_H_
+#define FEATURE_DATA_H_
 
 #include <vector>
 #include <iostream>
 
 using namespace std;
 
-class Feature {
+class Data {
 private:
 	vector<double> features;
 	int label;
 	double weight;
 
 public:
-	Feature(vector<double> features);
-	Feature(vector<double> features, int label);
-	~Feature();
+	Data(vector<double> features);
+	Data(vector<double> features, int label);
+	~Data();
 	void print();
 	const vector<double>& getFeatures() const;
 	void setFeatures(const vector<double>& features);

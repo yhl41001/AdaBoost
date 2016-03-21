@@ -26,17 +26,17 @@ class AdaBoost {
 private:
 	int iterations;
 	//Features and labels vector (must be the same size)
-	vector<Feature> features;
+	vector<Data> features;
 	StrongClassifier strongClassifier;
 	WeakClassifier* trainWeakClassifier();
 	void updateWeights(WeakClassifier* weakClassifier);
 
 public:
-	AdaBoost(vector<Feature> data, int iterations);
+	AdaBoost(vector<Data> data, int iterations);
 	int getIterations() const;
 	void setIterations(int iterations);
 	void train();
-	int predict(Feature x);
+	int predict(Data x);
 	void showFeatures();
 	~AdaBoost();
 };

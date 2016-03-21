@@ -15,7 +15,7 @@ using namespace std;
  * Initialize a new adaboost object with a vector of training samples (features)
  * and a given number of iterations
  */
-AdaBoost::AdaBoost(vector<Feature> data, int iterations) :
+AdaBoost::AdaBoost(vector<Data> data, int iterations) :
 	iterations(iterations),
 	features(data),
 	strongClassifier(*(new StrongClassifier(vector<WeakClassifier>{}))){
@@ -77,7 +77,7 @@ void AdaBoost::train(){
          << " ms\n\n";
 }
 
-int AdaBoost::predict(Feature x){
+int AdaBoost::predict(Data x){
 	if(strongClassifier.isTrained()){
 		return strongClassifier.predict(x);
 	} else {

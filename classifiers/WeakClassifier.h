@@ -10,7 +10,8 @@
 
 #include <iostream>
 #include <vector>
-#include "../features/Feature.h"
+
+#include "../features/Data.h"
 #include "../utils/utils.h"
 
 using namespace std;
@@ -27,8 +28,8 @@ private:
 
 public:
 	WeakClassifier();
-	int predict(Feature x);
-	double evaluateError(vector<Feature> features);
+	int predict(Data x);
+	double evaluateError(vector<Data> features);
 	void printInfo();
 	double getError() const;
 	void setError(double error);

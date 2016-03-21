@@ -10,13 +10,14 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
-#include "Feature.h"
 
-class FeatureComparator: public std::binary_function<bool, const Feature*, const Feature*> {
+#include "Data.h"
+
+class FeatureComparator: public std::binary_function<bool, const Data*, const Data*> {
 	int dim;
 public:
 	FeatureComparator(int d) : dim(d) {}
-    bool operator()(Feature const f1, Feature const f2) const {
+    bool operator()(Data const f1, Data const f2) const {
     	return (f1.getFeatures())[dim] < (f2.getFeatures())[dim];
     }
 };

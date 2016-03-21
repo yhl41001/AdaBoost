@@ -14,7 +14,7 @@ WeakClassifier::WeakClassifier(): error(1.), dimension(0),
 /**
  * Predict feature label
  */
-int WeakClassifier::predict(Feature x){
+int WeakClassifier::predict(Data x){
 	if(x.getFeatures()[dimension] <= threshold){
 		if(sign == POSITIVE) return 1;
 		else return -1;
@@ -27,7 +27,7 @@ int WeakClassifier::predict(Feature x){
 /**
  * Evaluate error base on weights and misclassified samples
  */
-double WeakClassifier::evaluateError(vector<Feature> features){
+double WeakClassifier::evaluateError(vector<Data> features){
 	double error = 0;
 	misclassified = 0;
 	for(int i = 0; i < features.size(); ++i){

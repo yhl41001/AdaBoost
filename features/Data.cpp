@@ -1,30 +1,30 @@
 /*
- * Feature.cpp
+ * Data.cpp
  *
  *  Created on: 15/mar/2016
  *      Author: lorenzocioni
  */
 
-#include "Feature.h"
+#include "Data.h"
 
-Feature::Feature(vector<double> features, int label):
+Data::Data(vector<double> features, int label):
 	features(features),
 	label(label),
 	weight(0.){}
 
-Feature::Feature(vector<double> features):
+Data::Data(vector<double> features):
 	features(features),
 	label(0),
 	weight(0.){}
 
-Feature::~Feature() {
+Data::~Data() {
 	features.clear();
 }
 
 /**
  * Print the vector of features
  */
-void Feature::print(){
+void Data::print(){
 	cout << "[";
 	for(int i = 0; i < features.size(); ++i){
 		cout << features[i];
@@ -35,26 +35,26 @@ void Feature::print(){
 	cout << "] (label: " << label << ", weight: " << weight << ")" << endl;
 }
 
-const vector<double>& Feature::getFeatures() const {
+const vector<double>& Data::getFeatures() const {
 	return features;
 }
 
-void Feature::setFeatures(const vector<double>& features) {
+void Data::setFeatures(const vector<double>& features) {
 	this->features = features;
 }
 
-int Feature::getLabel() const {
+int Data::getLabel() const {
 	return label;
 }
 
-double Feature::getWeight() const {
+double Data::getWeight() const {
 	return weight;
 }
 
-void Feature::setWeight(double weight) {
+void Data::setWeight(double weight) {
 	this->weight = weight;
 }
 
-void Feature::setLabel(int label) {
+void Data::setLabel(int label) {
 	this->label = label;
 }
