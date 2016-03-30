@@ -9,19 +9,19 @@
 #define UTILS_INTEGRALIMAGE_H_
 
 #include <opencv2/core.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 using namespace cv;
 
 class IntegralImage {
 
 private:
-	Mat img;
 	Mat integralImg;
-
-	void computeIntegralImage(Mat img);
 
 public:
 	IntegralImage(Mat img);
+	Mat computeIntegralImage(Mat img);
+	double computeArea(Rect r);
 	~IntegralImage();
 };
 

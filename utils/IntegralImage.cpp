@@ -9,24 +9,25 @@
 #include <iostream>
 
 using namespace std;
+using namespace cv;
 
-IntegralImage::IntegralImage(Mat img): img(img){
-	computeIntegralImage(img);
+IntegralImage::IntegralImage(Mat img){
+	cout << "Init integral image" << endl;
+	this->integralImg = computeIntegralImage(img);
 }
 
-void IntegralImage::computeIntegralImage(Mat img){
-	this->integralImg = Mat::zeros(img.rows, img.cols, CV_32F);
+double IntegralImage::computeArea(Rect r){
+	double a1 = this->integralImg.at<double>(r.x + r.width, r.y + r.height);
+	double a2 = this->integralImg.at<double>(r.x, r.y);
+	double a3 = this->integralImg.at<double>(r.x + r.width, r.y);
+	double a4 = this->integralImg.at<double>(r.x, r.y + r.height);
+	return a1 + a2 - a3 - a4;
+}
 
-	for(int i = 0; i < img.rows; ++i){
-		for(int j = 0; i < img.cols; ++j){
-			this->integralImg.at<double>(i, j) = img.at<double>(i, j);
-			if(i > 0) this->integralImg.at<double>(i, j) += this->integralImg.at<double>(i - 1, j);
-			if(j > 0) this->integralImg.at<double>(i, j) += this->integralImg.at<double>(i, j - 1);
-			if(i > 0 && j > 0) this->integralImg.at<double>(i, j) -= this->integralImg.at<double>(i - 1, j - 1);
-		}
-	}
-
-	cout << this->integralImg << endl;
+Mat IntegralImage::computeIntegralImage(Mat img){
+	Mat output;
+	integral(img, output, CV_64F);
+	return output;
 }
 
 
