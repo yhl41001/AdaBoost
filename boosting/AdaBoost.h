@@ -5,8 +5,8 @@
  *      Author: lorenzocioni
  */
 
-#ifndef ADABOOST_H_
-#define ADABOOST_H_
+#ifndef BOOSTING_ADABOOST_H_
+#define BOOSTING_ADABOOST_H_
 
 #include <string>
 #include <vector>
@@ -15,9 +15,10 @@
 #include <algorithm>
 #include <chrono>
 #include <ctime>
+
+#include "classifiers/StrongClassifier.h"
 #include "classifiers/WeakClassifier.h"
 #include "features/FeatureComparator.h"
-#include "classifiers/StrongClassifier.h"
 
 using namespace std;
 
@@ -41,4 +42,4 @@ public:
 	~AdaBoost();
 };
 
-#endif /* ADABOOST_H_ */
+#endif /* BOOSTING_ADABOOST_H_ */

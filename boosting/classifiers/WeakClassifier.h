@@ -5,8 +5,8 @@
  *      Author: lorenzocioni
  */
 
-#ifndef CLASSIFIERS_WEAKCLASSIFIER_H_
-#define CLASSIFIERS_WEAKCLASSIFIER_H_
+#ifndef BOOSTING_CLASSIFIERS_WEAKCLASSIFIER_H_
+#define BOOSTING_CLASSIFIERS_WEAKCLASSIFIER_H_
 
 #include <iostream>
 #include <vector>
@@ -47,4 +47,4 @@ public:
 	void setMisclassified(int misclassified);
 };
 
-#endif /* CLASSIFIERS_WEAKCLASSIFIER_H_ */
+#endif /* BOOSTING_CLASSIFIERS_WEAKCLASSIFIER_H_ */

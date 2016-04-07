@@ -5,8 +5,8 @@
  *      Author: lorenzocioni
  */
 
-#ifndef UTILS_UTILS_H_
-#define UTILS_UTILS_H_
+#ifndef BOOSTING_UTILS_UTILS_H_
+#define BOOSTING_UTILS_UTILS_H_
 
 enum example {POSITIVE, NEGATIVE};
 
@@ -15,4 +15,4 @@ template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
 
-#endif /* UTILS_UTILS_H_ */
+#endif /* BOOSTING_UTILS_UTILS_H_ */

@@ -9,10 +9,11 @@
 #include <string>
 #include <vector>
 #include <opencv2/core.hpp>
-#include "AdaBoost.h"
-#include "features/Data.h"
+#include "boosting/AdaBoost.h"
+#include "boosting/features/Data.h"
+#include "facedetector/utils/IntegralImage.h"
+#include "facedetector/features/HaarFeatures.h"
 #include "opencv2/highgui/highgui.hpp"
-#include "utils/IntegralImage.h"
 
 using namespace std;
 using namespace cv;
@@ -24,8 +25,15 @@ int main( int argc, char** argv ){
 	Mat img = imread(imagesPath, IMREAD_GRAYSCALE);
 
 	IntegralImage* intImage = new IntegralImage(img);
-	double a = intImage->computeArea(Rect(1, 1, 1, 1));
-	cout << a <<endl;
+
+	Mat subwindow = img(Rect(0, 0, 23, 23));
+
+	HaarFeatures* haar = new HaarFeatures();
+	haar->extractFeatures(subwindow, *intImage, 0, 0);
+
+
+	//double a = intImage->computeArea(Rect(1, 1, 1, 1));
+	//cout << a <<endl;
 
 	cout << "AdaBoost classifier" << endl;
 

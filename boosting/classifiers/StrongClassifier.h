@@ -5,10 +5,11 @@
  *      Author: lorenzocioni
  */
 
-#ifndef CLASSIFIERS_STRONGCLASSIFIER_H_
-#define CLASSIFIERS_STRONGCLASSIFIER_H_
+#ifndef BOOSTING_CLASSIFIERS_STRONGCLASSIFIER_H_
+#define BOOSTING_CLASSIFIERS_STRONGCLASSIFIER_H_
 
 #include <vector>
+
 #include "WeakClassifier.h"
 #include "../features/Data.h"
 
@@ -30,4 +31,4 @@ public:
 
 
 
-#endif /* CLASSIFIERS_STRONGCLASSIFIER_H_ */
+#endif /* BOOSTING_CLASSIFIERS_STRONGCLASSIFIER_H_ */

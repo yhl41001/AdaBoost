@@ -5,8 +5,8 @@
  *      Author: lorenzocioni
  */
 
-#ifndef FEATURES_FEATURECOMPARATOR_H_
-#define FEATURES_FEATURECOMPARATOR_H_
+#ifndef BOOSTING_FEATURES_FEATURECOMPARATOR_H_
+#define BOOSTING_FEATURES_FEATURECOMPARATOR_H_
 #include <vector>
 #include <algorithm>
 #include <functional>
@@ -22,4 +22,4 @@ public:
     }
 };
 
-#endif /* FEATURES_FEATURECOMPARATOR_H_ */
+#endif /* BOOSTING_FEATURES_FEATURECOMPARATOR_H_ */

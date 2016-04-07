@@ -5,8 +5,8 @@
  *      Author: lorenzocioni
  */
 
-#ifndef UTILS_INTEGRALIMAGE_H_
-#define UTILS_INTEGRALIMAGE_H_
+#ifndef FACEDETECTOR_UTILS_INTEGRALIMAGE_H_
+#define FACEDETECTOR_UTILS_INTEGRALIMAGE_H_
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -27,4 +27,4 @@ public:
 
 
 
-#endif /* UTILS_INTEGRALIMAGE_H_ */
+#endif /* FACEDETECTOR_UTILS_INTEGRALIMAGE_H_ */
