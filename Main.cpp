@@ -29,7 +29,7 @@ int main( int argc, char** argv ){
 	Mat subwindow = img(Rect(0, 0, 23, 23));
 
 	HaarFeatures* haar = new HaarFeatures();
-	haar->extractFeatures(subwindow, *intImage, 0, 0);
+	haar->extractFeatures(subwindow, *intImage, 150, 200);
 
 
 	//double a = intImage->computeArea(Rect(1, 1, 1, 1));

@@ -7,43 +7,41 @@
 
 #include "HaarFeatures.h"
 
-HaarFeatures::HaarFeatures(){}
+HaarFeatures::HaarFeatures() {
+}
 
-vector<double> HaarFeatures::extractFeatures(Mat real, IntegralImage img, int r, int c){
+vector<double> HaarFeatures::extractFeatures(Mat real, IntegralImage img, int r, int c) {
 	vector<double> features;
-	double white, black;
-	/**
-	 * Compute feature type (a): horizontal, white left, black right
-	 */
+	const int types[][2] = { { 2, 1 }, { 1, 2 }, { 3, 1 }, { 1, 3 }, { 2, 2 } };
 
 	int count = 0;
-
-	for(int w = 1; w < WINDOW/2; ++w){
-		for(int i = 0; i < WINDOW - 2 * w + 1; ++i){
-			for(int j = 0; j < WINDOW - w + 1; ++j){
-				Mat tmp;
-				real.copyTo(tmp);
-
-				rectangle(tmp, Rect(j + c, i + r, w, w), Scalar(255, 255, 255), CV_FILLED);
-				rectangle(tmp, Rect(j + c + w, i + r, w, w), Scalar(40, 40, 40), CV_FILLED);
-
-				imshow("img", tmp);
-				waitKey(10);
-
-//
-//								white = img.computeArea(Rect(i + r, j + c, h, w));
-//							    black = img.computeArea(Rect(i + r, j + c + w, h, w));
-//							    features.push_back((double) (white - black));
-								count++;
-							    cout << "extracted feature: " << count << endl;
-
+	double white, black;
+	int i, x, y, sizeX, sizeY, width, height;
+	for (i = 0; i < sizeof(types); i++) {
+		sizeX = types[i][0];
+		sizeY = types[i][1];
+		/* each size (multiples of basic shapes) */
+		for (width = sizeX; width <= WINDOW; width += sizeX) {
+			for (height = sizeY; height <= WINDOW; height += sizeY) {
+				/* each possible position given size */
+				for (x = 0; x <= WINDOW - width; x++) {
+					for (y = 0; y <= WINDOW - height; y++) {
+						white = img.computeArea(Rect(y + r, x + c, width/2, height));
+						black = img.computeArea(Rect(y + r, x + c + width/2, width/2, height));
+						cout << white - black << endl;
+						features.push_back((double) (white - black));
+						count++;
+					}
+				}
 			}
 		}
 	}
 
+	cout << count << endl;
 
 	return features;
 }
 
-HaarFeatures::~HaarFeatures(){}
+HaarFeatures::~HaarFeatures() {
+}
 
