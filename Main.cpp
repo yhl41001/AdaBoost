@@ -24,7 +24,7 @@ int main( int argc, char** argv ){
 	Mat img = imread(imagesPath, IMREAD_GRAYSCALE);
 
 	IntegralImage* intImage = new IntegralImage(img);
-	double a = intImage->computeArea(Rect(10, 20, 10, 5));
+	double a = intImage->computeArea(Rect(1, 1, 1, 1));
 	cout << a <<endl;
 
 	cout << "AdaBoost classifier" << endl;
