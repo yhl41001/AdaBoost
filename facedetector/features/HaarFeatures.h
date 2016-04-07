@@ -26,7 +26,7 @@ class HaarFeatures {
 
 public:
 	HaarFeatures();
-	vector<double> extractFeatures(Mat real, IntegralImage img, int r, int c);
+	vector<double> extractFeatures(IntegralImage img, int r, int c);
 	~HaarFeatures();
 
 };

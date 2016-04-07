@@ -29,7 +29,11 @@ int main( int argc, char** argv ){
 	Mat subwindow = img(Rect(0, 0, 23, 23));
 
 	HaarFeatures* haar = new HaarFeatures();
-	haar->extractFeatures(subwindow, *intImage, 150, 200);
+	haar->extractFeatures(*intImage, 150, 200);
+
+
+	FaceDetector* detector = new FaceDetector(12);
+	detector->train();
 
 
 	//double a = intImage->computeArea(Rect(1, 1, 1, 1));
@@ -38,21 +42,21 @@ int main( int argc, char** argv ){
 	cout << "AdaBoost classifier" << endl;
 
 	vector<Data> features = {
-		*(new Data(vector<double>{1, 1}, 1)),
-		*(new Data(vector<double>{1, 2}, 1)),
-		*(new Data(vector<double>{2, 1.5}, -1)),
-//		*(new Data(vector<double>{3, 2}, 1)),
-		*(new Data(vector<double>{2.8, 4}, 1))
-//		*(new Data(vector<double>{3.2, 1}, -1)),
-//		*(new Data(vector<double>{3, 3.5}, -1)),
-//		*(new Data(vector<double>{4, 1.5}, 1)),
-//		*(new Data(vector<double>{4.2, 4}, 1))
+		*(new Data(vector<double>{2, 2}, 1)),
+		*(new Data(vector<double>{3, 5}, 1)),
+		*(new Data(vector<double>{6, 2}, 1)),
+		*(new Data(vector<double>{6, 6}, 1)),
+		*(new Data(vector<double>{8, 4}, 1)),
+		*(new Data(vector<double>{4, 3}, -1)),
+		*(new Data(vector<double>{4, 4}, -1)),
+		*(new Data(vector<double>{5, 3}, -1)),
+		*(new Data(vector<double>{5, 4}, -1))
 	};
 
-	//AdaBoost* boost = new AdaBoost(features, 20);
+	//AdaBoost* boost = new AdaBoost(features, 3);
 	//boost->train();
 
-	//int p = boost->predict(*(new Data(vector<double>{5, 4})));
+	//int p = boost->predict(*(new Data(vector<double>{4.5, 3.5})));
 
 	//cout << p << endl;
 	//delete boost;

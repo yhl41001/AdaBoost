@@ -10,7 +10,7 @@
 HaarFeatures::HaarFeatures() {
 }
 
-vector<double> HaarFeatures::extractFeatures(Mat real, IntegralImage img, int r, int c) {
+vector<double> HaarFeatures::extractFeatures(IntegralImage img, int r, int c) {
 	vector<double> features;
 	const int types[][2] = { { 2, 1 }, { 1, 2 }, { 3, 1 }, { 1, 3 }, { 2, 2 } };
 
@@ -28,7 +28,6 @@ vector<double> HaarFeatures::extractFeatures(Mat real, IntegralImage img, int r,
 					for (y = 0; y <= WINDOW - height; y++) {
 						white = img.computeArea(Rect(y + r, x + c, width/2, height));
 						black = img.computeArea(Rect(y + r, x + c + width/2, width/2, height));
-						cout << white - black << endl;
 						features.push_back((double) (white - black));
 						count++;
 					}
