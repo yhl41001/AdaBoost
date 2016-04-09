@@ -14,15 +14,9 @@
 using namespace cv;
 
 class IntegralImage {
-
-private:
-	Mat integralImg;
-
 public:
-	IntegralImage(Mat img);
-	Mat computeIntegralImage(Mat img);
-	double computeArea(Rect r);
-	~IntegralImage();
+	static Mat computeIntegralImage(Mat img);
+	static double computeArea(Mat intImg, Rect r);
 };
 
 

@@ -17,21 +17,13 @@
 #include <iostream>
 #include "../utils/IntegralImage.h"
 
-#define WINDOW 24
-
 using namespace cv;
 using namespace std;
 
 class HaarFeatures {
 
 public:
-	HaarFeatures();
-	vector<double> extractFeatures(IntegralImage img, int r, int c);
-	~HaarFeatures();
-
+	static vector<double> extractFeatures(Mat img, int size, int r, int c);
 };
-
-
-
 
 #endif /* FEATURES_HAARFEATURE_H_ */
