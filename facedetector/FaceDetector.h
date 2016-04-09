@@ -33,7 +33,7 @@ private:
 
 public:
 	FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int scales, int detectionWindowSize);
-	void train(Mat img);
+	void train();
 	vector<Prediction> detect(Mat img);
 	~FaceDetector();
 

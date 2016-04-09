@@ -3,6 +3,9 @@
  *
  *  Created on: 07/apr/2016
  *      Author: lorenzocioni
+ *
+ *  Face detector implementing Viola&Jones algorithm
+ *  AdaBoost extension for real time face detection using cascade classifiers
  */
 
 #include "FaceDetector.h"
@@ -14,7 +17,7 @@ FaceDetector::FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int
 	this->detectionWindowSize = detectionWindowSize;
 }
 
-void FaceDetector::train(Mat img){
+void FaceDetector::train(){
 	vector<Data> trainData;
 
 	for(int i = 0; i < trainImages.size(); ++i){
@@ -23,8 +26,6 @@ void FaceDetector::train(Mat img){
 		vector<double> features = HaarFeatures::extractFeatures(intImg, detectionWindowSize, 0, 0);
 		trainData.push_back(*(new Data(features, trainLabels[i])));
 	}
-
-	cout << "size" << trainData.size() << endl;
 
 }
 

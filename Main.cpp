@@ -41,7 +41,7 @@ int main( int argc, char** argv ){
 	vector<int> trainLabels = {1};
 
 	FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 12, 6);
-	detector->train(img);
+	detector->train();
 
 
 	//double a = intImage->computeArea(Rect(1, 1, 1, 1));
