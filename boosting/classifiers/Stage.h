@@ -24,6 +24,7 @@ private:
 public:
 	Stage(int number, vector<WeakClassifier> weaks, double fpr, double dr);
 	int predict(Data x);
+	void decreaseThreshold(double value);
 	~Stage();
 	double getThreshold() const;
 	void setThreshold(double threshold);

@@ -51,6 +51,7 @@ void ViolaJones::train(){
 		i++;
 		n = 0;
 		FPR = FPRold;
+		DR = DRold;
 		Stage* stage;
 		while(FPR > minFPR * FPRold){
 			n++;
@@ -61,8 +62,14 @@ void ViolaJones::train(){
 			FPR = rates.first;
 			DR = rates.second;
 			stage = new Stage(i, strongClassifier.getClassifiers(), FPR, DR);
-//			decrease threshold for the ith classifier
-//			until the current cascaded classifier has a detection rate of at least d x D(i-1) (this also affects F(i))
+			//until the current cascaded classifier has a detection rate of at least d x D(i-1) (this also affects F(i))
+			while(DR < minDR * DRold ){
+				//decrease threshold for the ith classifier
+				stage->decreaseThreshold(0.1);
+				pair<double, double> rates = computeRates(features);
+				FPR = rates.first;
+				DR = rates.second;
+			}
 
 
 //			 N = ∅
@@ -72,6 +79,8 @@ void ViolaJones::train(){
 
 		}
 
+
+		cout << "stage added" << endl;
 
 		FPRold = FPR;
 		classifier.addStage(*stage);
@@ -100,8 +109,12 @@ pair<double, double> ViolaJones::computeRates(vector<Data> features){
 			tp++;
 		}
 	}
+
+	cout << "FP: " << fp << " TN: " << tn << " FN: " << fn << "TP: " << tp << endl;
 	output.first = (double) fp / (fp + tn);
 	output.second = (double) tp / (tp + fn);
+
+	cout << "FR: " << output.first << " DR: " << output.second << endl;
 	return output;
 }
 

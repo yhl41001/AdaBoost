@@ -33,16 +33,16 @@ AdaBoost::AdaBoost(vector<Data> positives, vector<Data> negatives, int iteration
 		iterations(iterations), strongClassifier(
 				*(new StrongClassifier(vector<WeakClassifier> {}))) {
 	vector<double> weights;
-	vector<Data> features;
-	set_union(positives.begin(), positives.end(),
-		negatives.begin(),
-		negatives.end(), back_inserter(features));
+	features.reserve(positives.size() + negatives.size());
+	features.insert(features.end(), positives.begin(), positives.end());
+	features.insert(features.end(), negatives.begin(), negatives.end());
+
 	for (int i = 0; i < features.size(); ++i) {
 		/*	Initialize weights */
 		if (features[i].getLabel() == 1) {
 			features[i].setWeight((double) 1 / (2 * positives.size()));
 		} else {
-			features[i].setWeight((double) 1 / (2 * positives.size()));
+			features[i].setWeight((double) 1 / (2 * negatives.size()));
 		}
 	}
 
@@ -80,7 +80,7 @@ StrongClassifier AdaBoost::train(){
 			updateWeights(weakClassifier);
 			weakClassifier->printInfo();
 			classifiers.push_back(*weakClassifier);
-			//If error is 0, classification is perfect (lineraly separable data)
+			//If error is 0, classification is perfect (linearly separable data)
 			if(error == 0){
 				break;
 			}

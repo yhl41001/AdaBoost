@@ -24,6 +24,10 @@ int Stage::predict(Data x){
 	return sum >= threshold ? 1 : 0;
 }
 
+void Stage::decreaseThreshold(double value){
+	threshold -= value;
+}
+
 double Stage::getThreshold() const {
 	return threshold;
 }

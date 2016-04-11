@@ -18,10 +18,10 @@ void CascadeClassifier::addStage(Stage stage){
 int CascadeClassifier::predict(Data x){
 	for(int i = 0; i < stages.size(); ++i){
 		if(stages[i].predict(x) != 1){
-			return false;
+			return 0;
 		}
 	}
-	return true;
+	return 1;
 }
 
 vector<int> CascadeClassifier::predict(vector<Data> x){
