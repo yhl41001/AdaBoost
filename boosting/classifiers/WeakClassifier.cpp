@@ -8,7 +8,7 @@
 #include "WeakClassifier.h"
 
 WeakClassifier::WeakClassifier(): error(1.), dimension(0),
-	threshold(0.), alpha(0.),
+	threshold(0.), alpha(0.), beta(0.),
 	sign(POSITIVE), misclassified(0){}
 
 /**
@@ -95,4 +95,12 @@ int WeakClassifier::getMisclassified() const {
 
 void WeakClassifier::setMisclassified(int misclassified) {
 	this->misclassified = misclassified;
+}
+
+double WeakClassifier::getBeta() const {
+	return beta;
+}
+
+void WeakClassifier::setBeta(double beta) {
+	this->beta = beta;
 }

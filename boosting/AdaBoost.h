@@ -30,6 +30,7 @@ private:
 	vector<Data> features;
 	StrongClassifier strongClassifier;
 	WeakClassifier* trainWeakClassifier();
+	void normalizeWeights();
 	void updateWeights(WeakClassifier* weakClassifier);
 
 public:

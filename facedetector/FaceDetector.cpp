@@ -51,7 +51,7 @@ void FaceDetector::train(){
 
 	cout << "Features extracted from " << count << " images" << endl;
 
-	AdaBoost* boost = new AdaBoost(trainData, weights, 20);
+	ViolaJones* boost = new ViolaJones(trainData, weights, 20);
 	boost->train();
 }
 

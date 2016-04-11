@@ -66,11 +66,14 @@ void AdaBoost::train(){
 	//Iterate for the specified iterations
 	for (int i = 0; i < this->iterations; ++i) {
 		cout << "Iteration: " << (i + 1) << " | ";
+		normalizeWeights();
 		WeakClassifier* weakClassifier = trainWeakClassifier();
 		double error = weakClassifier->getError();
 		if(error < 0.5){
-			double alpha = 0.5 * log((1 - error)/error);
+			double beta = error / (1 - error);
+			double alpha = 0.5 * log(1 / beta);
 			weakClassifier->setAlpha(alpha);
+			weakClassifier->setBeta(beta);
 			updateWeights(weakClassifier);
 			weakClassifier->printInfo();
 			classifiers.push_back(*weakClassifier);
@@ -91,10 +94,10 @@ void AdaBoost::train(){
     auto t_end = chrono::high_resolution_clock::now();
 
     cout << std::fixed << "\nCPU time used: "
-         << 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC << " ms\n"
+         << (c_end - c_start) / CLOCKS_PER_SEC << " s\n"
          << "Time: "
-         << chrono::duration<double, milli>(t_end - t_start).count()
-         << " ms\n\n";
+         << (chrono::duration<double, milli>(t_end - t_start).count())/1000
+         << " s\n\n";
 }
 
 int AdaBoost::predict(Data x){
@@ -113,6 +116,7 @@ int AdaBoost::predict(Data x){
  * In this way, AdaBoost focuses on the most informative or difficult examples.
  */
 void AdaBoost::updateWeights(WeakClassifier* weakClassifier){
+	cout << "updating weights adabost" << endl;
 	double norm = 0;
 	for(int i = 0; i < features.size(); ++i){
 		double num = (features[i].getWeight() * exp(-weakClassifier->getAlpha()
@@ -195,6 +199,9 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 	return bestWeakClass;
 }
 
+void ViolaJones::normalizeWeights(){
+	//Does nothing, maybe used in extensions
+}
 
 void AdaBoost::showFeatures(){
 	for(int i = 0; i < features.size(); ++i){
