@@ -10,6 +10,7 @@
 
 #include "WeakClassifier.h"
 #include <vector>
+#include <iostream>
 
 using namespace std;
 
@@ -22,7 +23,8 @@ private:
 	double threshold;
 
 public:
-	Stage(int number, vector<WeakClassifier> weaks, double fpr, double dr);
+	Stage(int number);
+	Stage(int number, vector<WeakClassifier> weaks);
 	int predict(Data x);
 	void decreaseThreshold(double value);
 	~Stage();

@@ -52,16 +52,18 @@ void ViolaJones::train(){
 		n = 0;
 		FPR = FPRold;
 		DR = DRold;
-		Stage* stage;
+		Stage* stage = new Stage(i - 1);
+		classifier.addStage(stage);
 		while(FPR > minFPR * FPRold){
 			n++;
 			this->iterations = n;
 			StrongClassifier strongClassifier = AdaBoost::train();
+			stage->setClassifiers(strongClassifier.getClassifiers());
 		    //Evaluate current cascaded classifier on validation set to determine F(i) & D(i)
 			pair<double, double> rates = computeRates(features);
 			FPR = rates.first;
 			DR = rates.second;
-			stage = new Stage(i, strongClassifier.getClassifiers(), FPR, DR);
+
 			//until the current cascaded classifier has a detection rate of at least d x D(i-1) (this also affects F(i))
 			while(DR < minDR * DRold ){
 				//decrease threshold for the ith classifier
@@ -83,7 +85,6 @@ void ViolaJones::train(){
 		cout << "stage added" << endl;
 
 		FPRold = FPR;
-		classifier.addStage(*stage);
 	}
 
 }
@@ -110,11 +111,11 @@ pair<double, double> ViolaJones::computeRates(vector<Data> features){
 		}
 	}
 
-	cout << "FP: " << fp << " TN: " << tn << " FN: " << fn << "TP: " << tp << endl;
+	cout << "FP: " << fp << ", TN: " << tn << ", FN: " << fn << ", TP: " << tp << endl;
 	output.first = (double) fp / (fp + tn);
 	output.second = (double) tp / (tp + fn);
 
-	cout << "FR: " << output.first << " DR: " << output.second << endl;
+	cout << "FPR: " << output.first << ", Detection Rate: " << output.second << endl;
 	return output;
 }
 

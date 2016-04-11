@@ -7,8 +7,13 @@
 
 #include "Stage.h"
 
-Stage::Stage(int number, vector<WeakClassifier> weaks, double fpr, double dr):
-    number(number), classifiers(weaks), fpr(fpr), detectionRate(dr){
+Stage::Stage(int number):
+    number(number), classifiers({}), fpr(1.), detectionRate(1.), threshold(0.){
+	cout << "\tAdded stage n. " << number << endl;
+}
+
+Stage::Stage(int number, vector<WeakClassifier> weaks):
+    number(number), classifiers(weaks), fpr(1.), detectionRate(1.){
 	threshold = 0;
 	for(int i = 0; i < classifiers.size(); ++i){
 		threshold += classifiers[i].getAlpha();
@@ -65,6 +70,11 @@ const vector<WeakClassifier>& Stage::getClassifiers() const {
 
 void Stage::setClassifiers(const vector<WeakClassifier>& classifiers) {
 	this->classifiers = classifiers;
+	threshold = 0;
+	for (int i = 0; i < classifiers.size(); ++i) {
+		threshold += classifiers[i].getAlpha();
+	}
+	threshold = threshold * 0.5;
 }
 
 void Stage::setNumber(int number) {

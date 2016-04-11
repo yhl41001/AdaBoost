@@ -11,13 +11,17 @@ CascadeClassifier::CascadeClassifier(){
 	this->stages = {};
 }
 
-void CascadeClassifier::addStage(Stage stage){
-	this->stages.push_back(stage);
+void CascadeClassifier::addStage(Stage* stage){
+	stages.push_back(stage);
+}
+
+void CascadeClassifier::setStage(int index, Stage* stage){
+	this->stages[index] = stage;
 }
 
 int CascadeClassifier::predict(Data x){
 	for(int i = 0; i < stages.size(); ++i){
-		if(stages[i].predict(x) != 1){
+		if(stages[i]->predict(x) != 1){
 			return 0;
 		}
 	}
@@ -32,6 +36,13 @@ vector<int> CascadeClassifier::predict(vector<Data> x){
 	return output;
 }
 
-CascadeClassifier::~CascadeClassifier(){}
+CascadeClassifier::~CascadeClassifier() {
+}
 
+const vector<Stage*>& CascadeClassifier::getStages() const {
+	return stages;
+}
 
+void CascadeClassifier::setStages(const vector<Stage*>& stages) {
+	this->stages = stages;
+}
