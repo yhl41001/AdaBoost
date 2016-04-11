@@ -111,8 +111,6 @@ vector<double> HaarFeatures::extractFeatures(Mat integralImage, int size, int r,
 		}
 	}
 
-	cout << "Total features: " << count << endl;
-
 	return features;
 }
 

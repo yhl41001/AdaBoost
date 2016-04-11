@@ -45,7 +45,7 @@ int main( int argc, char** argv ){
 	//Loading training negative images
 	vector<string> negativeImages = Utils::open(imagePath + "negative");
 	for(int k = 0; k < negativeImages.size(); ++k){
-		Mat img = imread(negativeImages[k]);
+		Mat img = imread(imagePath + "negative/" + negativeImages[k]);
 		Mat dest;
 		resize(img, dest, Size(24, 24));
 		trainImages.push_back(dest);

@@ -17,9 +17,11 @@ FaceDetector::FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int
 	this->detectionWindowSize = detectionWindowSize;
 	this->positive = 0;
 	this->negative = 0;
-	for(int i = 0; i < trainLabels; ++i){
+	for(int i = 0; i < trainLabels.size(); ++i){
 		if(trainLabels[i] == 1){
-
+			this->positive++;
+		} else {
+			this->negative++;
 		}
 	}
 }
@@ -28,23 +30,28 @@ void FaceDetector::train(){
 	vector<Data> trainData;
 	vector<double> weights;
 
+	int count = 0;
+
+	cout << "Extracting image features" << endl;
+
 	for(int i = 0; i < trainImages.size(); ++i){
 		Mat intImg = IntegralImage::computeIntegralImage(trainImages[i]);
 		//Extracting haar like features
 		vector<double> features = HaarFeatures::extractFeatures(intImg, detectionWindowSize, 0, 0);
 		trainData.push_back(*(new Data(features, trainLabels[i])));
+		/*	Initialize weights */
+		if(trainLabels[i] == 1){
+			weights.push_back((double) 1 / (2 * this->positive));
+		} else {
+			weights.push_back((double) 1 / (2 * this->negative));
+		}
+		count++;
 	}
 
-/*	Initialize weights w1,i = 1 , 1 for yi = 0, 1 respectively, 2m 2l
-	where m and l are the number of negatives and positives
-	respectively.*/
+	cout << "Features extracted from " << count << " images" << endl;
 
-
-
-
-
-
-
+	AdaBoost* boost = new AdaBoost(trainData, weights, 20);
+	boost->train();
 }
 
 void FaceDetector::computeImagePyramid(Mat img){
