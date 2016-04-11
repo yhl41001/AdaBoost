@@ -9,9 +9,9 @@
 #define BOOSTING_CLASSIFIERS_STRONGCLASSIFIER_H_
 
 #include <vector>
-
-#include "WeakClassifier.h"
+#include <iostream>
 #include "../features/Data.h"
+#include "WeakClassifier.h"
 
 class StrongClassifier {
 
@@ -22,6 +22,7 @@ private:
 public:
 	StrongClassifier(vector<WeakClassifier> classifiers);
 	int predict(Data x);
+	vector<int> predict(vector<Data> x);
 	~StrongClassifier();
 	const vector<WeakClassifier>& getClassifiers() const;
 	void setClassifiers(const vector<WeakClassifier>& classifiers);

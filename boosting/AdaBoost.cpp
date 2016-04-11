@@ -7,7 +7,7 @@
  *      Decision stump: Single axis-parallel partition of space
  */
 
-#include "AdaBoost.hpp"
+#include "AdaBoost.h"
 
 using namespace std;
 
@@ -54,6 +54,7 @@ AdaBoost::AdaBoost(vector<Data> data, vector<double> weights, int iterations):
  * with the iteration attributes.
  */
 void AdaBoost::train(){
+	cout << "Training AdaBoost with " << iterations << " iterations" << endl;
 	clock_t c_start = clock();
 	auto t_start = chrono::high_resolution_clock::now();
 
@@ -116,7 +117,6 @@ int AdaBoost::predict(Data x){
  * In this way, AdaBoost focuses on the most informative or difficult examples.
  */
 void AdaBoost::updateWeights(WeakClassifier* weakClassifier){
-	cout << "updating weights adabost" << endl;
 	double norm = 0;
 	for(int i = 0; i < features.size(); ++i){
 		double num = (features[i].getWeight() * exp(-weakClassifier->getAlpha()

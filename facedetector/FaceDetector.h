@@ -14,8 +14,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "utils/Prediction.h"
-#include "../boosting/ViolaJones.hpp"
 #include "../boosting/features/Data.h"
+#include "../boosting/ViolaJones.h"
 #include "features/HaarFeatures.h"
 #include "utils/IntegralImage.h"
 

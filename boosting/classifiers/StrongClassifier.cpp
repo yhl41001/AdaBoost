@@ -23,6 +23,14 @@ int StrongClassifier::predict(Data x){
 	}
 }
 
+vector<int> StrongClassifier::predict(vector<Data> x){
+	vector<int> output;
+	for(int i = 0; i < x.size(); ++i){
+		cout << i << endl;
+	}
+	return output;
+}
+
 const vector<WeakClassifier>& StrongClassifier::getClassifiers() const {
 	return classifiers;
 }

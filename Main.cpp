@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 #include <opencv2/core.hpp>
-#include "boosting/AdaBoost.hpp"
+#include "boosting/AdaBoost.h"
 #include "boosting/features/Data.h"
 #include "facedetector/FaceDetector.h"
 #include "facedetector/utils/IntegralImage.h"
