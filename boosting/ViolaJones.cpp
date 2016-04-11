@@ -7,9 +7,12 @@
 
 #include "ViolaJones.h"
 
-ViolaJones::ViolaJones(vector<Data> data, vector<double> weights, int iterations):
-	AdaBoost(data, weights, iterations){
+ViolaJones::ViolaJones(vector<Data> positives, vector<Data> negatives, int iterations):
+	AdaBoost(positives, negatives, iterations){
 	this->maxInterations = iterations;
+	this->classifier = *(new CascadeClassifier());
+	this->positives = positives;
+	this->negatives = negatives;
 }
 
 void ViolaJones::normalizeWeights(){
@@ -34,27 +37,33 @@ void ViolaJones::updateWeights(WeakClassifier* weakClassifier){
 void ViolaJones::train(){
 	//TODO will be two attributes
 	double targetFPR = 0.3;
-	double targetFPRLayer = 0.5;
+	double minFPR = 0.65;
+	double minDR = 0.7;
 
-	double F = 1.0;
-	double Fold = 1.0;
-	double D = 1.0;
+	double FPR = 1.0;
+	double FPRold = FPR;
+	double DR = 1.0;
+	double DRold = DR;
+
 	int i = 0;
 	int n = 0;
-	while(F > targetFPR){
+	while(FPR > targetFPR){
 		i++;
 		n = 0;
-		F = Fold;
-		while(F > targetFPRLayer * Fold){
+		FPR = FPRold;
+		Stage* stage;
+		while(FPR > minFPR * FPRold){
 			n++;
 			this->iterations = n;
-			AdaBoost::train();
+			StrongClassifier strongClassifier = AdaBoost::train();
 		    //Evaluate current cascaded classifier on validation set to determine F(i) & D(i)
 			pair<double, double> rates = computeRates(features);
-			F = rates.first;
-			D = rates.second;
+			FPR = rates.first;
+			DR = rates.second;
+			stage = new Stage(i, strongClassifier.getClassifiers(), FPR, DR);
 //			decrease threshold for the ith classifier
-//			        until the current cascaded classifier has a detection rate of at least d x D(i-1) (this also affects F(i))
+//			until the current cascaded classifier has a detection rate of at least d x D(i-1) (this also affects F(i))
+
 
 //			 N = ∅
 //			if F(i) > Ftarget then
@@ -63,22 +72,16 @@ void ViolaJones::train(){
 
 		}
 
-//		while Fi > f × Fi−1
-//		∗ni ←ni +1
-//		∗ Use P and N to train a classifier with ni features using
-//		AdaBoost
-//		∗ Evaluate current cascaded classifier on validation set to
-//		determine Fi and Di .
-//		∗ Decrease threshold for the ith classifier until the current
-//		cascaded classifier has a detection rate of at least d × Di −1 (this also affects Fi )
 
+		FPRold = FPR;
+		classifier.addStage(*stage);
 	}
 
 }
 
 pair<double, double> ViolaJones::computeRates(vector<Data> features){
 	pair<double, double> output;
-	vector<int> predictions = strongClassifier.predict(features);
+	vector<int> predictions = classifier.predict(features);
 	int tp = 0;
 	int fp = 0;
 	int tn = 0;

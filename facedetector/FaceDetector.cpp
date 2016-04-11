@@ -16,20 +16,11 @@ FaceDetector::FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int
 	this->trainLabels = trainLabels;
 	this->scales = scales;
 	this->detectionWindowSize = detectionWindowSize;
-	this->positive = 0;
-	this->negative = 0;
-	for(int i = 0; i < trainLabels.size(); ++i){
-		if(trainLabels[i] == 1){
-			this->positive++;
-		} else {
-			this->negative++;
-		}
-	}
 }
 
 void FaceDetector::train(){
-	vector<Data> trainData;
-	vector<double> weights;
+	vector<Data> positives;
+	vector<Data> negatives;
 
 	int count = 0;
 
@@ -39,19 +30,18 @@ void FaceDetector::train(){
 		Mat intImg = IntegralImage::computeIntegralImage(trainImages[i]);
 		//Extracting haar like features
 		vector<double> features = HaarFeatures::extractFeatures(intImg, detectionWindowSize, 0, 0);
-		trainData.push_back(*(new Data(features, trainLabels[i])));
 		/*	Initialize weights */
 		if(trainLabels[i] == 1){
-			weights.push_back((double) 1 / (2 * this->positive));
+			positives.push_back(*(new Data(features, trainLabels[i])));
 		} else {
-			weights.push_back((double) 1 / (2 * this->negative));
+			negatives.push_back(*(new Data(features, trainLabels[i])));
 		}
 		count++;
 	}
 
 	cout << "Features extracted from " << count << " images" << endl;
 
-	ViolaJones* boost = new ViolaJones(trainData, weights, 20);
+	ViolaJones* boost = new ViolaJones(positives, negatives, 20);
 	boost->train();
 }
 

@@ -26,7 +26,7 @@ int StrongClassifier::predict(Data x){
 vector<int> StrongClassifier::predict(vector<Data> x){
 	vector<int> output;
 	for(int i = 0; i < x.size(); ++i){
-		cout << i << endl;
+		output.push_back(predict(x[i]));
 	}
 	return output;
 }

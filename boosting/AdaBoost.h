@@ -34,11 +34,12 @@ protected:
 	virtual void updateWeights(WeakClassifier* weakClassifier);
 
 public:
+	AdaBoost();
 	AdaBoost(vector<Data> data, int iterations);
-	AdaBoost(vector<Data> data, vector<double> weights, int iterations);
+	AdaBoost(vector<Data> positives, vector<Data> negatives, int iterations);
 	int getIterations() const;
 	void setIterations(int iterations);
-	void train();
+	StrongClassifier train();
 	int predict(Data x);
 	void showFeatures();
 	virtual ~AdaBoost();

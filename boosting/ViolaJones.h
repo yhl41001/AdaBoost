@@ -10,13 +10,18 @@
 
 #include <cmath>
 #include <iostream>
+#include <vector>
 #include "AdaBoost.h"
+#include "classifiers/CascadeClassifier.h"
 
 using namespace std;
 
 class ViolaJones: public AdaBoost {
 private:
 	int maxInterations;
+	vector<Data> positives;
+	vector<Data> negatives;
+	CascadeClassifier classifier;
 	pair<double, double> computeRates(vector<Data> features);
 
 protected:
@@ -24,7 +29,7 @@ protected:
 	void updateWeights(WeakClassifier* weakClassifier);
 
 public:
-	ViolaJones(vector<Data> data, vector<double> weights, int iterations);
+	ViolaJones(vector<Data> positives, vector<Data> negatives, int iterations);
 	void train();
 	~ViolaJones();
 };

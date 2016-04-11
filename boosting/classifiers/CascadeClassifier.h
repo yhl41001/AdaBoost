@@ -8,14 +8,21 @@
 #ifndef BOOSTING_CLASSIFIERS_CASCADECLASSIFIER_H_
 #define BOOSTING_CLASSIFIERS_CASCADECLASSIFIER_H_
 
+#include <vector>
+#include "Stage.h"
+
+using namespace std;
+
 class CascadeClassifier {
 private:
-	int stages;
-	int number;
+	vector<Stage> stages;
 
 public:
-	CascadeClassifier(int stages);
+	CascadeClassifier();
+	void addStage(Stage stage);
 	void train();
+	int predict(Data x);
+	vector<int> predict(vector<Data> x);
 	~CascadeClassifier();
 };
 

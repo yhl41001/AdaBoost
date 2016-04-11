@@ -29,31 +29,33 @@ AdaBoost::AdaBoost(vector<Data> data, int iterations) :
 	cout << "Initialized uniform weights\n" << endl;
 }
 
-AdaBoost::AdaBoost(vector<Data> data, vector<double> weights, int iterations):
-		iterations(iterations), features(data), strongClassifier(
+AdaBoost::AdaBoost(vector<Data> positives, vector<Data> negatives, int iterations):
+		iterations(iterations), strongClassifier(
 				*(new StrongClassifier(vector<WeakClassifier> {}))) {
+	vector<double> weights;
+	vector<Data> features;
+	set_union(positives.begin(), positives.end(),
+		negatives.begin(),
+		negatives.end(), back_inserter(features));
+	for (int i = 0; i < features.size(); ++i) {
+		/*	Initialize weights */
+		if (features[i].getLabel() == 1) {
+			features[i].setWeight((double) 1 / (2 * positives.size()));
+		} else {
+			features[i].setWeight((double) 1 / (2 * positives.size()));
+		}
+	}
+
 	int size = features.size();
 	cout << "\nInitializing AdaBoost with " << iterations << " iterations" << endl;
 	cout << "Training size: " << size << "\n" << endl;
-	//Initialize weights
-	if(weights.size() == features.size()){
-		for (int m = 0; m < features.size(); ++m) {
-			features[m].setWeight((double) weights[m]);
-		}
-		cout << "Initialized custom weights\n" << endl;
-	} else {
-		for (int m = 0; m < features.size(); ++m) {
-			features[m].setWeight((double) 1 / features.size());
-		}
-		cout << "Initialized uniform weights\n" << endl;
-	}
 }
 
 /**
  * Train the AdaBoost classifier with a number of weak classifier specified
  * with the iteration attributes.
  */
-void AdaBoost::train(){
+StrongClassifier AdaBoost::train(){
 	cout << "Training AdaBoost with " << iterations << " iterations" << endl;
 	clock_t c_start = clock();
 	auto t_start = chrono::high_resolution_clock::now();
@@ -99,6 +101,7 @@ void AdaBoost::train(){
          << "Time: "
          << (chrono::duration<double, milli>(t_end - t_start).count())/1000
          << " s\n\n";
+    return strongClassifier;
 }
 
 int AdaBoost::predict(Data x){
