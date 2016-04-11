@@ -11,6 +11,7 @@
 #include "FaceDetector.h"
 
 FaceDetector::FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int scales, int detectionWindowSize = 24){
+	cout << "\nInitializing FaceDetector\n\tScales: " << scales << " \tWindow size: "<< detectionWindowSize << endl;
 	this->trainImages = trainImages;
 	this->trainLabels = trainLabels;
 	this->scales = scales;
@@ -32,7 +33,7 @@ void FaceDetector::train(){
 
 	int count = 0;
 
-	cout << "Extracting image features" << endl;
+	cout << "\nExtracting image features" << endl;
 
 	for(int i = 0; i < trainImages.size(); ++i){
 		Mat intImg = IntegralImage::computeIntegralImage(trainImages[i]);

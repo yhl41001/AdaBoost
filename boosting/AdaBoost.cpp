@@ -33,7 +33,7 @@ AdaBoost::AdaBoost(vector<Data> data, vector<double> weights, int iterations):
 		iterations(iterations), features(data), strongClassifier(
 				*(new StrongClassifier(vector<WeakClassifier> { }))) {
 	int size = features.size();
-	cout << "Initializing AdaBoost with " << iterations << " iterations" << endl;
+	cout << "\nInitializing AdaBoost with " << iterations << " iterations" << endl;
 	cout << "Training size: " << size << "\n" << endl;
 	//Initialize weights
 	if(weights.size() == features.size()){
