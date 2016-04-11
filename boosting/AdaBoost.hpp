@@ -5,8 +5,8 @@
  *      Author: lorenzocioni
  */
 
-#ifndef BOOSTING_ADABOOST_H_
-#define BOOSTING_ADABOOST_H_
+#ifndef BOOSTING_ADABOOST_HPP_
+#define BOOSTING_ADABOOST_HPP_
 
 #include <string>
 #include <vector>
@@ -24,14 +24,14 @@ using namespace std;
 
 class AdaBoost {
 
-private:
+protected:
 	int iterations;
 	//Features and labels vector (must be the same size)
 	vector<Data> features;
 	StrongClassifier strongClassifier;
 	WeakClassifier* trainWeakClassifier();
-	void normalizeWeights();
-	void updateWeights(WeakClassifier* weakClassifier);
+	virtual void normalizeWeights();
+	virtual void updateWeights(WeakClassifier* weakClassifier);
 
 public:
 	AdaBoost(vector<Data> data, int iterations);
@@ -41,7 +41,7 @@ public:
 	void train();
 	int predict(Data x);
 	void showFeatures();
-	~AdaBoost();
+	virtual ~AdaBoost();
 };
 
-#endif /* BOOSTING_ADABOOST_H_ */
+#endif /* BOOSTING_ADABOOST_HPP_ */

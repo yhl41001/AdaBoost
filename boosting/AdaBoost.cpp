@@ -7,7 +7,7 @@
  *      Decision stump: Single axis-parallel partition of space
  */
 
-#include "AdaBoost.h"
+#include "AdaBoost.hpp"
 
 using namespace std;
 
@@ -31,7 +31,7 @@ AdaBoost::AdaBoost(vector<Data> data, int iterations) :
 
 AdaBoost::AdaBoost(vector<Data> data, vector<double> weights, int iterations):
 		iterations(iterations), features(data), strongClassifier(
-				*(new StrongClassifier(vector<WeakClassifier> { }))) {
+				*(new StrongClassifier(vector<WeakClassifier> {}))) {
 	int size = features.size();
 	cout << "\nInitializing AdaBoost with " << iterations << " iterations" << endl;
 	cout << "Training size: " << size << "\n" << endl;
@@ -199,7 +199,7 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 	return bestWeakClass;
 }
 
-void ViolaJones::normalizeWeights(){
+void AdaBoost::normalizeWeights(){
 	//Does nothing, maybe used in extensions
 }
 

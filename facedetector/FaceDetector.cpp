@@ -11,7 +11,7 @@
 #include "FaceDetector.h"
 
 FaceDetector::FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int scales, int detectionWindowSize = 24){
-	cout << "\nInitializing FaceDetector\n\tScales: " << scales << " \tWindow size: "<< detectionWindowSize << endl;
+	cout << "Initializing FaceDetector: scales: " << scales << ", window size: "<< detectionWindowSize << endl;
 	this->trainImages = trainImages;
 	this->trainLabels = trainLabels;
 	this->scales = scales;

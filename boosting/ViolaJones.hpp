@@ -8,14 +8,16 @@
 #ifndef BOOSTING_VIOLAJONES_HPP_
 #define BOOSTING_VIOLAJONES_HPP_
 
-#include "AdaBoost.h"
+#include <cmath>
+#include "AdaBoost.hpp"
 
 class ViolaJones: public AdaBoost {
-private:
+protected:
 	void normalizeWeights();
 	void updateWeights(WeakClassifier* weakClassifier);
 public:
 	ViolaJones(vector<Data> data, vector<double> weights, int iterations);
+	~ViolaJones();
 };
 
 

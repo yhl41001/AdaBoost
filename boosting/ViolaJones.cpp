@@ -7,9 +7,8 @@
 
 #include "ViolaJones.hpp"
 
-ViolaJones::ViolaJones(vector<Data> data, vector<double> weights, int iterations){
-	this->AdaBoost(data, weights, iterations);
-}
+ViolaJones::ViolaJones(vector<Data> data, vector<double> weights, int iterations):
+	AdaBoost(data, weights, iterations){}
 
 void ViolaJones::normalizeWeights(){
 	double norm = 0;
@@ -27,9 +26,10 @@ void ViolaJones::updateWeights(WeakClassifier* weakClassifier){
 	for(int i = 0; i < features.size(); ++i){
 		int e = (features[i].getLabel()
 				* weakClassifier->predict(this->features[i]) > 0) ? 0 : 1;
-		double num = features[i].getWeight() * (weakClassifier->getBeta() ^ (1 - e));
+		double num = features[i].getWeight() * (pow(weakClassifier->getBeta(), (double) (1 - e)));
 		features[i].setWeight(num);
 	}
-
 }
+
+ViolaJones::~ViolaJones(){}
 
