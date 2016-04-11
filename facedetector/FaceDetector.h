@@ -24,6 +24,8 @@ using namespace cv;
 class FaceDetector {
 
 private:
+	int positive;
+	int negative;
 	vector<Mat> trainImages;
 	vector<int> trainLabels;
 	int detectionWindowSize;

@@ -14,45 +14,56 @@
 #include "facedetector/FaceDetector.h"
 #include "facedetector/utils/IntegralImage.h"
 #include "facedetector/features/HaarFeatures.h"
+#include "facedetector/utils/Utils.hpp"
 #include "opencv2/highgui/highgui.hpp"
-
 
 using namespace std;
 using namespace cv;
 
 int main( int argc, char** argv ){
 
-	string imagesPath = "/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/images/2002/07/19/big/img_130.jpg";
+	int subjects = 40;
+	int poses = 10;
+	string imagePath = "/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/dataset/";
+	string path;
 
-	Mat img = imread(imagesPath, IMREAD_GRAYSCALE);
+	vector<Mat> trainImages;
+	vector<int> trainLabels;
 
-	//IntegralImage* intImage = new IntegralImage(img);
+	//Loading training positive images
+	for(int s = 1; s <= subjects; ++s){
+		for(int p = 1; p <= poses; ++p){
+			path = imagePath + "s" + to_string(s) + "/" + to_string(p) + ".pgm";
+			Mat img = imread(path);
+			Mat dest;
+			resize(img, dest, Size(24, 24));
+			trainImages.push_back(dest);
+			trainLabels.push_back(1);
+		}
+	}
 
-	/*Mat subwindow = img(Rect(0, 0, 23, 23));
-
-	HaarFeatures* haar = new HaarFeatures();
-	haar->extractFeatures(*intImage, 150, 200);
-*/
-
-	Mat subwindow = img(Rect(200, 200, 6, 6));
-	cout << subwindow << endl;
-
-	vector<Mat> trainImages = {subwindow};
-	vector<int> trainLabels = {1};
+	//Loading training negative images
+	vector<string> negativeImages = Utils::open(imagePath + "negative");
+	for(int k = 0; k < negativeImages.size(); ++k){
+		Mat img = imread(negativeImages[k]);
+		Mat dest;
+		resize(img, dest, Size(24, 24));
+		trainImages.push_back(dest);
+		trainLabels.push_back(-1);
+	}
 
 	FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 12, 6);
 	detector->train();
 
-
 	//double a = intImage->computeArea(Rect(1, 1, 1, 1));
 	//cout << a <<endl;
 
-	vector<Data> features = {
-		*(new Data(vector<double>{2, 2}, 1)),
-		*(new Data(vector<double>{3, 2}, 1)),
-		*(new Data(vector<double>{2, 4}, -1)),
-		*(new Data(vector<double>{5, 5}, -1))
-	};
+//	vector<Data> features = {
+//		*(new Data(vector<double>{2, 2}, 1)),
+//		*(new Data(vector<double>{3, 2}, 1)),
+//		*(new Data(vector<double>{2, 4}, -1)),
+//		*(new Data(vector<double>{5, 5}, -1))
+//	};
 
 	//AdaBoost* boost = new AdaBoost(features, 3);
 	//boost->train();

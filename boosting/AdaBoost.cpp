@@ -22,6 +22,31 @@ AdaBoost::AdaBoost(vector<Data> data, int iterations) :
 	int size = features.size();
 	cout << "Initializing AdaBoost with " << iterations << " iterations" << endl;
 	cout << "Training size: " << size << "\n" << endl;
+	//Initialize weights
+	for(int m = 0; m < features.size(); ++m){
+		features[m].setWeight((double) 1/features.size());
+	}
+	cout << "Initialized uniform weights\n" << endl;
+}
+
+AdaBoost::AdaBoost(vector<Data> data, vector<double> weights, int iterations):
+		iterations(iterations), features(data), strongClassifier(
+				*(new StrongClassifier(vector<WeakClassifier> { }))) {
+	int size = features.size();
+	cout << "Initializing AdaBoost with " << iterations << " iterations" << endl;
+	cout << "Training size: " << size << "\n" << endl;
+	//Initialize weights
+	if(weights.size() == features.size()){
+		for (int m = 0; m < features.size(); ++m) {
+			features[m].setWeight((double) weights[m]);
+		}
+		cout << "Initialized custom weights\n" << endl;
+	} else {
+		for (int m = 0; m < features.size(); ++m) {
+			features[m].setWeight((double) 1 / features.size());
+		}
+		cout << "Initialized uniform weights\n" << endl;
+	}
 }
 
 /**
@@ -34,11 +59,6 @@ void AdaBoost::train(){
 
 	//Reinitialize classifier
 	strongClassifier.setTrained(false);
-
-	//Initialize weights
-	for(int m = 0; m < features.size(); ++m){
-		features[m].setWeight((double) 1/features.size());
-	}
 
 	//The vector of weak classifiers
 	vector<WeakClassifier> classifiers;

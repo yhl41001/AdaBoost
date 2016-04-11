@@ -34,6 +34,7 @@ private:
 
 public:
 	AdaBoost(vector<Data> data, int iterations);
+	AdaBoost(vector<Data> data, vector<double> weights, int iterations);
 	int getIterations() const;
 	void setIterations(int iterations);
 	void train();
