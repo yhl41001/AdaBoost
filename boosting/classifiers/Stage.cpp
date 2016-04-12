@@ -9,7 +9,7 @@
 
 Stage::Stage(int number):
     number(number), classifiers({}), fpr(1.), detectionRate(1.), threshold(0.){
-	cout << "\tAdded stage n. " << number << endl;
+	cout << "- Added stage n. " << number << endl;
 }
 
 Stage::Stage(int number, vector<WeakClassifier> weaks):

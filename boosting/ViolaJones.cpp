@@ -13,6 +13,11 @@ ViolaJones::ViolaJones(vector<Data> positives, vector<Data> negatives, int itera
 	this->classifier = *(new CascadeClassifier());
 	this->positives = positives;
 	this->negatives = negatives;
+	cout << "\nInitializing ViolaJones AdaBoost with " << iterations << " iterations" << endl;
+	cout << "Training size: " << (positives.size() + negatives.size()) << endl;
+	cout << "  -Positive samples: " << positives.size() << endl;
+	cout << "  -Negative samples: " << negatives.size() << endl;
+	cout << "  -Max iterations: " << iterations << "\n" << endl;
 }
 
 double ViolaJones::updateAlpha(double error){
@@ -43,6 +48,8 @@ void ViolaJones::updateWeights(WeakClassifier* weakClassifier){
 }
 
 void ViolaJones::train(){
+	cout << "Training Cascade Classifier\n" << endl;
+
 	//TODO will be two attributes
 	double targetFPR = 0.3;
 	double minFPR = 0.65;

@@ -11,7 +11,8 @@
 #include "FaceDetector.h"
 
 FaceDetector::FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int scales, int detectionWindowSize = 24){
-	cout << "Initializing FaceDetector: scales: " << scales << ", window size: "<< detectionWindowSize << endl;
+	cout << "FaceDetector\n************" << endl;
+	cout << "  -Scales: " << scales << "\n  -Window size: "<< detectionWindowSize << endl;
 	this->trainImages = trainImages;
 	this->trainLabels = trainLabels;
 	this->scales = scales;
@@ -23,6 +24,7 @@ void FaceDetector::train(){
 	vector<Data> negatives;
 
 	int count = 0;
+	auto t_start = chrono::high_resolution_clock::now();
 
 	cout << "\nExtracting image features" << endl;
 
@@ -36,14 +38,16 @@ void FaceDetector::train(){
 		} else {
 			negatives.push_back(*(new Data(features, trainLabels[i])));
 		}
-		count++;
+		count += features.size();
 	}
-
-	cout << "Features extracted from " << count << " images" << endl;
+	cout << "Extracted " << count << " features in ";
+	auto t_end = chrono::high_resolution_clock::now();
+	cout << std::fixed << (chrono::duration<double, milli>(t_end - t_start).count())/1000 << " s\n";
 
 	ViolaJones* boost = new ViolaJones(positives, negatives, 20);
 	boost->train();
 }
+
 
 void FaceDetector::computeImagePyramid(Mat img){
 
@@ -53,7 +57,10 @@ void FaceDetector::computeImagePyramid(Mat img){
 
 }
 
-FaceDetector::~FaceDetector(){}
+FaceDetector::~FaceDetector(){
+	trainImages.clear();
+	trainLabels.clear();
+}
 
 
 

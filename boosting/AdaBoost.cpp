@@ -47,8 +47,6 @@ AdaBoost::AdaBoost(vector<Data> positives, vector<Data> negatives, int iteration
 	}
 
 	int size = features.size();
-	cout << "\nInitializing AdaBoost with " << iterations << " iterations" << endl;
-	cout << "Training size: " << size << "\n" << endl;
 }
 
 /**
