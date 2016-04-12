@@ -22,7 +22,7 @@ void CascadeClassifier::setStage(int index, Stage* stage){
 int CascadeClassifier::predict(Data x){
 	for(int i = 0; i < stages.size(); ++i){
 		if(stages[i]->predict(x) != 1){
-			return 0;
+			return -1;
 		}
 	}
 	return 1;

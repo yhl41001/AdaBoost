@@ -69,12 +69,11 @@ StrongClassifier AdaBoost::train(){
 	//Iterate for the specified iterations
 	for (int i = 0; i < this->iterations; ++i) {
 		cout << "Iteration: " << (i + 1) << " | ";
-		normalizeWeights();
 		WeakClassifier* weakClassifier = trainWeakClassifier();
 		double error = weakClassifier->getError();
 		if(error < 0.5){
-			double beta = error / (1 - error);
-			double alpha = 0.5 * log(1 / beta);
+			double alpha = updateAlpha(error);
+			double beta = updateBeta(error);
 			weakClassifier->setAlpha(alpha);
 			weakClassifier->setBeta(beta);
 			updateWeights(weakClassifier);
@@ -200,6 +199,14 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 		}
 	}
 	return bestWeakClass;
+}
+
+double AdaBoost::updateAlpha(double error){
+	return  0.5 * log((1 - error) / error);
+}
+
+double AdaBoost::updateBeta(double error){
+	return error / (1 - error);
 }
 
 void AdaBoost::normalizeWeights(){

@@ -12,6 +12,7 @@
 #include <iostream>
 #include <vector>
 #include "AdaBoost.h"
+#include "classifiers/StrongClassifier.h"
 #include "classifiers/CascadeClassifier.h"
 
 using namespace std;
@@ -23,8 +24,11 @@ private:
 	vector<Data> negatives;
 	CascadeClassifier classifier;
 	pair<double, double> computeRates(vector<Data> features);
+	void resetWeights();
 
 protected:
+	double updateAlpha(double error);
+	double updateBeta(double error);
 	void normalizeWeights();
 	void updateWeights(WeakClassifier* weakClassifier);
 

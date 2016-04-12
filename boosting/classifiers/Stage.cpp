@@ -26,7 +26,7 @@ int Stage::predict(Data x){
 	for(int i = 0; i < classifiers.size(); ++i){
 		sum += classifiers[i].getAlpha() * classifiers[i].predict(x);
 	}
-	return sum >= threshold ? 1 : 0;
+	return sum >= threshold ? 1 : -1;
 }
 
 void Stage::decreaseThreshold(double value){

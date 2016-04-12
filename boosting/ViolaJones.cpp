@@ -15,6 +15,14 @@ ViolaJones::ViolaJones(vector<Data> positives, vector<Data> negatives, int itera
 	this->negatives = negatives;
 }
 
+double ViolaJones::updateAlpha(double error){
+	return  log((1 - error) / error);
+}
+
+double ViolaJones::updateBeta(double error){
+	return error / (1 - error);
+}
+
 void ViolaJones::normalizeWeights(){
 	double norm = 0;
 	for (int i = 0; i < features.size(); ++i) {
@@ -57,6 +65,7 @@ void ViolaJones::train(){
 		while(FPR > minFPR * FPRold){
 			n++;
 			this->iterations = n;
+			resetWeights();
 			StrongClassifier strongClassifier = AdaBoost::train();
 			stage->setClassifiers(strongClassifier.getClassifiers());
 		    //Evaluate current cascaded classifier on validation set to determine F(i) & D(i)
@@ -67,18 +76,21 @@ void ViolaJones::train(){
 			//until the current cascaded classifier has a detection rate of at least d x D(i-1) (this also affects F(i))
 			while(DR < minDR * DRold ){
 				//decrease threshold for the ith classifier
+				cout << "decrease" << endl;
 				stage->decreaseThreshold(0.1);
 				pair<double, double> rates = computeRates(features);
 				FPR = rates.first;
 				DR = rates.second;
 			}
 
+			//N = ∅
 
-//			 N = ∅
-//			if F(i) > Ftarget then
-//			evaluate the current cascaded detector on the set of non-face images
-//			and put any false detections into the set N.
 
+			if(FPR > targetFPR){
+				//if F(i) > Ftarget then
+				//evaluate the current cascaded detector on the set of non-face images
+				//and put any false detections into the set N.
+			}
 		}
 
 
@@ -99,14 +111,11 @@ pair<double, double> ViolaJones::computeRates(vector<Data> features){
 	for(int i = 0; i < predictions.size(); ++i){
 		if(predictions[i] == 1 && features[i].getLabel() == -1){
 			fp++;
-		}
-		if(predictions[i] == -1 && features[i].getLabel() == -1){
+		} else if(predictions[i] == -1 && features[i].getLabel() == -1){
 			tn++;
-		}
-		if(predictions[i] == -1 && features[i].getLabel() == 1){
+		} else if(predictions[i] == -1 && features[i].getLabel() == 1){
 			fn++;
-		}
-		if(predictions[i] == 1 && features[i].getLabel() == 1){
+		} else if(predictions[i] == 1 && features[i].getLabel() == 1){
 			tp++;
 		}
 	}
@@ -119,5 +128,15 @@ pair<double, double> ViolaJones::computeRates(vector<Data> features){
 	return output;
 }
 
-ViolaJones::~ViolaJones(){}
+void ViolaJones::resetWeights(){
+	for (int i = 0; i < features.size(); ++i) {
+		/*	Initialize weights */
+		if (features[i].getLabel() == 1) {
+			features[i].setWeight((double) 1 / (2 * positives.size()));
+		} else {
+			features[i].setWeight((double) 1 / (2 * negatives.size()));
+		}
+	}
+}
 
+ViolaJones::~ViolaJones(){}
