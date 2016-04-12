@@ -29,24 +29,8 @@ AdaBoost::AdaBoost(vector<Data> data, int iterations) :
 	cout << "Initialized uniform weights\n" << endl;
 }
 
-AdaBoost::AdaBoost(vector<Data> positives, vector<Data> negatives, int iterations):
-		iterations(iterations), strongClassifier(
+AdaBoost::AdaBoost(): iterations(0), strongClassifier(
 				*(new StrongClassifier(vector<WeakClassifier> {}))) {
-	vector<double> weights;
-	features.reserve(positives.size() + negatives.size());
-	features.insert(features.end(), positives.begin(), positives.end());
-	features.insert(features.end(), negatives.begin(), negatives.end());
-
-	for (int i = 0; i < features.size(); ++i) {
-		/*	Initialize weights */
-		if (features[i].getLabel() == 1) {
-			features[i].setWeight((double) 1 / (2 * positives.size()));
-		} else {
-			features[i].setWeight((double) 1 / (2 * negatives.size()));
-		}
-	}
-
-	int size = features.size();
 }
 
 /**
@@ -93,11 +77,11 @@ StrongClassifier AdaBoost::train(){
     clock_t c_end = clock();
     auto t_end = chrono::high_resolution_clock::now();
 
-    cout << std::fixed << "\nCPU time used: "
-         << (c_end - c_start) / CLOCKS_PER_SEC << " s\n"
-         << "Time: "
+    cout << std::fixed << "CPU time used: "
+         << (c_end - c_start) / CLOCKS_PER_SEC << " s"
+         << ", Time: "
          << (chrono::duration<double, milli>(t_end - t_start).count())/1000
-         << " s\n\n";
+         << " s" << endl;
     return strongClassifier;
 }
 

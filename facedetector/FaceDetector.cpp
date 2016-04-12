@@ -10,7 +10,7 @@
 
 #include "FaceDetector.h"
 
-FaceDetector::FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int scales, int detectionWindowSize = 24){
+FaceDetector::FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int scales, int detectionWindowSize){
 	cout << "FaceDetector\n************" << endl;
 	cout << "  -Scales: " << scales << "\n  -Window size: "<< detectionWindowSize << endl;
 	this->trainImages = trainImages;
@@ -44,23 +44,39 @@ void FaceDetector::train(){
 	auto t_end = chrono::high_resolution_clock::now();
 	cout << std::fixed << (chrono::duration<double, milli>(t_end - t_start).count())/1000 << " s\n";
 
-	ViolaJones* boost = new ViolaJones(positives, negatives, 20);
+	//FIXME correct the number of stages
+	ViolaJones* boost = new ViolaJones(positives, negatives, 2, 20);
 	boost->train();
 }
 
-
-void FaceDetector::computeImagePyramid(Mat img){
-
-	Mat dst;
-
-	resize(img, dst, Size(), 0.5, 0.5);
-
+vector<Rect> FaceDetector::detect(Mat img){
+	vector<Rect> predictions;
+	double scaleFactor = 0.75;
+	Mat tmp = img;
+	Mat dst, window, intImg;
+	//For each image scale
+	for(int s = 0; s < scales; ++s){
+		//Detection window slides
+		intImg = IntegralImage::computeIntegralImage(tmp);
+		for(int j = 0; j < tmp.rows - detectionWindowSize; ++j){
+			for(int i = 0; i < tmp.cols - detectionWindowSize; ++i){
+				window = intImg(Rect(i, j, detectionWindowSize, detectionWindowSize));
+				//Extracting haar like features
+				vector<double> features = HaarFeatures::extractFeatures(intImg, detectionWindowSize, 0, 0);
+				//FIXME correct the number of stages
+				ViolaJones* boost = new ViolaJones("trainedPath");
+				boost->predict(*(new Data(features)));
+				//TODO handling detection
+			}
+		}
+		resize(tmp, dst, Size(), scaleFactor, scaleFactor);
+		tmp = dst;
+	}
+	return predictions;
 }
+
 
 FaceDetector::~FaceDetector(){
 	trainImages.clear();
 	trainLabels.clear();
 }
-
-
-

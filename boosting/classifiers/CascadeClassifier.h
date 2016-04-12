@@ -29,6 +29,4 @@ public:
 	void setStages(const vector<Stage*>& stages);
 };
 
-
-
 #endif /* BOOSTING_CLASSIFIERS_CASCADECLASSIFIER_H_ */

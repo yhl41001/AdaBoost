@@ -28,6 +28,7 @@ public:
 	int predict(Data x);
 	void decreaseThreshold(double value);
 	~Stage();
+	void printInfo();
 	double getThreshold() const;
 	void setThreshold(double threshold);
 	double getDetectionRate() const;

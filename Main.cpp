@@ -52,8 +52,19 @@ int main( int argc, char** argv ){
 		trainLabels.push_back(-1);
 	}
 
-	FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 12, 6);
+	FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 12);
 	detector->train();
+
+
+	/*
+	Mat test = imread(imagePath + "test/test.jpg", 0);
+	imshow("img", test);
+	waitKey(0);
+
+	detector->detect(test);
+
+	*/
+
 
 	//double a = intImage->computeArea(Rect(1, 1, 1, 1));
 	//cout << a <<endl;

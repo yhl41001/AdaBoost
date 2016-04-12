@@ -32,12 +32,11 @@ private:
 	int detectionWindowSize;
 	int scales;
 	vector<Mat> scaledImages;
-	void computeImagePyramid(Mat img);
 
 public:
-	FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int scales, int detectionWindowSize);
+	FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int scales, int detectionWindowSize = 24);
 	void train();
-	vector<Prediction> detect(Mat img);
+	vector<Rect> detect(Mat img);
 	~FaceDetector();
 
 };

@@ -12,6 +12,7 @@
 #include <iostream>
 #include <vector>
 #include "AdaBoost.h"
+#include "features/Fe
 #include "classifiers/StrongClassifier.h"
 #include "classifiers/CascadeClassifier.h"
 
@@ -20,11 +21,13 @@ using namespace std;
 class ViolaJones: public AdaBoost {
 private:
 	int maxInterations;
+	int maxStages;
 	vector<Data> positives;
 	vector<Data> negatives;
 	CascadeClassifier classifier;
+	vector<Data> falseDetections;
 	pair<double, double> computeRates(vector<Data> features);
-	void resetWeights();
+	void initializeWeights();
 
 protected:
 	double updateAlpha(double error);
@@ -33,8 +36,10 @@ protected:
 	void updateWeights(WeakClassifier* weakClassifier);
 
 public:
-	ViolaJones(vector<Data> positives, vector<Data> negatives, int iterations);
+	ViolaJones(string trainedPath);
+	ViolaJones(vector<Data> positives, vector<Data> negatives, int maxStages, int maxIter);
 	void train();
+	int predict(Data x);
 	~ViolaJones();
 };
 

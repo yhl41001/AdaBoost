@@ -38,7 +38,6 @@ protected:
 public:
 	AdaBoost();
 	AdaBoost(vector<Data> data, int iterations);
-	AdaBoost(vector<Data> positives, vector<Data> negatives, int iterations);
 	int getIterations() const;
 	void setIterations(int iterations);
 	StrongClassifier train();
