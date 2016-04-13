@@ -123,33 +123,27 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 	WeakClassifier* bestWeakClass = new WeakClassifier();
 
 	if (features.size() > 0) {
-
 		//Feature vector dimension
-		int size = features[0].getFeatures().size();
-
+		int dimensions = features[0].getFeatures().size();
 		//Error and signs vector
 		vector<example> signs;
 		vector<double> errors;
 		vector<int> misclassifies;
-
 		//Cumulative sums of the weights
 		double posWeights = 0;
 		double negWeights = 0;
 		double totNegWeights = 0;
 		double totPosWeights = 0;
-
 		//Number of examples
 		int totPositive = 0;
 		int totNegative = 0;
 		int cumPositive = 0;
 		int cumNegative = 0;
-
 		//Errors
 		double weight, error;
 		double errorPos, errorNeg;
 		double threshold;
 		int index;
-
 		double percent = 0;
 
 		//Evaluating total sum of negative and positive weights
@@ -164,7 +158,7 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 		}
 
 		//Iterate through dimensions
-		for (unsigned int j = 0; j < size; ++j) {
+		for (unsigned int j = 0; j < dimensions; ++j) {
 
 			//Sorts vector of features according to the j-th dimension
 			sort(features.begin(), features.end(),
@@ -173,6 +167,7 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 			//Reinitialize variables
 			signs.clear();
 			errors.clear();
+			misclassifies.clear();
 			posWeights = 0;
 			negWeights = 0;
 			cumNegative = 0;
@@ -192,16 +187,20 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 				errorPos = posWeights + (totNegWeights - negWeights);
 				errorNeg = negWeights + (totPosWeights - posWeights);
 
-				cout << "feat: " << i << " errP: " << errorPos << " errN: " << errorNeg << endl;
-
-				if (errorPos > errorNeg) {
-					errors.push_back(errorNeg);
-					signs.push_back(POSITIVE);
-					misclassifies.push_back(cumNegative + (totPositive - cumPositive));
+				if ( (i < features.size() - 1 && features[i].getFeatures()[j] != features[i + 1].getFeatures()[j]) || i == features.size() - 1 ){
+					if (errorPos > errorNeg) {
+						errors.push_back(errorNeg);
+						signs.push_back(POSITIVE);
+						misclassifies.push_back(cumNegative + (totPositive - cumPositive));
+					} else {
+						errors.push_back(errorPos);
+						signs.push_back(NEGATIVE);
+						misclassifies.push_back(cumPositive + (totNegative - cumNegative));
+					}
 				} else {
-					errors.push_back(errorPos);
-					signs.push_back(NEGATIVE);
-					misclassifies.push_back(cumPositive + (totNegative - cumNegative));
+					errors.push_back(1.);
+					signs.push_back(POSITIVE);
+					misclassifies.push_back(0);
 				}
 			}
 
@@ -218,11 +217,11 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 				bestWeakClass->setSign(signs[index]);
 			}
 
-//			if (j % 100 == 0) {
-//				percent = (double) j * 100 / size;
-//				cout << "\rCompleted: " << percent << "%, analyzed " << (j + 1)
-//						<< " dimensions" << flush;
-//			}
+			if (j % 100 == 0) {
+				percent = (double) j * 100 / dimensions;
+				cout << "\rCompleted: " << percent << "%, analyzed " << (j + 1)
+						<< " dimensions" << flush;
+			}
 		}
 	}
 	return bestWeakClass;
