@@ -74,12 +74,12 @@ int main( int argc, char** argv ){
 
 	vector<Data> features = {
 		*(new Data(vector<double>{2, 2}, 1)),
-		*(new Data(vector<double>{2, 4}, -1)),
+		*(new Data(vector<double>{3, 4}, 1)),
 		*(new Data(vector<double>{2, 8}, 1)),
 		*(new Data(vector<double>{2, 3}, -1)),
-		*(new Data(vector<double>{2, 9}, 1)),
-		*(new Data(vector<double>{2, 10}, -1)),
-		*(new Data(vector<double>{3, 4}, 1))
+		*(new Data(vector<double>{4, 9}, -1)),
+		*(new Data(vector<double>{6, 10}, -1)),
+		*(new Data(vector<double>{4, 5}, 1))
 	};
 
 	AdaBoost* boost = new AdaBoost(features, 1);
