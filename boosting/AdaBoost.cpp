@@ -145,8 +145,17 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 		double weight, error;
 		double errorPos, errorNeg;
 		double threshold;
-		int index, misclassified;
 
+		//Variables used for selecting best feature
+		//when more than one feature have the same values
+		double maxError = 0;
+		double oldFeature;
+		example maxSign;
+		bool sameFeatureGroup = false;
+		int index, misclassified, sameFeatureLenght;
+		misclassified = 0;
+
+		//Used for performance
 		double percent = 0;
 
 		//Evaluating total sum of negative and positive weights
@@ -161,7 +170,7 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 		}
 
 		//Iterate through dimensions
-		for(unsigned int j = 0; j < size; ++j){
+		for(unsigned int j = 0; j < 1; ++j){
 
 			//Sorts vector of features according to the j-th dimension
 			sort(features.begin(), features.end(),
@@ -174,11 +183,12 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 			negWeights = 0;
 			cumNegative = 0;
 			cumPositive = 0;
+			sameFeatureLenght = 0;
 
 			//Iterates features
 			for(int i = 0; i < features.size(); ++i){
 				weight = features[i].getWeight();
-				if(features[i].getLabel() == 1){
+				if (features[i].getLabel() == 1) {
 					posWeights += weight;
 					cumPositive++;
 				} else {
@@ -189,15 +199,76 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 				errorPos = posWeights + (totNegWeights - negWeights);
 				errorNeg = negWeights + (totPosWeights - posWeights);
 
-				if(errorPos > errorNeg){
+				if (errorPos > errorNeg) {
+					misclassified = cumNegative + (totPositive - cumPositive);
+					if(i > 0 && features[i].getFeatures()[j] == oldFeature){
+						if(maxError < errorNeg) {
+							maxError = errorNeg;
+							maxSign = POSITIVE;
+						}
+						sameFeatureLenght++;
+						sameFeatureGroup = true;
+					} else {
+						if(sameFeatureGroup){
+							for(unsigned int s = 0; s <= sameFeatureLenght; ++s){
+								errors[i - s - 1] = maxError;
+								signs[i - s - 1]  = maxSign;
+							}
+							sameFeatureGroup = false;
+							maxError = 0;
+							sameFeatureLenght = 0;
+							cout << "end of feature group: maxErr " << maxError << endl;
+						}
+					}
 					errors.push_back(errorNeg);
 					signs.push_back(POSITIVE);
-					misclassified = cumNegative + (totPositive - cumPositive);
 				} else {
+					misclassified = cumPositive + (totNegative - cumNegative);
+					if(i > 0 && features[i].getFeatures()[j] == oldFeature){
+						if(maxError < errorPos){
+							maxError = errorPos;
+							maxSign = NEGATIVE;
+						}
+						sameFeatureLenght++;
+						sameFeatureGroup = true;
+					} else {
+						if(sameFeatureGroup){
+							for(unsigned int s = 0; s <= sameFeatureLenght; ++s){
+								errors[i - s - 1] = maxError;
+								signs[i - s - 1]  = maxSign;
+							}
+
+							cout << "end of feature group: maxErr " << maxError << endl;
+							sameFeatureGroup = false;
+							maxError = 0;
+							sameFeatureLenght = 0;
+						}
+					}
 					errors.push_back(errorPos);
 					signs.push_back(NEGATIVE);
-					misclassified = cumPositive + (totNegative - cumNegative);
 				}
+
+				oldFeature = features[i].getFeatures()[j];
+				cout << "Feat. " << features[i].getFeatures()[j] << ", lab: " << features[i].getLabel();
+				cout << ", err. " << errors[i] << ", mis: " << misclassified << endl;
+			}
+
+			if(sameFeatureGroup){
+				for (unsigned int s = 0; s <= sameFeatureLenght; ++s) {
+					errors[errors.size() - s - 1] = maxError;
+					signs[errors.size() - s - 1] = maxSign;
+				}
+
+				cout << "end of feature group: maxErr " << maxError
+						<< ", size: " << sameFeatureLenght << endl;
+				sameFeatureGroup = false;
+				maxError = 0;
+				sameFeatureLenght = 0;
+			}
+
+
+			for(unsigned int k = 0; k < features.size(); ++k){
+				cout << "feature: " << k << ", err: " << errors[k] << endl;
 			}
 
 			auto errorMin = min_element(begin(errors), end(errors));

@@ -53,8 +53,8 @@ int main( int argc, char** argv ){
 		trainLabels.push_back(-1);
 	}
 
-	FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 12);
-	detector->train();
+	//FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 12);
+	//detector->train();
 
 
 	/*
@@ -69,18 +69,21 @@ int main( int argc, char** argv ){
 
 	//double a = intImage->computeArea(Rect(1, 1, 1, 1));
 	//cout << a <<endl;
-/*
+
+
+
 	vector<Data> features = {
 		*(new Data(vector<double>{2, 2}, 1)),
-		*(new Data(vector<double>{4, 4}, -1)),
-		*(new Data(vector<double>{5, 8}, 1)),
-		*(new Data(vector<double>{6, 3}, -1)),
-		*(new Data(vector<double>{9, 4}, 1)),
-		*(new Data(vector<double>{9, 6}, 1)),
+		*(new Data(vector<double>{2, 4}, -1)),
+		*(new Data(vector<double>{2, 8}, 1)),
+		*(new Data(vector<double>{2, 3}, -1)),
+		*(new Data(vector<double>{2, 9}, 1)),
+		*(new Data(vector<double>{2, 10}, -1)),
+		*(new Data(vector<double>{3, 4}, 1))
 	};
 
-	AdaBoost* boost = new AdaBoost(features, 3);
-	boost->train();*/
+	AdaBoost* boost = new AdaBoost(features, 1);
+	boost->train();
 
 	//int p = boost->predict(*(new Data(vector<double>{4.5, 3.5})));
 
