@@ -126,15 +126,23 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 
 		//Cumulative sums
 		vector<double> w;
-
 		//Iterate through dimensions
+
 		for(int j = 0; j < size; ++j){
+			auto t_start = chrono::high_resolution_clock::now();
+
 			WeakClassifier* weakClassifier = new WeakClassifier();
 			weakClassifier->setDimension(j);
 
 			//Sorts vector of features according to the j-th dimension
-			sort(features.begin(), features.end(), FeatureComparator(j));
+			sort(features.begin(), features.end(),
+					[j](Data const &a, Data const &b) { return a.getFeatures()[j] < b.getFeatures()[j]; });
 
+			auto t_end = chrono::high_resolution_clock::now();
+			cout << "Sorting: "
+			         << (chrono::duration<double, milli>(t_end - t_start).count())/1000
+			         << " s" << endl;
+			t_start = chrono::high_resolution_clock::now();
 			w.clear();
 			double sum = 0;
 
@@ -144,8 +152,18 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 				w.push_back(sum);
 			}
 
+			t_end = chrono::high_resolution_clock::now();
+						cout << "sum: "
+						         << (chrono::duration<double, milli>(t_end - t_start).count())/1000
+						         << " s" << endl;
+						t_start = chrono::high_resolution_clock::now();
 			//Retrieving min and max of the sums
 			auto result = minmax_element(w.begin(), w.end());
+			t_end = chrono::high_resolution_clock::now();
+									cout << "Find min max: "
+									         << (chrono::duration<double, milli>(t_end - t_start).count())/1000
+									         << " s" << endl;
+									t_start = chrono::high_resolution_clock::now();
 			double min = w[result.first - w.begin()];
 			double max = w[result.second - w.begin()];
 			int index;
@@ -178,6 +196,11 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 				bestWeakClass->setMisclassified(weakClassifier->getMisclassified());
 				bestWeakClass->setSign(weakClassifier->getSign());
 			}
+			t_end = chrono::high_resolution_clock::now();
+												cout << "computation: "
+												         << (chrono::duration<double, milli>(t_end - t_start).count())/1000
+												         << " s" << endl;
+
 		}
 	}
 	return bestWeakClass;

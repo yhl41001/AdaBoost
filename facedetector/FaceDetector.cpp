@@ -10,6 +10,16 @@
 
 #include "FaceDetector.h"
 
+FaceDetector::FaceDetector(string trainedCascade){
+	cout << "FaceDetector\n************" << endl;
+	cout << "  -Scales: " << scales << "\n  -Window size: "<< detectionWindowSize << endl;
+	this->trainImages = {};
+	this->trainLabels = {};
+	this->scales = 12;
+	this->detectionWindowSize = 24;
+	boost = new ViolaJones(trainedCascade);
+}
+
 FaceDetector::FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int scales, int detectionWindowSize){
 	cout << "FaceDetector\n************" << endl;
 	cout << "  -Scales: " << scales << "\n  -Window size: "<< detectionWindowSize << endl;
@@ -17,6 +27,7 @@ FaceDetector::FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int
 	this->trainLabels = trainLabels;
 	this->scales = scales;
 	this->detectionWindowSize = detectionWindowSize;
+	boost = new ViolaJones();
 }
 
 void FaceDetector::train(){
@@ -45,7 +56,7 @@ void FaceDetector::train(){
 	cout << std::fixed << (chrono::duration<double, milli>(t_end - t_start).count())/1000 << " s\n";
 
 	//FIXME correct the number of stages
-	ViolaJones* boost = new ViolaJones(positives, negatives, 2, 20);
+	boost = new ViolaJones(positives, negatives, 2, 20);
 	boost->train();
 }
 

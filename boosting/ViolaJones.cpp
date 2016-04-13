@@ -7,6 +7,10 @@
 
 #include "ViolaJones.h"
 
+ViolaJones::ViolaJones(){
+	//TODO load from file
+}
+
 ViolaJones::ViolaJones(string trainedPath){
 	//TODO load from file
 }
@@ -183,5 +187,15 @@ pair<double, double> ViolaJones::computeRates(vector<Data> features){
 	return output;
 }
 
+int ViolaJones::predict(Data x){
+	return classifier.predict(x);
+}
+
+void ViolaJones::store(){
+	FILE *finfo = fopen("info.txt", "w");
+
+
+
+}
 
 ViolaJones::~ViolaJones(){}

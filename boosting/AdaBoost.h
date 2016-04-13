@@ -18,7 +18,6 @@
 
 #include "classifiers/StrongClassifier.h"
 #include "classifiers/WeakClassifier.h"
-#include "features/FeatureComparator.h"
 
 using namespace std;
 

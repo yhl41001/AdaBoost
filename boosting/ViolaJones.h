@@ -12,7 +12,6 @@
 #include <iostream>
 #include <vector>
 #include "AdaBoost.h"
-#include "features/Fe
 #include "classifiers/StrongClassifier.h"
 #include "classifiers/CascadeClassifier.h"
 
@@ -36,10 +35,12 @@ protected:
 	void updateWeights(WeakClassifier* weakClassifier);
 
 public:
+	ViolaJones();
 	ViolaJones(string trainedPath);
 	ViolaJones(vector<Data> positives, vector<Data> negatives, int maxStages, int maxIter);
 	void train();
 	int predict(Data x);
+	void store();
 	~ViolaJones();
 };
 

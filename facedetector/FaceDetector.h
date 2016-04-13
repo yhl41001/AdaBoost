@@ -32,8 +32,10 @@ private:
 	int detectionWindowSize;
 	int scales;
 	vector<Mat> scaledImages;
+	ViolaJones* boost;
 
 public:
+	FaceDetector(string trainedCascade);
 	FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int scales, int detectionWindowSize = 24);
 	void train();
 	vector<Rect> detect(Mat img);

@@ -22,8 +22,8 @@ using namespace cv;
 
 int main( int argc, char** argv ){
 
-	int subjects = 40;
-	int poses = 10;
+	int subjects = 10;
+	int poses = 1;
 	string imagePath = "/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/dataset/";
 	string path;
 
@@ -44,7 +44,8 @@ int main( int argc, char** argv ){
 
 	//Loading training negative images
 	vector<string> negativeImages = Utils::open(imagePath + "negative");
-	for(int k = 0; k < negativeImages.size(); ++k){
+	int negativeExamples = 10;
+	for(int k = 0; k < negativeExamples; ++k){
 		Mat img = imread(imagePath + "negative/" + negativeImages[k]);
 		Mat dest;
 		resize(img, dest, Size(24, 24));
@@ -69,12 +70,12 @@ int main( int argc, char** argv ){
 	//double a = intImage->computeArea(Rect(1, 1, 1, 1));
 	//cout << a <<endl;
 
-//	vector<Data> features = {
-//		*(new Data(vector<double>{2, 2}, 1)),
-//		*(new Data(vector<double>{3, 2}, 1)),
-//		*(new Data(vector<double>{2, 4}, -1)),
-//		*(new Data(vector<double>{5, 5}, -1))
-//	};
+	/*vector<Data> features = {
+		*(new Data(vector<double>{2, 2}, 1)),
+		*(new Data(vector<double>{3, 2}, 1)),
+		*(new Data(vector<double>{2, 4}, -1)),
+		*(new Data(vector<double>{5, 5}, -1))
+	};*/
 
 	//AdaBoost* boost = new AdaBoost(features, 3);
 	//boost->train();
