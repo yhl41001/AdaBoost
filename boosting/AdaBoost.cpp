@@ -50,7 +50,7 @@ StrongClassifier AdaBoost::train(){
 
 	//Iterate for the specified iterations
 	for (int i = 0; i < this->iterations; ++i) {
-		cout << "Iteration: " << (i + 1) << " | ";
+		cout << "Iteration: " << (i + 1) << endl;;
 		WeakClassifier* weakClassifier = trainWeakClassifier();
 		double error = weakClassifier->getError();
 		if(error < 0.5){
@@ -121,86 +121,102 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 	WeakClassifier* bestWeakClass = new WeakClassifier();
 
 	if(features.size() > 0){
+
 		//Feature vector dimension
 		int size = features[0].getFeatures().size();
 
-		//Cumulative sums
-		vector<double> w;
+		//Error and signs vector
+		vector<example> signs;
+		vector<double> errors;
+
+		//Cumulative sums of the weights
+		double posWeights = 0;
+		double negWeights = 0;
+		double totNegWeights = 0;
+		double totPosWeights = 0;
+
+		//Number of examples
+		int totPositive = 0;
+		int totNegative = 0;
+		int cumPositive = 0;
+		int cumNegative = 0;
+
+		//Errors
+		double weight, error;
+		double errorPos, errorNeg;
+		double threshold;
+		int index, misclassified;
+
+		double percent = 0;
+
+		//Evaluating total sum of negative and positive weights
+		for(unsigned int i = 0; i < features.size(); ++i){
+			if(features[i].getLabel() == 1){
+				totPosWeights += features[i].getWeight();
+				totPositive++;
+			} else {
+				totNegWeights += features[i].getWeight();
+				totNegative++;
+			}
+		}
+
 		//Iterate through dimensions
-
-		for(int j = 0; j < size; ++j){
-			auto t_start = chrono::high_resolution_clock::now();
-
-			WeakClassifier* weakClassifier = new WeakClassifier();
-			weakClassifier->setDimension(j);
+		for(unsigned int j = 0; j < size; ++j){
 
 			//Sorts vector of features according to the j-th dimension
 			sort(features.begin(), features.end(),
 					[j](Data const &a, Data const &b) { return a.getFeatures()[j] < b.getFeatures()[j]; });
 
-			auto t_end = chrono::high_resolution_clock::now();
-			cout << "Sorting: "
-			         << (chrono::duration<double, milli>(t_end - t_start).count())/1000
-			         << " s" << endl;
-			t_start = chrono::high_resolution_clock::now();
-			w.clear();
-			double sum = 0;
+			//Reinitialize variables
+			signs.clear();
+			errors.clear();
+			posWeights = 0;
+			negWeights = 0;
+			cumNegative = 0;
+			cumPositive = 0;
 
 			//Iterates features
 			for(int i = 0; i < features.size(); ++i){
-				sum = sum + features[i].getWeight() * features[i].getLabel();
-				w.push_back(sum);
+				weight = features[i].getWeight();
+				if(features[i].getLabel() == 1){
+					posWeights += weight;
+					cumPositive++;
+				} else {
+					negWeights += weight;
+					cumNegative++;
+				}
+
+				errorPos = posWeights + (totNegWeights - negWeights);
+				errorNeg = negWeights + (totPosWeights - posWeights);
+
+				if(errorPos > errorNeg){
+					errors.push_back(errorNeg);
+					signs.push_back(POSITIVE);
+					misclassified = cumNegative + (totPositive - cumPositive);
+				} else {
+					errors.push_back(errorPos);
+					signs.push_back(NEGATIVE);
+					misclassified = cumPositive + (totNegative - cumNegative);
+				}
 			}
 
-			t_end = chrono::high_resolution_clock::now();
-						cout << "sum: "
-						         << (chrono::duration<double, milli>(t_end - t_start).count())/1000
-						         << " s" << endl;
-						t_start = chrono::high_resolution_clock::now();
-			//Retrieving min and max of the sums
-			auto result = minmax_element(w.begin(), w.end());
-			t_end = chrono::high_resolution_clock::now();
-									cout << "Find min max: "
-									         << (chrono::duration<double, milli>(t_end - t_start).count())/1000
-									         << " s" << endl;
-									t_start = chrono::high_resolution_clock::now();
-			double min = w[result.first - w.begin()];
-			double max = w[result.second - w.begin()];
-			int index;
-			double threshold;
+			auto errorMin = min_element(begin(errors), end(errors));
+			error = *errorMin;
 
-			if(abs(min) > abs(max)){
-				//Negative values
-				index = result.first - w.begin();
-
-			} else {
-				//Positive values
-				index = result.second - w.begin();
-			}
-
-			if(w[index] > 0){
-				weakClassifier->setSign(POSITIVE);
-			} else {
-				weakClassifier->setSign(NEGATIVE);
-			}
-
-			//Setting threshold
-			threshold = (features[index]).getFeatures()[j];
-			weakClassifier->setThreshold(threshold);
-
-			double error = weakClassifier->evaluateError(features);
 			if(error < bestWeakClass->getError()){
+				index = errorMin - errors.begin();
+				threshold = (features[index]).getFeatures()[j];
 				bestWeakClass->setError(error);
 				bestWeakClass->setDimension(j);
 				bestWeakClass->setThreshold(threshold);
-				bestWeakClass->setMisclassified(weakClassifier->getMisclassified());
-				bestWeakClass->setSign(weakClassifier->getSign());
+				bestWeakClass->setMisclassified(misclassified);
+				bestWeakClass->setSign(signs[index]);
 			}
-			t_end = chrono::high_resolution_clock::now();
-												cout << "computation: "
-												         << (chrono::duration<double, milli>(t_end - t_start).count())/1000
-												         << " s" << endl;
 
+			if(j % 100 == 0){
+				percent = (double) j * 100 / size;
+				cout << "\rCompleted: " <<  percent << "%, analyzed " << (j + 1) << " dimensions" << flush;
+			}
 		}
 	}
 	return bestWeakClass;

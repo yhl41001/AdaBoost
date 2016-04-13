@@ -69,16 +69,18 @@ int main( int argc, char** argv ){
 
 	//double a = intImage->computeArea(Rect(1, 1, 1, 1));
 	//cout << a <<endl;
-
-	/*vector<Data> features = {
+/*
+	vector<Data> features = {
 		*(new Data(vector<double>{2, 2}, 1)),
-		*(new Data(vector<double>{3, 2}, 1)),
-		*(new Data(vector<double>{2, 4}, -1)),
-		*(new Data(vector<double>{5, 5}, -1))
-	};*/
+		*(new Data(vector<double>{4, 4}, -1)),
+		*(new Data(vector<double>{5, 8}, 1)),
+		*(new Data(vector<double>{6, 3}, -1)),
+		*(new Data(vector<double>{9, 4}, 1)),
+		*(new Data(vector<double>{9, 6}, 1)),
+	};
 
-	//AdaBoost* boost = new AdaBoost(features, 3);
-	//boost->train();
+	AdaBoost* boost = new AdaBoost(features, 3);
+	boost->train();*/
 
 	//int p = boost->predict(*(new Data(vector<double>{4.5, 3.5})));
 

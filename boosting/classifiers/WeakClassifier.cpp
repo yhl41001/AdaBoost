@@ -44,7 +44,7 @@ double WeakClassifier::evaluateError(vector<Data> features){
  * Print info about weak classifier
  */
 void WeakClassifier::printInfo(){
-	std::cout << "alpha: " << alpha << ", dimension: " << dimension
+	std::cout << "\nTrained WeakClassifier: alpha: " << alpha << ", dimension: " << dimension
 			<< ", error: " << error << ", misclassified: " << misclassified
 			<< ", threshold: " << threshold << std::endl;
 }
