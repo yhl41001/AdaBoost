@@ -9,13 +9,14 @@
 #include <string>
 #include <vector>
 #include <opencv2/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include "boosting/AdaBoost.h"
 #include "boosting/features/Data.h"
 #include "facedetector/FaceDetector.h"
 #include "facedetector/utils/IntegralImage.h"
 #include "facedetector/features/HaarFeatures.h"
 #include "facedetector/utils/Utils.hpp"
-#include "opencv2/highgui/highgui.hpp"
+
 
 using namespace std;
 using namespace cv;

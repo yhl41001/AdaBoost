@@ -17,14 +17,14 @@ using namespace std;
 class Stage {
 private:
 	int number;
-	vector<WeakClassifier> classifiers;
+	vector<WeakClassifier*> classifiers;
 	double fpr;
 	double detectionRate;
 	double threshold;
 
 public:
 	Stage(int number);
-	Stage(int number, vector<WeakClassifier> weaks);
+	Stage(int number, vector<WeakClassifier*> weaks);
 	int predict(Data x);
 	void decreaseThreshold(double value);
 	~Stage();
@@ -37,8 +37,8 @@ public:
 	void setFpr(double fpr);
 	int getNumber() const;
 	void setNumber(int number);
-	const vector<WeakClassifier>& getClassifiers() const;
-	void setClassifiers(const vector<WeakClassifier>& classifiers);
+	const vector<WeakClassifier*>& getClassifiers() const;
+	void setClassifiers(const vector<WeakClassifier*>& classifiers);
 };
 
 #endif /* BOOSTING_CLASSIFIERS_STAGE_H_ */

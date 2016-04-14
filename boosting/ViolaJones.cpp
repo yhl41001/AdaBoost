@@ -140,6 +140,8 @@ void ViolaJones::train(){
 				DR = rates.second;
 				stage->setFpr(FPR);
 				stage->setDetectionRate(DR);
+
+				cout << "sono qui? " << endl;
 			}
 		}
 
@@ -156,7 +158,7 @@ void ViolaJones::train(){
 		stage->printInfo();
 		FPRold = FPR;
 	}
-
+	store();
 }
 
 pair<double, double> ViolaJones::computeRates(vector<Data> features){
@@ -179,11 +181,8 @@ pair<double, double> ViolaJones::computeRates(vector<Data> features){
 			tp++;
 		}
 	}
-
-	//cout << "FP: " << fp << ", TN: " << tn << ", FN: " << fn << ", TP: " << tp << endl;
 	output.first = (double) fp / (fp + tn);
 	output.second = (double) tp / (tp + fn);
-	//cout << "FPR: " << output.first << ", Detection Rate: " << output.second << endl;
 	return output;
 }
 
@@ -192,10 +191,42 @@ int ViolaJones::predict(Data x){
 }
 
 void ViolaJones::store(){
-	FILE *finfo = fopen("info.txt", "w");
+	cout << "Storing trained face detector" << endl;
+	ofstream output;
+	output.open ("trained.txt");
 
+	Stage* stage;
+	WeakClassifier* wc;
 
+    for(unsigned int i = 0; i < classifier.getStages().size(); ++i){
+    	stage = classifier.getStages()[i];
 
+    	output << "Stage " << i << "\n\n";
+    	output << "FPR: " << stage->getFpr() << "\n";
+    	output << " DR: " << stage->getDetectionRate() << "\n";
+    	output << " Threshold: " << stage->getThreshold() << "\n";
+    	output << "Classifiers:\n" << endl;
+
+    	for(unsigned int j = 0; j < stage->getClassifiers().size(); ++j){
+    		wc = stage->getClassifiers()[j];
+    		output << "WeakClassifier " << j << "\n";
+    		output << "Error: " << wc->getError() << "\n";
+    		output << "Dimension: " << wc->getDimension() << "\n";
+    		output << "Threshold: " << wc->getThreshold() << "\n";
+    		output << "Alpha: " << wc->getAlpha() << "\n";
+    		output << "Beta: " << wc->getBeta() << "\n";
+    		if(wc->getSign() == POSITIVE){
+    			output << "Sign: POSITIVE\n";
+    		} else {
+    			output << "Sign: NEGATIVE\n";
+    		}
+    		output << "Miscalssified: " << wc->getMisclassified() << "\n\n";
+    	}
+
+    	output << "---------------\n" << endl;
+	}
+
+    output.close();
 }
 
 ViolaJones::~ViolaJones(){}

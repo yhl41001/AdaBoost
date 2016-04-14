@@ -10,6 +10,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include "AdaBoost.h"
 #include "classifiers/StrongClassifier.h"
