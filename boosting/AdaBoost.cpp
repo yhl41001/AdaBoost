@@ -159,10 +159,9 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 
 		//Iterate through dimensions
 		//FIXME remove:
-		dimensions = 30;
+		//dimensions = 30;
 
 		for (unsigned int j = 0; j < dimensions; ++j) {
-
 			//Sorts vector of features according to the j-th dimension
 			sort(features.begin(), features.end(),
 					[j](Data const &a, Data const &b) {return a.getFeatures()[j] < b.getFeatures()[j];});
@@ -221,7 +220,7 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 			}
 
 			percent = (double) j * 100 / (dimensions - 1) ;
-			cout << "\rCompleted: " << percent << "%" << flush;
+			cout << "\rEvaluated: " << j + 1 << "/" << dimensions << " features" << flush;
 		}
 	}
 	return bestWeakClass;

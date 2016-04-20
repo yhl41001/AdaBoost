@@ -12,7 +12,7 @@ Threshold: -170
 Alpha: 1.09861
 Beta: 0.333333
 Sign: NEGATIVE
-Miscalssified: 5
+Misclassified: 5
 
 ---------------
 
@@ -30,7 +30,7 @@ Threshold: -54
 Alpha: 2.19722
 Beta: 0.111111
 Sign: POSITIVE
-Miscalssified: 2
+Misclassified: 2
 
 ---------------
 

@@ -208,7 +208,7 @@ int ViolaJones::predict(Data x){
 }
 
 void ViolaJones::store(){
-	cout << "Storing trained face detector" << endl;
+	cout << "\nStoring trained face detector" << endl;
 	ofstream output;
 	output.open ("trained.txt");
 
