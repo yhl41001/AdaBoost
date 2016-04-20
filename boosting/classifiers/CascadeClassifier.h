@@ -20,10 +20,8 @@ private:
 public:
 	CascadeClassifier();
 	void addStage(Stage* stage);
-	void setStage(int index, Stage* stage);
 	void train();
 	int predict(Data x);
-	vector<int> predict(vector<Data> x);
 	~CascadeClassifier();
 	const vector<Stage*>& getStages() const;
 	void setStages(const vector<Stage*>& stages);

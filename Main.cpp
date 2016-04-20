@@ -63,32 +63,29 @@ int main( int argc, char** argv ){
 	imshow("img", test);
 	waitKey(0);
 
+	test(Rect(0, 0, 1, test.cols))
+
 	detector->detect(test);
 
 	*/
-
-
-	//double a = intImage->computeArea(Rect(1, 1, 1, 1));
-	//cout << a <<endl;
-
-
-	/*
+/*
 	vector<Data> features = {
 		*(new Data(vector<double>{2, 2}, 1)),
 		*(new Data(vector<double>{2, 4}, 1)),
-		*(new Data(vector<double>{2, 8}, -1)),
-		*(new Data(vector<double>{2, 3}, -1))
-		*(new Data(vector<double>{4, 9}, -1))
+		*(new Data(vector<double>{3, 8}, -1)),
+		*(new Data(vector<double>{2, 3}, -1)),
+		*(new Data(vector<double>{4, 9}, -1)),
 		*(new Data(vector<double>{6, 10}, -1)),
 		*(new Data(vector<double>{4, 5}, 1))
-	};
+	};*/
 
-	AdaBoost* boost = new AdaBoost(features, 1);
-	boost->train();*/
+	//AdaBoost* boost = new AdaBoost(features, 3);
+	//boost->train();
 
 	//int p = boost->predict(*(new Data(vector<double>{4.5, 3.5})));
 
 	//cout << p << endl;
 	//delete boost;
+
     return 0;
 }

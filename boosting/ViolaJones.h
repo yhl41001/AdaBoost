@@ -26,7 +26,7 @@ private:
 	vector<Data> negatives;
 	CascadeClassifier classifier;
 	vector<Data> falseDetections;
-	pair<double, double> computeRates(vector<Data> features);
+	pair<double, double> computeRates();
 	void initializeWeights();
 
 protected:

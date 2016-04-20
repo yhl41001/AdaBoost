@@ -30,7 +30,7 @@ private:
 public:
 	WeakClassifier();
 	int predict(Data x);
-	double evaluateError(vector<Data> features);
+	double evaluateError(vector<Data>& features);
 	void printInfo();
 	double getError() const;
 	void setError(double error);

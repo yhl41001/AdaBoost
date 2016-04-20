@@ -12,11 +12,11 @@ Stage::Stage(int number):
 	cout << "\n*** Stage n. " << number << " ***\n" << endl;
 }
 
-Stage::Stage(int number, vector<WeakClassifier*> weaks):
+Stage::Stage(int number, vector<WeakClassifier> weaks):
     number(number), classifiers(weaks), fpr(1.), detectionRate(1.){
 	threshold = 0;
 	for(int i = 0; i < classifiers.size(); ++i){
-		threshold += classifiers[i]->getAlpha();
+		threshold += classifiers[i].getAlpha();
 	}
 	threshold = threshold * 0.5;
 }
@@ -24,8 +24,11 @@ Stage::Stage(int number, vector<WeakClassifier*> weaks):
 int Stage::predict(Data x){
 	double sum = 0;
 	for(int i = 0; i < classifiers.size(); ++i){
-		sum += classifiers[i]->getAlpha() * classifiers[i]->predict(x);
+		sum += classifiers[i].getAlpha() * classifiers[i].predict(x);
+		//cout << "class: " << classifiers[i]->predict(x)<< endl;
 	}
+
+
 	return sum >= threshold ? 1 : -1;
 }
 
@@ -64,11 +67,11 @@ int Stage::getNumber() const {
 	return number;
 }
 
-void Stage::setClassifiers(const vector<WeakClassifier*>& classifiers) {
+void Stage::setClassifiers(const vector<WeakClassifier>& classifiers) {
 	this->classifiers = classifiers;
 	threshold = 0;
 	for (int i = 0; i < classifiers.size(); ++i) {
-		threshold += classifiers[i]->getAlpha();
+		threshold += classifiers[i].getAlpha();
 	}
 	threshold = threshold * 0.5;
 }
@@ -81,7 +84,7 @@ void Stage::printInfo(){
 	cout << "\nStage n. " << number << ", FPR: " << fpr << ", DR: " << detectionRate << endl;
 }
 
-const vector<WeakClassifier*>& Stage::getClassifiers() const {
+const vector<WeakClassifier>& Stage::getClassifiers() const {
 	return classifiers;
 }
 

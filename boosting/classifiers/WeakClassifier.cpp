@@ -27,7 +27,7 @@ int WeakClassifier::predict(Data x){
 /**
  * Evaluate error base on weights and misclassified samples
  */
-double WeakClassifier::evaluateError(vector<Data> features){
+double WeakClassifier::evaluateError(vector<Data>& features){
 	double error = 0;
 	misclassified = 0;
 	for(int i = 0; i < features.size(); ++i){
@@ -46,7 +46,13 @@ double WeakClassifier::evaluateError(vector<Data> features){
 void WeakClassifier::printInfo(){
 	std::cout << "\nTrained WeakClassifier: alpha: " << alpha << ", dimension: " << dimension
 			<< ", error: " << error << ", misclassified: " << misclassified
-			<< ", threshold: " << threshold << std::endl;
+			<< ", threshold: " << threshold
+			<< ", sign: ";
+	if(sign == POSITIVE){
+		std::cout << "positive" << std::endl;
+	} else {
+		std::cout << "negative" << std::endl;
+	}
 }
 
 double WeakClassifier::getError() const {

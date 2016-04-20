@@ -18,7 +18,7 @@ using namespace std;
 AdaBoost::AdaBoost(vector<Data> data, int iterations) :
 	iterations(iterations),
 	features(data),
-	strongClassifier(*(new StrongClassifier(vector<WeakClassifier*>{}))){
+	strongClassifier(*(new StrongClassifier(vector<WeakClassifier>{}))){
 	int size = features.size();
 	cout << "Initializing AdaBoost with " << iterations << " iterations" << endl;
 	cout << "Training size: " << size << "\n" << endl;
@@ -30,7 +30,7 @@ AdaBoost::AdaBoost(vector<Data> data, int iterations) :
 }
 
 AdaBoost::AdaBoost(): iterations(0), strongClassifier(
-				*(new StrongClassifier(vector<WeakClassifier*> {}))) {
+				*(new StrongClassifier(vector<WeakClassifier> {}))) {
 }
 
 /**
@@ -46,7 +46,7 @@ StrongClassifier AdaBoost::train(){
 	strongClassifier.setTrained(false);
 
 	//The vector of weak classifiers
-	vector<WeakClassifier*> classifiers;
+	vector<WeakClassifier> classifiers;
 
 	//Iterate for the specified iterations
 	for (int i = 0; i < this->iterations; ++i) {
@@ -60,7 +60,7 @@ StrongClassifier AdaBoost::train(){
 			weakClassifier->setBeta(beta);
 			updateWeights(weakClassifier);
 			weakClassifier->printInfo();
-			classifiers.push_back(weakClassifier);
+			classifiers.push_back(*weakClassifier);
 
 			delete weakClassifier;
 			//If error is 0, classification is perfect (linearly separable data)
@@ -159,12 +159,18 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 
 		//Iterate through dimensions
 		//FIXME rremove:
-		dimensions = 100;
-		for (unsigned int j = 0; j < dimensions; ++j) {
+		dimensions = 30;
 
+		for (unsigned int j = 25; j < dimensions; ++j) {
+
+			//cout << "\ndimension: " << j << endl;
 			//Sorts vector of features according to the j-th dimension
 			sort(features.begin(), features.end(),
 					[j](Data const &a, Data const &b) {return a.getFeatures()[j] < b.getFeatures()[j];});
+
+			/*for(int t = 0; t < features.size(); ++t){
+				cout << "Lab: " << features[t].getLabel() << ", Val: " << features[t].getFeatures()[j]<< endl;
+			}*/
 
 			//Reinitialize variables
 			signs.clear();
@@ -219,11 +225,12 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 				bestWeakClass->setSign(signs[index]);
 			}
 
+			/*
 			if (j % 100 == 0) {
 				percent = (double) j * 100 / dimensions;
 				cout << "\rCompleted: " << percent << "%, analyzed " << (j + 1)
 						<< " dimensions" << flush;
-			}
+			}*/
 		}
 	}
 	return bestWeakClass;
