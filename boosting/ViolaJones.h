@@ -20,7 +20,6 @@ using namespace std;
 
 class ViolaJones: public AdaBoost {
 private:
-	int maxInterations;
 	int maxStages;
 	vector<Data> positives;
 	vector<Data> negatives;
@@ -38,7 +37,7 @@ protected:
 public:
 	ViolaJones();
 	ViolaJones(string trainedPath);
-	ViolaJones(vector<Data> positives, vector<Data> negatives, int maxStages, int maxIter);
+	ViolaJones(vector<Data> positives, vector<Data> negatives, int maxStages);
 	void train();
 	int predict(Data x);
 	void store();

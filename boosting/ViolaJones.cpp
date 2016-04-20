@@ -15,10 +15,9 @@ ViolaJones::ViolaJones(string trainedPath){
 	//TODO load from file
 }
 
-ViolaJones::ViolaJones(vector<Data> positives, vector<Data> negatives, int maxStages, int maxIter):
+ViolaJones::ViolaJones(vector<Data> positives, vector<Data> negatives, int maxStages):
 	AdaBoost(){
-	this->iterations = maxIter;
-	this->maxInterations = maxIter;
+	this->iterations = 0;
 	this->maxStages = maxStages;
 	this->classifier = *(new CascadeClassifier());
 	this->positives = positives;
@@ -129,9 +128,6 @@ void ViolaJones::train(){
 			StrongClassifier strongClassifier = AdaBoost::train();
 			stage->setClassifiers(strongClassifier.getClassifiers());
 
-
-
-
 		    //Evaluate current cascaded classifier on validation set to determine F(i) & D(i)
 			pair<double, double> rates = computeRates();
 			FPR = rates.first;
@@ -139,8 +135,6 @@ void ViolaJones::train(){
 			DRtmp = 1.1;
 			stage->setFpr(FPR);
 			stage->setDetectionRate(DR);
-
-			cout << "DR: " << DR << " eval: " <<  minDR * DRold << endl;
 
 			//until the current cascaded classifier has a detection rate of at least d x D(i-1) (this also affects F(i))
 			while(DR < minDR * DRold && DR != DRtmp){
@@ -177,7 +171,7 @@ pair<double, double> ViolaJones::computeRates(){
 
 	int m = 0;
 	for(int f=0;f<features.size();++f){
-		cout << "Feat: " << f << ", lab: " << features[f].getLabel() << ", pred: " << classifier.predict(features[f]) << endl;
+		//cout << "Feat: " << f << ", lab: " << features[f].getLabel() << ", pred: " << classifier.predict(features[f]) << endl;
 		if(features[f].getLabel() != classifier.predict(features[f])){
 			m++;
 		}
@@ -242,7 +236,7 @@ void ViolaJones::store(){
     		} else {
     			output << "Sign: NEGATIVE\n";
     		}
-    		output << "Miscalssified: " << wc.getMisclassified() << "\n\n";
+    		output << "Misclassified: " << wc.getMisclassified() << "\n\n";
     	}
 
     	output << "---------------\n" << endl;
