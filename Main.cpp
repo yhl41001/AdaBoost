@@ -59,16 +59,14 @@ int main( int argc, char** argv ){
 
 	FaceDetector* detector = new FaceDetector("test.txt");
 
-	/*
+
 	Mat test = imread(imagePath + "test/test.jpg", 0);
 	imshow("img", test);
 	waitKey(0);
 
-	test(Rect(0, 0, 1, test.cols))
-
 	detector->detect(test);
 
-	*/
+
 /*
 	vector<Data> features = {
 		*(new Data(vector<double>{2, 2}, 1)),

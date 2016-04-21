@@ -173,16 +173,6 @@ void ViolaJones::train(){
 pair<double, double> ViolaJones::computeRates(){
 	pair<double, double> output;
 	falseDetections.clear();
-
-	int m = 0;
-	for(int f=0;f<features.size();++f){
-		//cout << "Feat: " << f << ", lab: " << features[f].getLabel() << ", pred: " << classifier.predict(features[f]) << endl;
-		if(features[f].getLabel() != classifier.predict(features[f])){
-			m++;
-		}
-	}
-	cout << "misclass: " << m << endl;
-
 	int tp = 0;
 	int fp = 0;
 	int tn = 0;
@@ -204,7 +194,6 @@ pair<double, double> ViolaJones::computeRates(){
 	output.first = (double) fp / (fp + tn);
 	output.second = (double) tp / (tp + fn);
 
-	//cout << "FP: " << fp << ", TP: " << tp << ", FN: " << fn << ", TN: " << tn << endl;
 	return output;
 }
 
@@ -214,19 +203,24 @@ int ViolaJones::predict(Data x){
 
 void ViolaJones::store(){
 	cout << "\nStoring trained face detector" << endl;
-	ofstream output;
-	output.open ("trained.txt");
+	ofstream output, data;
+	output.open ("trainedInfo.txt");
+	data.open ("trainedData.txt");
 
 	WeakClassifier wc;
 
     for(unsigned int i = 0; i < classifier.getStages().size(); ++i){
     	Stage* stage = classifier.getStages()[i];
 
+    	//Outputs info
     	output << "Stage " << i << "\n\n";
     	output << "FPR: " << stage->getFpr() << "\n";
     	output << "DR: " << stage->getDetectionRate() << "\n";
     	output << "Threshold: " << stage->getThreshold() << "\n";
     	output << "Classifiers:\n" << endl;
+    	//Output data
+		data << "s:" << stage->getFpr() << "," << stage->getDetectionRate()
+				<< "," << stage->getDetectionRate() << "\n";
 
     	for(unsigned int j = 0; j < stage->getClassifiers().size(); ++j){
     		wc = stage->getClassifiers()[j];
@@ -242,6 +236,16 @@ void ViolaJones::store(){
     			output << "Sign: NEGATIVE\n";
     		}
     		output << "Misclassified: " << wc.getMisclassified() << "\n\n";
+    		//Outputs data
+			data << "c:" << wc.getError() << "," << wc.getDimension() << ","
+					<< wc.getThreshold() << "," << wc.getAlpha() << ","
+					<< wc.getBeta() << ",";
+			if (wc.getSign() == POSITIVE) {
+				data << "POSITIVE,";
+			} else {
+				data << "NEGATIVE,";
+			}
+			data << wc.getMisclassified() << "\n";
     	}
 
     	output << "---------------\n" << endl;
