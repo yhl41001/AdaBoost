@@ -15,11 +15,11 @@
 #include <opencv2/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include "utils/Prediction.h"
 #include "../boosting/features/Data.h"
 #include "../boosting/ViolaJones.h"
 #include "features/HaarFeatures.h"
 #include "utils/IntegralImage.h"
+#include "utils/Utils.hpp"
 
 using namespace std;
 using namespace cv;
@@ -33,11 +33,13 @@ private:
 	int scales;
 	vector<Mat> scaledImages;
 	ViolaJones* boost;
+	bool showResults;
 
 public:
 	FaceDetector(string trainedCascade);
 	FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int scales, int detectionWindowSize = 24);
 	void train();
+	vector<Rect> detect(Mat img, bool showResults);
 	vector<Rect> detect(Mat img);
 	~FaceDetector();
 

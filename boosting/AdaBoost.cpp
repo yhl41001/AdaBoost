@@ -158,9 +158,6 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 		}
 
 		//Iterate through dimensions
-		//FIXME remove:
-		//dimensions = 30;
-
 		for (unsigned int j = 0; j < dimensions; ++j) {
 			//Sorts vector of features according to the j-th dimension
 			sort(features.begin(), features.end(),

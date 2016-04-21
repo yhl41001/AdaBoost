@@ -24,10 +24,7 @@ int Stage::predict(Data x){
 	double sum = 0;
 	for(int i = 0; i < classifiers.size(); ++i){
 		sum += classifiers[i].getAlpha() * classifiers[i].predict(x);
-		//cout << "class: " << classifiers[i]->predict(x)<< endl;
 	}
-
-
 	return sum >= threshold ? 1 : -1;
 }
 

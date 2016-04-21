@@ -9,12 +9,15 @@
 
 ViolaJones::ViolaJones(): AdaBoost(){
 	this->maxStages = 0;
+	this->selectedFeatures = {};
+	this->falseDetections = {};
 }
 
 ViolaJones::ViolaJones(string trainedPath): AdaBoost(){
 	this->maxStages = 0;
 	this->iterations = 0;
 	this->falseDetections = {};
+	this->selectedFeatures = {};
 	this->classifier = *(new CascadeClassifier());
 	loadTrainedData(trainedPath);
 }
@@ -27,6 +30,7 @@ ViolaJones::ViolaJones(vector<Data> positives, vector<Data> negatives, int maxSt
 	this->positives = positives;
 	this->negatives = negatives;
 	this->falseDetections = {};
+	this->selectedFeatures = {};
 	cout << "\nInitializing ViolaJones AdaBoost with " << iterations << " iterations" << endl;
 	cout << "Training size: " << (positives.size() + negatives.size()) << endl;
 	cout << "  -Positive samples: " << positives.size() << endl;
@@ -296,11 +300,26 @@ void ViolaJones::loadTrainedData(string filename){
 			}
 			getline(iss, read, ',');
 			wc->setMisclassified(stoi(read));
+			vector<Rect> whites;
+			vector<Rect> blacks;
+			HaarSingle haar;
+			HaarFeatures::getFeature(24, wc->getDimension(), haar);
+			selectedFeatures.push_back(haar);
 			stage->addClassifier(wc);
 		}
 	}
+
 	readFile.close();
 	cout << "Trained data loaded correctly" << endl;
+}
+
+const vector<HaarSingle>& ViolaJones::getSelectedFeatures() const {
+	return selectedFeatures;
+}
+
+void ViolaJones::setSelectedFeatures(
+		const vector<HaarSingle>& selectedFeatures) {
+	this->selectedFeatures = selectedFeatures;
 }
 
 ViolaJones::~ViolaJones(){}

@@ -59,12 +59,8 @@ int main( int argc, char** argv ){
 
 	FaceDetector* detector = new FaceDetector("test.txt");
 
-
-	Mat test = imread(imagePath + "test/test.jpg", 0);
-	imshow("img", test);
-	waitKey(0);
-
-	detector->detect(test);
+	Mat test = imread(imagePath + "test/test3.jpg", 0);
+	detector->detect(test, true);
 
 
 /*
