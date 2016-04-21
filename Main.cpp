@@ -53,12 +53,8 @@ int main( int argc, char** argv ){
 		trainLabels.push_back(-1);
 	}
 
-
-
-
-	//Mat test = imread(imagePath + "test/test3.jpg", 0);
-	Mat test = imread(imagePath + "s1/1.pgm", 0);
-
+	Mat test = imread(imagePath + "test/test3.jpg", 0);
+	//Mat test = imread(imagePath + "s1/1.pgm", 0);
 
 	//FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 12);
 	//detector->train();

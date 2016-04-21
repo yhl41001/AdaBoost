@@ -17,7 +17,7 @@ FaceDetector::FaceDetector(string trainedCascade){
 	this->scales = 12;
 	this->detectionWindowSize = 24;
 	this->showResults = false;
-	this->delta = 1.5;
+	this->delta = 1.;
 	cout << "  -Scales: " << scales << "\n  -Window size: "<< detectionWindowSize << endl;
 	boost = new ViolaJones(trainedCascade);
 }
@@ -81,16 +81,11 @@ vector<Rect> FaceDetector::detect(Mat img){
 	Mat tmp = img;
 	Mat dst, window, intImg;
 
-	unsigned int f = 0;
-	unsigned int n = 0;
-
 	//For each image scale
 	for(int s = 0; s < scales; ++s){
 		cout << "Try scale " << s << endl;
 		scaleRefactor = scaleFactor * (s + 1);
 		//Detection window slides
-		f = 0;
-		n = 0;
 		intImg = IntegralImage::computeIntegralImage(tmp);
 		for(int j = 0; j < tmp.rows - detectionWindowSize; ++j){
 			for(int i = 0; i < tmp.cols - detectionWindowSize; ++i){
@@ -106,15 +101,17 @@ vector<Rect> FaceDetector::detect(Mat img){
 		tmp = dst;
 	}
 
+	cout << "Detected: " << predictions.size() << " faces" << endl;
 	t_end = chrono::high_resolution_clock::now();
 	cout << "Detection time: " << (chrono::duration<double, milli>(t_end - t_start).count())/1000 << " s" << endl;
 
-//	predictions = Utils::mergeRectangles(predictions, 0.5, 5);
+    predictions = Utils::mergeRectangles(predictions, 0.8, 10);
 	if(showResults){
+		cout << "Merged: " << predictions.size() << endl;
 		for(int p = 0; p < predictions.size(); ++p){
 			rectangle(img, predictions[p], Scalar(255, 255, 255));
 		}
-		imshow("output", img);
+		imshow("img", img);
 		waitKey(0);
 	}
 
