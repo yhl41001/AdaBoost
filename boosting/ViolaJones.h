@@ -11,6 +11,8 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <string>
 #include <vector>
 #include "AdaBoost.h"
 #include "classifiers/StrongClassifier.h"
@@ -40,6 +42,7 @@ public:
 	ViolaJones(vector<Data> positives, vector<Data> negatives, int maxStages);
 	void train();
 	int predict(Data x);
+	void loadTrainedData(string filename);
 	void store();
 	~ViolaJones();
 };

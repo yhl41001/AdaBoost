@@ -7,12 +7,16 @@
 
 #include "ViolaJones.h"
 
-ViolaJones::ViolaJones(){
-	//TODO load from file
+ViolaJones::ViolaJones(): AdaBoost(){
+	this->maxStages = 0;
 }
 
-ViolaJones::ViolaJones(string trainedPath){
-	//TODO load from file
+ViolaJones::ViolaJones(string trainedPath): AdaBoost(){
+	this->maxStages = 0;
+	this->iterations = 0;
+	this->falseDetections = {};
+	this->classifier = *(new CascadeClassifier());
+	loadTrainedData(trainedPath);
 }
 
 ViolaJones::ViolaJones(vector<Data> positives, vector<Data> negatives, int maxStages):
@@ -110,6 +114,7 @@ void ViolaJones::train(){
 		FPR = FPRold;
 		DR = DRold;
 		Stage* stage = new Stage(i - 1);
+		cout << "\n*** Stage n. " << i - 1 << " ***\n" << endl;
 		classifier.addStage(stage);
 		while(FPR > minFPR * FPRold){
 			n++;
@@ -219,8 +224,8 @@ void ViolaJones::store(){
 
     	output << "Stage " << i << "\n\n";
     	output << "FPR: " << stage->getFpr() << "\n";
-    	output << " DR: " << stage->getDetectionRate() << "\n";
-    	output << " Threshold: " << stage->getThreshold() << "\n";
+    	output << "DR: " << stage->getDetectionRate() << "\n";
+    	output << "Threshold: " << stage->getThreshold() << "\n";
     	output << "Classifiers:\n" << endl;
 
     	for(unsigned int j = 0; j < stage->getClassifiers().size(); ++j){
@@ -243,6 +248,55 @@ void ViolaJones::store(){
 	}
 
     output.close();
+}
+
+void ViolaJones::loadTrainedData(string filename){
+	cout << "Loading data from file: " << filename << endl;
+	string line;
+	string read;
+	ifstream readFile(filename);
+	Stage* stage;
+	WeakClassifier* wc;
+
+	while(getline(readFile,line)){
+		stringstream iss(line);
+		getline(iss, read, ':');
+		if (read.compare("s") == 0) {
+			//Found stage
+			stage = new Stage(classifier.getStages().size());
+			getline(iss, read, ',');
+			stage->setFpr(stod(read));
+			getline(iss, read, ',');
+			stage->setDetectionRate(stod(read));
+			getline(iss, read, ',');
+			stage->setThreshold(stod(read));
+			classifier.addStage(stage);
+		} else if (read.compare("c") == 0) {
+			//Found classifier
+			wc = new WeakClassifier();
+			getline(iss, read, ',');
+			wc->setError(stod(read));
+			getline(iss, read, ',');
+			wc->setDimension(stoi(read));
+			getline(iss, read, ',');
+			wc->setThreshold(stod(read));
+			getline(iss, read, ',');
+			wc->setAlpha(stod(read));
+			getline(iss, read, ',');
+			wc->setBeta(stod(read));
+			getline(iss, read, ',');
+			if (read.compare("POSITIVE") == 0) {
+				wc->setSign(POSITIVE);
+			} else {
+				wc->setSign(NEGATIVE);
+			}
+			getline(iss, read, ',');
+			wc->setMisclassified(stoi(read));
+			stage->addClassifier(wc);
+		}
+	}
+	readFile.close();
+	cout << "Trained data loaded correctly" << endl;
 }
 
 ViolaJones::~ViolaJones(){}

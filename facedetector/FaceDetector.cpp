@@ -12,11 +12,11 @@
 
 FaceDetector::FaceDetector(string trainedCascade){
 	cout << "FaceDetector\n************" << endl;
-	cout << "  -Scales: " << scales << "\n  -Window size: "<< detectionWindowSize << endl;
 	this->trainImages = {};
 	this->trainLabels = {};
 	this->scales = 12;
 	this->detectionWindowSize = 24;
+	cout << "  -Scales: " << scales << "\n  -Window size: "<< detectionWindowSize << endl;
 	boost = new ViolaJones(trainedCascade);
 }
 

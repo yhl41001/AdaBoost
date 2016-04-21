@@ -39,6 +39,7 @@ public:
 	void setNumber(int number);
 	const vector<WeakClassifier>& getClassifiers() const;
 	void setClassifiers(const vector<WeakClassifier>& classifiers);
+	void addClassifier(WeakClassifier* wc);
 };
 
 #endif /* BOOSTING_CLASSIFIERS_STAGE_H_ */
