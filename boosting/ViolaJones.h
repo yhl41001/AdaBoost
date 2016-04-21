@@ -18,10 +18,10 @@
 #include <string>
 #include <vector>
 #include "AdaBoost.h"
-#include "../facedetector/features/HaarFeatures.h"
-#include "../facedetector/features/HaarSingle.h"
+#include "features/Haar.h"
 #include "classifiers/StrongClassifier.h"
 #include "classifiers/CascadeClassifier.h"
+#include "features/HaarFeatures.h"
 
 using namespace std;
 using namespace cv;
@@ -35,7 +35,7 @@ private:
 	vector<Data> falseDetections;
 	pair<double, double> computeRates();
 	void initializeWeights();
-	vector<HaarSingle> selectedFeatures;
+	vector<Haar> selectedFeatures;
 
 protected:
 	double updateAlpha(double error);
@@ -48,12 +48,13 @@ public:
 	ViolaJones(string trainedPath);
 	ViolaJones(vector<Data> positives, vector<Data> negatives, int maxStages);
 	void train();
-	int predict(Data x);
+	int predict(Mat img, int size);
+	int predict(vector<double> x);
 	void loadTrainedData(string filename);
 	void store();
 	~ViolaJones();
-	const vector<HaarSingle>& getSelectedFeatures() const;
-	void setSelectedFeatures(const vector<HaarSingle>& selectedFeatures);
+	const vector<Haar>& getSelectedFeatures() const;
+	void setSelectedFeatures(const vector<Haar>& selectedFeatures);
 };
 
 #endif /* BOOSTING_VIOLAJONES_H_ */

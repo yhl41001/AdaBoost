@@ -15,9 +15,18 @@ void CascadeClassifier::addStage(Stage* stage){
 	stages.push_back(stage);
 }
 
-int CascadeClassifier::predict(Data x){
+int CascadeClassifier::predict(vector<double> x){
 	for(int i = 0; i < stages.size(); ++i){
 		if(stages[i]->predict(x) != 1){
+			return -1;
+		}
+	}
+	return 1;
+}
+
+int CascadeClassifier::predict(vector<Haar> values){
+	for(int i = 0; i < stages.size(); ++i){
+		if (stages[i]->predict(values) != 1) {
 			return -1;
 		}
 	}

@@ -15,12 +15,35 @@ WeakClassifier::WeakClassifier(): error(1.), dimension(0),
  * Predict feature label
  */
 int WeakClassifier::predict(Data x){
-	if(x.getFeatures()[dimension] <= threshold){
-		if(sign == POSITIVE) return 1;
-		else return -1;
+	return predict(x.getFeatures());
+}
+
+int WeakClassifier::predict(vector<Haar> values){
+	for(int i = 0; i < values.size(); ++i){
+		if(values[i].getDimension() == dimension){
+			if(values[i].getValue() <= threshold){
+				if (sign == POSITIVE) return 1;
+				else return -1;
+			} else {
+				if (sign == POSITIVE) return -1;
+				else return 1;
+			}
+		}
+	}
+	return -1;
+}
+
+int WeakClassifier::predict(vector<double> x){
+	if(x[dimension] <= threshold){
+		if (sign == POSITIVE)
+			return 1;
+		else
+			return -1;
 	} else {
-		if(sign == POSITIVE) return -1;
-		else return 1;
+		if (sign == POSITIVE)
+			return -1;
+		else
+			return 1;
 	}
 }
 

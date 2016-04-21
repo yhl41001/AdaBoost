@@ -20,10 +20,18 @@ Stage::Stage(int number, vector<WeakClassifier> weaks):
 	threshold = threshold * 0.5;
 }
 
-int Stage::predict(Data x){
+int Stage::predict(vector<double> x){
 	double sum = 0;
-	for(int i = 0; i < classifiers.size(); ++i){
+	for (int i = 0; i < classifiers.size(); ++i) {
 		sum += classifiers[i].getAlpha() * classifiers[i].predict(x);
+	}
+	return sum >= threshold ? 1 : -1;
+}
+
+int Stage::predict(vector<Haar> values){
+	double sum = 0;
+	for (int i = 0; i < classifiers.size(); ++i) {
+		sum += classifiers[i].getAlpha() * classifiers[i].predict(values);
 	}
 	return sum >= threshold ? 1 : -1;
 }

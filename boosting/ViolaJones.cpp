@@ -183,7 +183,7 @@ pair<double, double> ViolaJones::computeRates(){
 	int fn = 0;
 	int prediction;
 	for(int i = 0; i < features.size(); ++i){
-		prediction = classifier.predict(features[i]);
+		prediction = classifier.predict(features[i].getFeatures());
 		if(prediction == 1 && features[i].getLabel() == -1){
 			fp++;
 			falseDetections.push_back(features[i]);
@@ -201,8 +201,15 @@ pair<double, double> ViolaJones::computeRates(){
 	return output;
 }
 
-int ViolaJones::predict(Data x){
+int ViolaJones::predict(vector<double> x){
 	return classifier.predict(x);
+}
+
+int ViolaJones::predict(Mat img, int size){
+	for(int i = 0; i < selectedFeatures.size(); ++i){
+		selectedFeatures[i].evaluate(img);
+	}
+	return classifier.predict(selectedFeatures);
 }
 
 void ViolaJones::store(){
@@ -302,7 +309,7 @@ void ViolaJones::loadTrainedData(string filename){
 			wc->setMisclassified(stoi(read));
 			vector<Rect> whites;
 			vector<Rect> blacks;
-			HaarSingle haar;
+			Haar haar;
 			HaarFeatures::getFeature(24, wc->getDimension(), haar);
 			selectedFeatures.push_back(haar);
 			stage->addClassifier(wc);
@@ -313,12 +320,12 @@ void ViolaJones::loadTrainedData(string filename){
 	cout << "Trained data loaded correctly" << endl;
 }
 
-const vector<HaarSingle>& ViolaJones::getSelectedFeatures() const {
+const vector<Haar>& ViolaJones::getSelectedFeatures() const {
 	return selectedFeatures;
 }
 
 void ViolaJones::setSelectedFeatures(
-		const vector<HaarSingle>& selectedFeatures) {
+		const vector<Haar>& selectedFeatures) {
 	this->selectedFeatures = selectedFeatures;
 }
 

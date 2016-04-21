@@ -7,13 +7,13 @@
 
 #include "HaarFeatures.h"
 
-void HaarFeatures::getFeature(int size, int dimension, HaarSingle& haar){
+void HaarFeatures::getFeature(int size, int dimension, Haar& haar){
 	Mat img(Size(size, size), CV_8UC3);
 	extractFeatures(img, size, 0, 0, haar, true, dimension);
 }
 
 vector<double> HaarFeatures::extractFeatures(Mat img, int size, int r, int c){
-	HaarSingle haar;
+	Haar haar;
 	return extractFeatures(img, size, r, c, haar, false, 0);
 }
 
@@ -24,9 +24,9 @@ vector<double> HaarFeatures::extractFeatures(Mat img, int size, int r, int c){
  * r: row offset
  * c: column offset
  */
-vector<double> HaarFeatures::extractFeatures(Mat integralImage, int size, int r, int c, HaarSingle& haar, bool store, int dimension) {
+vector<double> HaarFeatures::extractFeatures(Mat integralImage, int size, int r, int c, Haar& haar, bool store, int dimension) {
 
-	vector<double> features;
+	vector<double> features(TOT_FEATURES);
 	int count = 0;
 	double white, black;
 	int x, y, sizeX, sizeY, width, height;
@@ -42,7 +42,7 @@ vector<double> HaarFeatures::extractFeatures(Mat integralImage, int size, int r,
 				for (y = 0; y <= size - height; ++y) {
 					white = IntegralImage::computeArea(integralImage, Rect(x + c, y + r, width / 2, height));
 					black = IntegralImage::computeArea(integralImage, Rect(x + c + width / 2, y + r, width / 2, height));
-					features.push_back((double) (white - black));
+					features[count] = (double) (white - black);
 					if(store && count == dimension){
 						haar.setDimension(dimension);
 						haar.addWhite(Rect(x + c, y + r, width / 2, height));
@@ -65,7 +65,7 @@ vector<double> HaarFeatures::extractFeatures(Mat integralImage, int size, int r,
 				for (y = 0; y <= size - height; ++y) {
 					white = IntegralImage::computeArea(integralImage, Rect(x + c, y + r, width, height / 2));
 					black = IntegralImage::computeArea(integralImage, Rect(x + c, y + r + height / 2, width, height / 2));
-					features.push_back((double) (white - black));
+					features[count] = (double) (white - black);
 					if(store && count == dimension){
 						haar.setDimension(dimension);
 						haar.addWhite(Rect(x + c, y + r, width, height / 2));
@@ -89,7 +89,7 @@ vector<double> HaarFeatures::extractFeatures(Mat integralImage, int size, int r,
 					white = IntegralImage::computeArea(integralImage, Rect(x + c, y + r, width / 3, height));
 					black = IntegralImage::computeArea(integralImage, Rect(x + c + width / 3, y + r, width / 3, height));
 					white += IntegralImage::computeArea(integralImage, Rect(x + c + 2 * width / 3, y + r, width / 3, height));
-					features.push_back((double) (white - black));
+					features[count] = (double) (white - black);
 					if(store && count == dimension){
 						haar.setDimension(dimension);
 						haar.addWhite(Rect(x + c, y + r, width / 3, height));
@@ -114,7 +114,7 @@ vector<double> HaarFeatures::extractFeatures(Mat integralImage, int size, int r,
 					white = IntegralImage::computeArea(integralImage, Rect(x + c, y + r, width, height / 3));
 					black = IntegralImage::computeArea(integralImage, Rect(x + c, y + r + height / 3, width, height / 3));
 					white += IntegralImage::computeArea(integralImage, Rect(x + c, y + r + 2 * height / 3, width, height / 3));
-					features.push_back((double) (white - black));
+					features[count] = (double) (white - black);
 					if(store && count == dimension){
 						haar.setDimension(dimension);
 						haar.addWhite(Rect(x + c, y + r, width, height / 3));
@@ -140,7 +140,7 @@ vector<double> HaarFeatures::extractFeatures(Mat integralImage, int size, int r,
 					black = IntegralImage::computeArea(integralImage, Rect(x + c + width / 2, y + r, width / 2, height / 2));
 					white += IntegralImage::computeArea(integralImage, Rect(x + c + width / 2, y + r + height / 2, width / 2, height / 2));
 					black += IntegralImage::computeArea(integralImage, Rect(x + c, y + r + height / 2, width / 2, height / 2));
-					features.push_back((double) (white - black));
+					features[count] = (double) (white - black);
 					if(store && count == dimension){
 						haar.setDimension(dimension);
 						haar.addWhite(Rect(x + c, y + r, width / 2, height / 2));
@@ -155,21 +155,13 @@ vector<double> HaarFeatures::extractFeatures(Mat integralImage, int size, int r,
 		}
 	}
 
+
 	return features;
 }
 
 
-vector<double> HaarFeatures::extractSelectedFeatures(Mat img, int size, int r, int c, vector<HaarSingle> selected){
-	vector<double> features;
-	int max = 0;
-	for(int i = 0; i < selected.size(); ++i){
-		if(selected[i].getDimension() > max){
-			max = selected[i].getDimension();
-		}
-	}
-	for(int j = 0; j <= max; ++j){
-		features.push_back(0.);
-	}
+vector<double> HaarFeatures::extractSelectedFeatures(Mat img, int size, int r, int c, vector<Haar> selected){
+	vector<double> features(selected.size(), 0);
 	for(int i = 0; i < selected.size(); ++i){
 		features[selected[i].getDimension()] = selected[i].evaluate(img);
 	}

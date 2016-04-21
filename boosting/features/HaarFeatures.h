@@ -8,26 +8,29 @@
  *
  */
 
-#ifndef FACEDETECTOR_FEATURES_HAARFEATURES_H_
-#define FACEDETECTOR_FEATURES_HAARFEATURES_H_
+#ifndef BOOSTING_FEATURES_HAARFEATURES_H_
+#define BOOSTING_FEATURES_HAARFEATURES_H_
 
 #include <opencv2/core.hpp>
 #include "opencv2/highgui/highgui.hpp"
 #include <vector>
 #include <iostream>
 #include <vector>
+
 #include "../utils/IntegralImage.h"
-#include "HaarSingle.h"
+#include "Haar.h"
+
+#define TOT_FEATURES 162336
 
 using namespace cv;
 using namespace std;
 
 class HaarFeatures {
 public:
-	static void getFeature(int size, int dimension, HaarSingle& haar);
+	static void getFeature(int size, int dimension, Haar& haar);
 	static vector<double> extractFeatures(Mat img, int size, int r, int c);
-	static vector<double> extractFeatures(Mat integralImage, int size, int r, int c, HaarSingle& haar, bool store, int dimension);
-	static vector<double> extractSelectedFeatures(Mat img, int size, int r, int c, vector<HaarSingle> selected);
+	static vector<double> extractFeatures(Mat integralImage, int size, int r, int c, Haar& haar, bool store, int dimension);
+	static vector<double> extractSelectedFeatures(Mat img, int size, int r, int c, vector<Haar> selected);
 
 };
 

@@ -5,28 +5,30 @@
  *      Author: lorenzocioni
  */
 
-#ifndef FACEDETECTOR_FEATURES_HAARSINGLE_H_
-#define FACEDETECTOR_FEATURES_HAARSINGLE_H_
+#ifndef BOOSTING_FEATURES_HAAR_H_
+#define BOOSTING_FEATURES_HAAR_H_
 
 #include <vector>
 #include <opencv2/core.hpp>
 #include <iostream>
+
 #include "../utils/IntegralImage.h"
 
 using namespace std;
 using namespace cv;
 
-class HaarSingle {
+class Haar {
 private:
 	int dimension;
 	vector<Rect> whites;
 	vector<Rect> blacks;
+	double value;
 
 public:
-	HaarSingle();
-	HaarSingle(int dimension);
-	HaarSingle(int dimension, vector<Rect> whites, vector<Rect> blacks);
-	~HaarSingle();
+	Haar();
+	Haar(int dimension);
+	Haar(int dimension, vector<Rect> whites, vector<Rect> blacks);
+	~Haar();
 	double evaluate(Mat intImg);
 	const vector<Rect>& getBlacks() const;
 	void setBlacks(const vector<Rect>& blacks);
@@ -37,8 +39,10 @@ public:
 	const vector<Rect>& getWhites() const;
 	void setWhites(const vector<Rect>& whites);
 	void toString();
+	double getValue() const;
+	void setValue(double value);
 };
 
 
 
-#endif /* FACEDETECTOR_FEATURES_HAARSINGLE_H_ */
+#endif /* BOOSTING_FEATURES_HAAR_H_ */

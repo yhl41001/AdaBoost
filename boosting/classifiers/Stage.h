@@ -25,7 +25,8 @@ private:
 public:
 	Stage(int number);
 	Stage(int number, vector<WeakClassifier> weaks);
-	int predict(Data x);
+	int predict(vector<Haar> values);
+	int predict(vector<double> x);
 	void decreaseThreshold(double value);
 	~Stage();
 	void printInfo();

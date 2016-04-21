@@ -16,9 +16,9 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "../boosting/features/Data.h"
+#include "../boosting/features/HaarFeatures.h"
+#include "../boosting/utils/IntegralImage.h"
 #include "../boosting/ViolaJones.h"
-#include "features/HaarFeatures.h"
-#include "utils/IntegralImage.h"
 #include "utils/Utils.hpp"
 
 using namespace std;
@@ -31,6 +31,7 @@ private:
 	vector<int> trainLabels;
 	int detectionWindowSize;
 	int scales;
+	float delta;
 	vector<Mat> scaledImages;
 	ViolaJones* boost;
 	bool showResults;

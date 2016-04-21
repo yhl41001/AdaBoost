@@ -5,65 +5,68 @@
  *      Author: lorenzocioni
  */
 
-#include "HaarSingle.h"
+#include "Haar.h"
 
-HaarSingle::HaarSingle(){
+Haar::Haar(){
 	this->dimension = 0;
 	this->whites = {};
 	this->blacks = {};
+	this->value = 0;
 }
 
-HaarSingle::HaarSingle(int dimension){
+Haar::Haar(int dimension){
 	this->dimension = dimension;
 	this->whites = {};
 	this->blacks = {};
+	this->value = 0;
 }
 
-HaarSingle::HaarSingle(int dimension, vector<Rect> whites, vector<Rect> blacks){
+Haar::Haar(int dimension, vector<Rect> whites, vector<Rect> blacks){
 	this->dimension = dimension;
 	this->whites = whites;
 	this->blacks = blacks;
+	this->value = 0;
 }
 
-void HaarSingle::addWhite(Rect w){
+void Haar::addWhite(Rect w){
 	whites.push_back(w);
 }
 
-void HaarSingle::addBlack(Rect b){
+void Haar::addBlack(Rect b){
 	blacks.push_back(b);
 }
 
-void HaarSingle::toString(){
+void Haar::toString(){
 	cout << "haar: " << dimension;
 	cout <<"whites" << whites.size();
 	cout << "blacks" << blacks.size();
 }
 
-const vector<Rect>& HaarSingle::getBlacks() const {
+const vector<Rect>& Haar::getBlacks() const {
 	return blacks;
 }
 
-void HaarSingle::setBlacks(const vector<Rect>& blacks) {
+void Haar::setBlacks(const vector<Rect>& blacks) {
 	this->blacks = blacks;
 }
 
-int HaarSingle::getDimension() const {
+int Haar::getDimension() const {
 	return dimension;
 }
 
-void HaarSingle::setDimension(int dimension) {
+void Haar::setDimension(int dimension) {
 	this->dimension = dimension;
 }
 
-const vector<Rect>& HaarSingle::getWhites() const {
+const vector<Rect>& Haar::getWhites() const {
 	return whites;
 }
 
-void HaarSingle::setWhites(const vector<Rect>& whites) {
+void Haar::setWhites(const vector<Rect>& whites) {
 	this->whites = whites;
 }
 
-double HaarSingle::evaluate(Mat intImg){
+double Haar::evaluate(Mat intImg){
 	double white = 0;
 	double black = 0;
 	for(int w = 0; w < whites.size(); ++w){
@@ -72,7 +75,17 @@ double HaarSingle::evaluate(Mat intImg){
 	for(int b = 0; b < whites.size(); ++b){
 		black += IntegralImage::computeArea(intImg, blacks[b]);
 	}
-	return white - black;
+	value = white - black;
+	return value;
 }
 
-HaarSingle::~HaarSingle(){}
+Haar::~Haar() {
+}
+
+double Haar::getValue() const {
+	return value;
+}
+
+void Haar::setValue(double value) {
+	this->value = value;
+}

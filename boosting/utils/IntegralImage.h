@@ -5,8 +5,8 @@
  *      Author: lorenzocioni
  */
 
-#ifndef FACEDETECTOR_UTILS_INTEGRALIMAGE_H_
-#define FACEDETECTOR_UTILS_INTEGRALIMAGE_H_
+#ifndef BOOSTING_UTILS_INTEGRALIMAGE_H_
+#define BOOSTING_UTILS_INTEGRALIMAGE_H_
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -19,6 +19,4 @@ public:
 	static double computeArea(Mat intImg, Rect r);
 };
 
-
-
-#endif /* FACEDETECTOR_UTILS_INTEGRALIMAGE_H_ */
+#endif /* BOOSTING_UTILS_INTEGRALIMAGE_H_ */

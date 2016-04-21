@@ -46,10 +46,10 @@ StrongClassifier AdaBoost::train(){
 	strongClassifier.setTrained(false);
 
 	//The vector of weak classifiers
-	vector<WeakClassifier> classifiers;
+	vector<WeakClassifier> classifiers(iterations);
 
 	//Iterate for the specified iterations
-	for (int i = 0; i < this->iterations; ++i) {
+	for (unsigned int i = 0; i < iterations; ++i) {
 		cout << "Iteration: " << (i + 1) << endl;;
 		WeakClassifier* weakClassifier = trainWeakClassifier();
 		double error = weakClassifier->getError();
@@ -60,8 +60,7 @@ StrongClassifier AdaBoost::train(){
 			weakClassifier->setBeta(beta);
 			updateWeights(weakClassifier);
 			weakClassifier->printInfo();
-			classifiers.push_back(*weakClassifier);
-
+			classifiers[i] = *weakClassifier;
 			delete weakClassifier;
 			//If error is 0, classification is perfect (linearly separable data)
 			if(error == 0){

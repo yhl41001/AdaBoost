@@ -12,19 +12,18 @@
 #include <opencv2/highgui/highgui.hpp>
 #include "boosting/AdaBoost.h"
 #include "boosting/features/Data.h"
+#include "boosting/features/HaarFeatures.h"
+#include "boosting/utils/IntegralImage.h"
 #include "facedetector/FaceDetector.h"
-#include "facedetector/utils/IntegralImage.h"
-#include "facedetector/features/HaarFeatures.h"
 #include "facedetector/utils/Utils.hpp"
-
 
 using namespace std;
 using namespace cv;
 
 int main( int argc, char** argv ){
 
-	int subjects = 10;
-	int poses = 1;
+	int subjects = 40;
+	int poses = 5;
 	string imagePath = "/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/dataset/";
 	string path;
 
@@ -45,7 +44,7 @@ int main( int argc, char** argv ){
 
 	//Loading training negative images
 	vector<string> negativeImages = Utils::open(imagePath + "negative");
-	int negativeExamples = 10;
+	int negativeExamples = 200;
 	for(int k = 0; k < negativeExamples; ++k){
 		Mat img = imread(imagePath + "negative/" + negativeImages[k]);
 		Mat dest;
@@ -54,17 +53,20 @@ int main( int argc, char** argv ){
 		trainLabels.push_back(-1);
 	}
 
+
+
+
+	//Mat test = imread(imagePath + "test/test3.jpg", 0);
+	Mat test = imread(imagePath + "s1/1.pgm", 0);
+
+
 	//FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 12);
 	//detector->train();
 
 	FaceDetector* detector = new FaceDetector("test.txt");
-
-	Mat test = imread(imagePath + "test/test3.jpg", 0);
 	detector->detect(test, true);
 
-
-/*
-	vector<Data> features = {
+	/*vector<Data> features = {
 		*(new Data(vector<double>{2, 2}, 1)),
 		*(new Data(vector<double>{2, 4}, 1)),
 		*(new Data(vector<double>{3, 8}, -1)),
@@ -72,10 +74,10 @@ int main( int argc, char** argv ){
 		*(new Data(vector<double>{4, 9}, -1)),
 		*(new Data(vector<double>{6, 10}, -1)),
 		*(new Data(vector<double>{4, 5}, 1))
-	};*/
+	};
 
-	//AdaBoost* boost = new AdaBoost(features, 3);
-	//boost->train();
+	AdaBoost* boost = new AdaBoost(features, 3);
+	boost->train();*/
 
 	//int p = boost->predict(*(new Data(vector<double>{4.5, 3.5})));
 
