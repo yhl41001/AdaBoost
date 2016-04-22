@@ -22,7 +22,7 @@ ViolaJones::ViolaJones(string trainedPath): AdaBoost(){
 	loadTrainedData(trainedPath);
 }
 
-ViolaJones::ViolaJones(vector<Data> positives, vector<Data> negatives, int maxStages):
+ViolaJones::ViolaJones(vector<Data*> positives, vector<Data*> negatives, int maxStages):
 	AdaBoost(){
 	this->iterations = 0;
 	this->maxStages = maxStages;
@@ -35,7 +35,6 @@ ViolaJones::ViolaJones(vector<Data> positives, vector<Data> negatives, int maxSt
 	cout << "Training size: " << (positives.size() + negatives.size()) << endl;
 	cout << "  -Positive samples: " << positives.size() << endl;
 	cout << "  -Negative samples: " << negatives.size() << endl;
-	cout << "  -Max iterations: " << iterations << "\n" << endl;
 
 	features = {};
 	features.reserve(positives.size() + negatives.size());
@@ -44,10 +43,10 @@ ViolaJones::ViolaJones(vector<Data> positives, vector<Data> negatives, int maxSt
 
 	for (int i = 0; i < features.size(); ++i) {
 		/*	Initialize weights */
-		if (features[i].getLabel() == 1) {
-			features[i].setWeight((double) 1 / (2 * positives.size()));
+		if (features[i]->getLabel() == 1) {
+			features[i]->setWeight((double) 1 / (2 * positives.size()));
 		} else {
-			features[i].setWeight((double) 1 / (2 * negatives.size()));
+			features[i]->setWeight((double) 1 / (2 * negatives.size()));
 		}
 	}
 	initializeWeights();
@@ -64,28 +63,28 @@ double ViolaJones::updateBeta(double error){
 void ViolaJones::normalizeWeights(){
 	double norm = 0;
 	for (int i = 0; i < features.size(); ++i) {
-		norm += features[i].getWeight();
+		norm += features[i]->getWeight();
 	}
 	for (int i = 0; i < features.size(); ++i) {
-		features[i].setWeight((double) features[i].getWeight() / norm);
+		features[i]->setWeight((double) features[i]->getWeight() / norm);
 	}
 }
 
 void ViolaJones::initializeWeights(){
 	for(int i = 0; i < positives.size(); ++i){
-		positives[i].setWeight((double) 1 / (2 * positives.size()));
+		positives[i]->setWeight((double) 1 / (2 * positives.size()));
 	}
 	for(int i = 0; i < negatives.size(); ++i){
-		negatives[i].setWeight((double) 1 / (2 * negatives.size()));
+		negatives[i]->setWeight((double) 1 / (2 * negatives.size()));
 	}
 }
 
 void ViolaJones::updateWeights(WeakClassifier* weakClassifier){
 	for(int i = 0; i < features.size(); ++i){
-		int e = (features[i].getLabel()
+		int e = (features[i]->getLabel()
 				* weakClassifier->predict(this->features[i]) > 0) ? 0 : 1;
-		double num = features[i].getWeight() * (pow(weakClassifier->getBeta(), (double) (1 - e)));
-		features[i].setWeight(num);
+		double num = features[i]->getWeight() * (pow(weakClassifier->getBeta(), (double) (1 - e)));
+		features[i]->setWeight(num);
 	}
 }
 
@@ -95,7 +94,7 @@ void ViolaJones::train(){
 	//TODO will be two attributes
 	double targetFPR = 0.3;
 	double minFPR = 0.65;
-	double minDR = 0.7;
+	double minDR = 0.9;
 
 	double FPR = 1.0;
 	double FPRold = FPR;
@@ -103,8 +102,8 @@ void ViolaJones::train(){
 	double DRold = DR;
 	double DRtmp;
 
-	vector<Data> negativeSamples (negatives);
-	vector<Data> positiveSamples (positives);
+	vector<Data*> negativeSamples (negatives);
+	vector<Data*> positiveSamples (positives);
 
 	int i = 0;
 	int n = 0;
@@ -134,8 +133,8 @@ void ViolaJones::train(){
 			cout << "  -Training size: " << features.size() << endl;
 
 			//Train the current classifier
-			StrongClassifier strongClassifier = AdaBoost::train();
-			stage->setClassifiers(strongClassifier.getClassifiers());
+			StrongClassifier* strongClassifier = AdaBoost::train();
+			stage->setClassifiers(strongClassifier->getClassifiers());
 
 		    //Evaluate current cascaded classifier on validation set to determine F(i) & D(i)
 			pair<double, double> rates = computeRates();
@@ -183,20 +182,22 @@ pair<double, double> ViolaJones::computeRates(){
 	int fn = 0;
 	int prediction;
 	for(int i = 0; i < features.size(); ++i){
-		prediction = classifier.predict(features[i].getFeatures());
-		if(prediction == 1 && features[i].getLabel() == -1){
+		prediction = classifier.predict(features[i]->getFeatures());
+		if(prediction == 1 && features[i]->getLabel() == -1){
 			fp++;
 			falseDetections.push_back(features[i]);
-		} else if(prediction == -1 && features[i].getLabel() == -1){
+		} else if(prediction == -1 && features[i]->getLabel() == -1){
 			tn++;
-		} else if(prediction == -1 && features[i].getLabel() == 1){
+		} else if(prediction == -1 && features[i]->getLabel() == 1){
 			fn++;
-		} else if(prediction == 1 && features[i].getLabel() == 1){
+		} else if(prediction == 1 && features[i]->getLabel() == 1){
 			tp++;
 		}
 	}
 	output.first = (double) fp / (fp + tn);
 	output.second = (double) tp / (tp + fn);
+
+	cout << "FP " << fp << " FN " << fn << " TN " << tn << " TP " << tp << endl;
 
 	return output;
 }

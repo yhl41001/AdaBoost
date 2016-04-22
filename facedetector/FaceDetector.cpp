@@ -35,9 +35,9 @@ FaceDetector::FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int
 }
 
 void FaceDetector::train(){
-	vector<Data> positives;
-	vector<Data> negatives;
-
+	vector<Data*> positives;
+	vector<Data*> negatives;
+	double percent = 0;
 	int count = 0;
 	auto t_start = chrono::high_resolution_clock::now();
 
@@ -49,12 +49,15 @@ void FaceDetector::train(){
 		vector<double> features = HaarFeatures::extractFeatures(intImg, detectionWindowSize, 0, 0);
 		/*	Initialize weights */
 		if(trainLabels[i] == 1){
-			positives.push_back(*(new Data(features, trainLabels[i])));
+			positives.push_back(new Data(features, trainLabels[i]));
 		} else {
-			negatives.push_back(*(new Data(features, trainLabels[i])));
+			negatives.push_back(new Data(features, trainLabels[i]));
 		}
 		count += features.size();
+		percent = (double) i * 100 / (trainImages.size() - 1) ;
+		cout << "\rEvaluated: " << i + 1 << "/" << trainImages.size() << " images" << flush;
 	}
+
 	cout << "Extracted " << count << " features in ";
 	auto t_end = chrono::high_resolution_clock::now();
 	cout << std::fixed << (chrono::duration<double, milli>(t_end - t_start).count())/1000 << " s\n";

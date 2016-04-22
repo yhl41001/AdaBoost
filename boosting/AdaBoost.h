@@ -26,8 +26,8 @@ class AdaBoost {
 protected:
 	int iterations;
 	//Features and labels vector (must be the same size)
-	vector<Data> features;
-	StrongClassifier strongClassifier;
+	vector<Data*> features;
+	StrongClassifier* strongClassifier;
 	WeakClassifier* trainWeakClassifier();
 	virtual void normalizeWeights();
 	virtual double updateAlpha(double error);
@@ -36,11 +36,11 @@ protected:
 
 public:
 	AdaBoost();
-	AdaBoost(vector<Data> data, int iterations);
+	AdaBoost(vector<Data*> data, int iterations);
 	int getIterations() const;
 	void setIterations(int iterations);
-	StrongClassifier train();
-	int predict(Data x);
+	StrongClassifier* train();
+	int predict(Data* x);
 	void showFeatures();
 	virtual ~AdaBoost();
 };

@@ -8,10 +8,9 @@
 #include "StrongClassifier.h"
 
 StrongClassifier::StrongClassifier(vector<WeakClassifier> classifiers):
-	classifiers(classifiers),
-	trained(false){}
+	classifiers(classifiers){}
 
-int StrongClassifier::predict(Data x){
+int StrongClassifier::predict(Data* x){
 	double sum = 0;
 	for(int i = 0; i < classifiers.size(); ++i){
 		sum += classifiers[i].getAlpha() * classifiers[i].predict(x);
@@ -25,14 +24,6 @@ int StrongClassifier::predict(Data x){
 
 StrongClassifier::~StrongClassifier(){
 	classifiers.clear();
-}
-
-bool StrongClassifier::isTrained() const {
-	return trained;
-}
-
-void StrongClassifier::setTrained(bool trained) {
-	this->trained = trained;
 }
 
 const vector<WeakClassifier>& StrongClassifier::getClassifiers() const {

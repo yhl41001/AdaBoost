@@ -23,7 +23,7 @@ using namespace cv;
 int main( int argc, char** argv ){
 
 	int subjects = 40;
-	int poses = 5;
+	int poses = 10;
 	string imagePath = "/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/dataset/";
 	string path;
 
@@ -44,7 +44,7 @@ int main( int argc, char** argv ){
 
 	//Loading training negative images
 	vector<string> negativeImages = Utils::open(imagePath + "negative");
-	int negativeExamples = 200;
+	int negativeExamples = 380;
 	for(int k = 0; k < negativeExamples; ++k){
 		Mat img = imread(imagePath + "negative/" + negativeImages[k]);
 		Mat dest;
@@ -56,24 +56,25 @@ int main( int argc, char** argv ){
 	Mat test = imread(imagePath + "test/test3.jpg", 0);
 	//Mat test = imread(imagePath + "s1/1.pgm", 0);
 
-	//FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 12);
-	//detector->train();
+	FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 12);
+	detector->train();
 
-	FaceDetector* detector = new FaceDetector("test.txt");
-	detector->detect(test, true);
+	//FaceDetector* detector = new FaceDetector("test.txt");
+	//detector->detect(test, true);
 
-	/*vector<Data> features = {
-		*(new Data(vector<double>{2, 2}, 1)),
-		*(new Data(vector<double>{2, 4}, 1)),
-		*(new Data(vector<double>{3, 8}, -1)),
-		*(new Data(vector<double>{2, 3}, -1)),
-		*(new Data(vector<double>{4, 9}, -1)),
-		*(new Data(vector<double>{6, 10}, -1)),
-		*(new Data(vector<double>{4, 5}, 1))
-	};
+	/*
+	vector<Data*> features = {
+		new Data(vector<double>{2, 2}, 1),
+		new Data(vector<double>{2, 4}, 1),
+		new Data(vector<double>{3, 8}, -1),
+		new Data(vector<double>{2, 3}, -1),
+		new Data(vector<double>{4, 9}, -1),
+		new Data(vector<double>{6, 10}, -1),
+		new Data(vector<double>{4, 5}, 1)
+	};*/
 
-	AdaBoost* boost = new AdaBoost(features, 3);
-	boost->train();*/
+	//AdaBoost* boost = new AdaBoost(features, 3);
+	//boost->train();
 
 	//int p = boost->predict(*(new Data(vector<double>{4.5, 3.5})));
 

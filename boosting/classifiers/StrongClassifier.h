@@ -17,14 +17,11 @@ class StrongClassifier {
 
 private:
 	vector<WeakClassifier> classifiers;
-	bool trained;
 
 public:
 	StrongClassifier(vector<WeakClassifier> classifiers);
-	int predict(Data x);
+	int predict(Data* x);
 	~StrongClassifier();
-	bool isTrained() const;
-	void setTrained(bool trained);
 	const vector<WeakClassifier>& getClassifiers() const;
 	void setClassifiers(const vector<WeakClassifier>& classifiers);
 };

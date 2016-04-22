@@ -15,35 +15,32 @@ using namespace std;
  * Initialize a new adaboost object with a vector of training samples (features)
  * and a given number of iterations
  */
-AdaBoost::AdaBoost(vector<Data> data, int iterations) :
+AdaBoost::AdaBoost(vector<Data*> data, int iterations) :
 	iterations(iterations),
 	features(data),
-	strongClassifier(*(new StrongClassifier(vector<WeakClassifier>{}))){
+	strongClassifier(new StrongClassifier(vector<WeakClassifier>{})){
 	int size = features.size();
 	cout << "Initializing AdaBoost with " << iterations << " iterations" << endl;
 	cout << "Training size: " << size << "\n" << endl;
 	//Initialize weights
 	for(int m = 0; m < features.size(); ++m){
-		features[m].setWeight((double) 1/features.size());
+		features[m]->setWeight((double) 1/features.size());
 	}
 	cout << "Initialized uniform weights\n" << endl;
 }
 
-AdaBoost::AdaBoost(): iterations(0), strongClassifier(
-				*(new StrongClassifier(vector<WeakClassifier> {}))) {
+AdaBoost::AdaBoost(): iterations(0),
+		strongClassifier(new StrongClassifier(vector<WeakClassifier> {})) {
 }
 
 /**
  * Train the AdaBoost classifier with a number of weak classifier specified
  * with the iteration attributes.
  */
-StrongClassifier AdaBoost::train(){
+StrongClassifier* AdaBoost::train(){
 	cout << "Training AdaBoost with " << iterations << " iterations" << endl;
 	clock_t c_start = clock();
 	auto t_start = chrono::high_resolution_clock::now();
-
-	//Reinitialize classifier
-	strongClassifier.setTrained(false);
 
 	//The vector of weak classifiers
 	vector<WeakClassifier> classifiers(iterations);
@@ -72,8 +69,7 @@ StrongClassifier AdaBoost::train(){
 	}
 	//showFeatures();
 	//Create strong classifier
-	strongClassifier.setClassifiers(classifiers);
-	strongClassifier.setTrained(true);
+	strongClassifier->setClassifiers(classifiers);
 
     clock_t c_end = clock();
     auto t_end = chrono::high_resolution_clock::now();
@@ -86,13 +82,8 @@ StrongClassifier AdaBoost::train(){
     return strongClassifier;
 }
 
-int AdaBoost::predict(Data x){
-	if(strongClassifier.isTrained()){
-		return strongClassifier.predict(x);
-	} else {
-		cout << "The classifier is not trained. Please train the classifier first." << endl;
-		return 0;
-	}
+int AdaBoost::predict(Data* x){
+	return strongClassifier->predict(x);
 }
 
 /**
@@ -104,14 +95,14 @@ int AdaBoost::predict(Data x){
 void AdaBoost::updateWeights(WeakClassifier* weakClassifier){
 	double norm = 0;
 	for(int i = 0; i < features.size(); ++i){
-		double num = (features[i].getWeight() * exp(-weakClassifier->getAlpha()
-				* features[i].getLabel() * weakClassifier->predict(this->features[i])));
+		double num = (features[i]->getWeight() * exp(-weakClassifier->getAlpha()
+				* features[i]->getLabel() * weakClassifier->predict(this->features[i])));
 		norm += num;
-		features[i].setWeight(num);
+		features[i]->setWeight(num);
 	}
 	for(int i = 0; i < features.size(); ++i){
 		//Normalize such that wt+1 is a prob. distribution
-		features[i].setWeight((double) features[i].getWeight()/norm);
+		features[i]->setWeight((double) features[i]->getWeight()/norm);
 	}
 }
 
@@ -123,7 +114,7 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 
 	if (features.size() > 0) {
 		//Feature vector dimension
-		int dimensions = features[0].getFeatures().size();
+		int dimensions = features[0]->getFeatures().size();
 		//Error and signs vector
 		vector<example> signs;
 		vector<double> errors;
@@ -147,20 +138,21 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 
 		//Evaluating total sum of negative and positive weights
 		for (unsigned int i = 0; i < features.size(); ++i) {
-			if (features[i].getLabel() == 1) {
-				totPosWeights += features[i].getWeight();
+			if (features[i]->getLabel() == 1) {
+				totPosWeights += features[i]->getWeight();
 				totPositive++;
 			} else {
-				totNegWeights += features[i].getWeight();
+				totNegWeights += features[i]->getWeight();
 				totNegative++;
 			}
 		}
 
 		//Iterate through dimensions
 		for (unsigned int j = 0; j < dimensions; ++j) {
+
 			//Sorts vector of features according to the j-th dimension
 			sort(features.begin(), features.end(),
-					[j](Data const &a, Data const &b) {return a.getFeatures()[j] < b.getFeatures()[j];});
+					[j](Data* const &a, Data* const &b) {return a->getFeatures()[j] < b->getFeatures()[j];});
 
 			//Reinitialize variables
 			signs.clear();
@@ -173,8 +165,8 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 
 			//Iterates features
 			for (int i = 0; i < features.size(); ++i) {
-				weight = features[i].getWeight();
-				if (features[i].getLabel() == 1) {
+				weight = features[i]->getWeight();
+				if (features[i]->getLabel() == 1) {
 					posWeights += weight;
 					cumPositive++;
 				} else {
@@ -185,7 +177,7 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 				errorPos = posWeights + (totNegWeights - negWeights);
 				errorNeg = negWeights + (totPosWeights - posWeights);
 
-				if ( (i < features.size() - 1 && features[i].getFeatures()[j] != features[i + 1].getFeatures()[j]) || i == features.size() - 1 ){
+				if ( (i < features.size() - 1 && features[i]->getFeatures()[j] != features[i + 1]->getFeatures()[j]) || i == features.size() - 1 ){
 					if (errorPos > errorNeg) {
 						errors.push_back(errorNeg);
 						signs.push_back(POSITIVE);
@@ -207,7 +199,7 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 
 			if (error < bestWeakClass->getError()) {
 				index = errorMin - errors.begin();
-				threshold = (features[index]).getFeatures()[j];
+				threshold = (features[index])->getFeatures()[j];
 				bestWeakClass->setError(error);
 				bestWeakClass->setDimension(j);
 				bestWeakClass->setThreshold(threshold);
@@ -236,7 +228,7 @@ void AdaBoost::normalizeWeights(){
 
 void AdaBoost::showFeatures(){
 	for(int i = 0; i < features.size(); ++i){
-		features[i].print();
+		features[i]->print();
 	}
 }
 

@@ -29,13 +29,13 @@ using namespace cv;
 class ViolaJones: public AdaBoost {
 private:
 	int maxStages;
-	vector<Data> positives;
-	vector<Data> negatives;
+	vector<Data*> positives;
+	vector<Data*> negatives;
+	vector<Data*> falseDetections;
+	vector<Haar> selectedFeatures;
 	CascadeClassifier classifier;
-	vector<Data> falseDetections;
 	pair<double, double> computeRates();
 	void initializeWeights();
-	vector<Haar> selectedFeatures;
 
 protected:
 	double updateAlpha(double error);
@@ -46,7 +46,7 @@ protected:
 public:
 	ViolaJones();
 	ViolaJones(string trainedPath);
-	ViolaJones(vector<Data> positives, vector<Data> negatives, int maxStages);
+	ViolaJones(vector<Data*> positives, vector<Data*> negatives, int maxStages);
 	void train();
 	int predict(Mat img, int size);
 	int predict(vector<double> x);

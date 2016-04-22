@@ -30,10 +30,10 @@ private:
 
 public:
 	WeakClassifier();
-	int predict(Data x);
+	int predict(Data* x);
 	int predict(vector<double> x);
 	int predict(vector<Haar> values);
-	double evaluateError(vector<Data>& features);
+	double evaluateError(vector<Data*>& features);
 	void printInfo();
 	double getError() const;
 	void setError(double error);

@@ -14,8 +14,8 @@ WeakClassifier::WeakClassifier(): error(1.), dimension(0),
 /**
  * Predict feature label
  */
-int WeakClassifier::predict(Data x){
-	return predict(x.getFeatures());
+int WeakClassifier::predict(Data* x){
+	return predict(x->getFeatures());
 }
 
 int WeakClassifier::predict(vector<Haar> values){
@@ -50,13 +50,13 @@ int WeakClassifier::predict(vector<double> x){
 /**
  * Evaluate error base on weights and misclassified samples
  */
-double WeakClassifier::evaluateError(vector<Data>& features){
+double WeakClassifier::evaluateError(vector<Data*>& features){
 	double error = 0;
 	misclassified = 0;
 	for(int i = 0; i < features.size(); ++i){
 		int pred = predict(features[i]);
-		if(pred != features[i].getLabel()){
-			error += features[i].getWeight();
+		if(pred != features[i]->getLabel()){
+			error += features[i]->getWeight();
 			misclassified += 1;
 		}
 	}
