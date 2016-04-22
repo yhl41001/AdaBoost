@@ -58,7 +58,7 @@ void FaceDetector::train(){
 		cout << "\rEvaluated: " << i + 1 << "/" << trainImages.size() << " images" << flush;
 	}
 
-	cout << "Extracted " << count << " features in ";
+	cout << "\nExtracted " << count << " features in ";
 	auto t_end = chrono::high_resolution_clock::now();
 	cout << std::fixed << (chrono::duration<double, milli>(t_end - t_start).count())/1000 << " s\n";
 
