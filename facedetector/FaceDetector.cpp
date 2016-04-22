@@ -62,7 +62,6 @@ void FaceDetector::train(){
 	auto t_end = chrono::high_resolution_clock::now();
 	cout << std::fixed << (chrono::duration<double, milli>(t_end - t_start).count())/1000 << " s\n";
 
-	//FIXME correct the number of stages
 	boost = new ViolaJones(positives, negatives, 32);
 	boost->train();
 }
