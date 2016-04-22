@@ -92,9 +92,9 @@ void ViolaJones::train(){
 	cout << "Training Cascade Classifier" << endl;
 
 	//TODO will be two attributes
-	double targetFPR = 0.3;
-	double minFPR = 0.65;
-	double minDR = 0.9;
+	double targetFPR = 0.1;
+	double minFPR = 0.2;
+	double minDR = 0.85;
 
 	double FPR = 1.0;
 	double FPRold = FPR;
