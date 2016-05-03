@@ -36,6 +36,7 @@ int main( int argc, char** argv ){
 	//Loading training positive images
 	vector<string> positive = Utils::open(imagePath + "face");
 	int positiveExamples = positive.size();
+	//int positiveExamples = 30;
 	for(int k = 0; k < positiveExamples; ++k){
 		Mat img = imread(imagePath + "face/" + positive[k]);
 		Mat dest;
@@ -47,6 +48,7 @@ int main( int argc, char** argv ){
 	//Loading training negative images
 	vector<string> negativeImages = Utils::open(imagePath + "non-face");
 	int negativeExamples = negativeImages.size();
+	//int negativeExamples = 30;
 	for(int k = 0; k < negativeExamples; ++k){
 		Mat img = imread(imagePath + "non-face/" + negativeImages[k]);
 		Mat dest;
@@ -54,7 +56,6 @@ int main( int argc, char** argv ){
 		trainImages.push_back(dest);
 		trainLabels.push_back(-1);
 	}
-
 
 	Mat test = imread(imagePath + "test/test.jpg", 0);
 	//Mat test = imread(imagePath + "s1/1.pgm", 0);

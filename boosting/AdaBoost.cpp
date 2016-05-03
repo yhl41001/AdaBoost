@@ -35,7 +35,7 @@ AdaBoost::AdaBoost(): iterations(0),
 
 /**
  * Train the AdaBoost classifier with a number of weak classifier specified
- * with the iteration attributes.
+ * with the iteration attribute.
  */
 StrongClassifier* AdaBoost::train(){
 	cout << "Training AdaBoost with " << iterations << " iterations" << endl;
@@ -239,6 +239,49 @@ int AdaBoost::getIterations() const {
 void AdaBoost::setIterations(int iterations) {
 	this->iterations = iterations;
 }
+
+StrongClassifier* AdaBoost::train(vector<WeakClassifier> classifiers){
+	cout << "Training AdaBoost with " << iterations << " iterations" << endl;
+	clock_t c_start = clock();
+	auto t_start = chrono::high_resolution_clock::now();
+
+	//Iterate for the specified iterations
+	for (unsigned int i = (iterations - (iterations - classifiers.size())); i < iterations; ++i) {
+		cout << "Iteration: " << (i + 1) << endl;;
+		WeakClassifier* weakClassifier = trainWeakClassifier();
+		double error = weakClassifier->getError();
+		if(error < 0.5){
+			double alpha = updateAlpha(error);
+			double beta = updateBeta(error);
+			weakClassifier->setAlpha(alpha);
+			weakClassifier->setBeta(beta);
+			updateWeights(weakClassifier);
+			weakClassifier->printInfo();
+			classifiers.push_back(*weakClassifier);
+			delete weakClassifier;
+			//If error is 0, classification is perfect (linearly separable data)
+			if(error == 0){
+				break;
+			}
+		} else {
+			cout << "Error: weak classifier with error > 0.5." << endl;
+		}
+	}
+	//showFeatures();
+	//Create strong classifier
+	strongClassifier->setClassifiers(classifiers);
+
+    clock_t c_end = clock();
+    auto t_end = chrono::high_resolution_clock::now();
+
+    cout << std::fixed << "CPU time used: "
+         << (c_end - c_start) / CLOCKS_PER_SEC << " s"
+         << ", Time: "
+         << (chrono::duration<double, milli>(t_end - t_start).count())/1000
+         << " s" << endl;
+    return strongClassifier;
+}
+
 
 /**
  * Deconstructor: free memory

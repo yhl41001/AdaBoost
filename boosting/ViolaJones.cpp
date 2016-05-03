@@ -91,38 +91,43 @@ void ViolaJones::updateWeights(WeakClassifier* weakClassifier){
 void ViolaJones::train(){
 	cout << "Training Cascade Classifier" << endl;
 
-	//TODO will be two attributes
-	double targetFPR = 0.1;
-	double minFPR = 0.2;
-	double minDR = 0.85;
+	double targetFPR = 0.000001;
+	double maxFPRlayer = 0.01;
+	double minDRlayer = 0.9;
 
-	double FPR = 1.0;
-	double FPRold = FPR;
-	double DR = 1.0;
-	double DRold = DR;
-	double DRtmp;
+	double* F = new double[maxStages + 1];
+	double* D = new double[maxStages + 1];
+
+	F[0] = 0.5;
+	D[0] = 0.5;
+	F[1] = 1.0;
+	D[1] = 1.0;
 
 	vector<Data*> negativeSamples (negatives);
 	vector<Data*> positiveSamples (positives);
+	vector<WeakClassifier> classifiers;
 
-	int i = 0;
-	int n = 0;
-	while(FPR > targetFPR && i < maxStages){
+	int i = 1;
+	int n;
+	while(F[i] > targetFPR && i <= maxStages){
 		if(negativeSamples.size() == 0){
 			cout << "All training negative samples classified correctly. Could not achieve validation target FPR for this stage." << endl;
 			break;
 		}
 		i++;
 		n = 0;
-		FPR = FPRold;
-		DR = DRold;
+		classifiers.clear();
+		initializeWeights();
+
+		F[i] = F[i - 1];
+
 		Stage* stage = new Stage(i - 1);
 		cout << "\n*** Stage n. " << i - 1 << " ***\n" << endl;
 		classifier.addStage(stage);
-		while(FPR > minFPR * FPRold){
+
+		while(F[i] > maxFPRlayer * F[i - 1]){
 			n++;
 			this->iterations = n;
-			initializeWeights();
 
 			//Rearrange features
 			features.clear();
@@ -133,34 +138,34 @@ void ViolaJones::train(){
 			cout << "  -Training size: " << features.size() << endl;
 
 			//Train the current classifier
-			StrongClassifier* strongClassifier = AdaBoost::train();
+
+			StrongClassifier* strongClassifier = AdaBoost::train(classifiers);
 			stage->setClassifiers(strongClassifier->getClassifiers());
+			classifiers = strongClassifier->getClassifiers();
 
 		    //Evaluate current cascaded classifier on validation set to determine F(i) & D(i)
 			pair<double, double> rates = computeRates();
-			FPR = rates.first;
-			DR = rates.second;
-			DRtmp = 1.1;
-			stage->setFpr(FPR);
-			stage->setDetectionRate(DR);
+			F[i] = rates.first;
+			D[i] = rates.second;
+			stage->setFpr(F[i]);
+			stage->setDetectionRate(D[i]);
 
 			//until the current cascaded classifier has a detection rate of at least d x D(i-1) (this also affects F(i))
-			while(DR < minDR * DRold && DR != DRtmp){
+			while(D[i] < minDRlayer * D[i - 1]){
 				//decrease threshold for the ith classifier
-				stage->decreaseThreshold(0.1);
-				DRtmp = DR;
+				stage->decreaseThreshold(0.01);
 				rates = computeRates();
-				FPR = rates.first;
-				DR = rates.second;
-				stage->setFpr(FPR);
-				stage->setDetectionRate(DR);
+				F[i] = rates.first;
+				D[i] = rates.second;
+				stage->setFpr(F[i]);
+				stage->setDetectionRate(D[i]);
 			}
 		}
 
 		//N = ∅
 		negativeSamples.clear();
 
-		if(FPR > targetFPR){
+		if(F[i] > targetFPR){
 			//if F(i) > Ftarget then
 			//evaluate the current cascaded detector on the set of non-face images
 			//and put any false detections into the set N.
@@ -168,7 +173,6 @@ void ViolaJones::train(){
 		}
 
 		stage->printInfo();
-		FPRold = FPR;
 	}
 	store();
 }
@@ -197,8 +201,7 @@ pair<double, double> ViolaJones::computeRates(){
 	output.first = (double) fp / (fp + tn);
 	output.second = (double) tp / (tp + fn);
 
-	cout << "FP " << fp << " FN " << fn << " TN " << tn << " TP " << tp << endl;
-
+	cout << "FP " << fp << " FN " << fn << " TN " << tn << " TP " << tp << "\n" <<  endl;
 	return output;
 }
 

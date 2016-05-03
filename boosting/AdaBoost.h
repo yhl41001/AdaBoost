@@ -40,6 +40,7 @@ public:
 	int getIterations() const;
 	void setIterations(int iterations);
 	StrongClassifier* train();
+	StrongClassifier* train(vector<WeakClassifier> classifiers);
 	int predict(Data* x);
 	void showFeatures();
 	virtual ~AdaBoost();
