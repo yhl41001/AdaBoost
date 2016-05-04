@@ -67,10 +67,8 @@ StrongClassifier* AdaBoost::train(vector<WeakClassifier> classifiers){
 	//Create strong classifier
 	strongClassifier->setClassifiers(classifiers);
 
-    auto t_end = chrono::high_resolution_clock::now();
-
-    cout << "Time: " << (chrono::duration<double, milli>(t_end - t_start).count())/1000
-         << " s" << endl;
+    auto t_end = high_resolution_clock::now();
+    cout << "Time: " << (duration<double, milli>(t_end - t_start).count())/1000 << " s" << endl;
     return strongClassifier;
 }
 

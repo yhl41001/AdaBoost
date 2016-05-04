@@ -38,6 +38,7 @@ int Stage::predict(vector<Haar> values){
 
 void Stage::decreaseThreshold(double value){
 	threshold -= value;
+	cout << "Threshold decreased to " << this->threshold << endl;
 }
 
 double Stage::getThreshold() const {

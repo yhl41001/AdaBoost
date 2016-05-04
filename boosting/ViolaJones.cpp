@@ -91,15 +91,15 @@ void ViolaJones::updateWeights(WeakClassifier* weakClassifier){
 void ViolaJones::train(){
 	cout << "Training Cascade Classifier" << endl;
 
-	double targetFPR = 0.000001;
-	double maxFPRlayer = 0.01;
-	double minDRlayer = 0.9;
+	double targetFPR = 0.0001;
+	double maxFPRlayer = 0.1;
+	double minDRlayer = 0.8;
 
 	double* F = new double[maxStages + 1];
 	double* D = new double[maxStages + 1];
 
-	F[0] = 0.5;
-	D[0] = 0.5;
+	F[0] = 1.0;
+	D[0] = 1.0;
 	F[1] = 1.0;
 	D[1] = 1.0;
 
@@ -153,7 +153,7 @@ void ViolaJones::train(){
 			//until the current cascaded classifier has a detection rate of at least d x D(i-1) (this also affects F(i))
 			while(D[i] < minDRlayer * D[i - 1]){
 				//decrease threshold for the ith classifier
-				stage->decreaseThreshold(0.01);
+				stage->decreaseThreshold(1.);
 				rates = computeRates();
 				F[i] = rates.first;
 				D[i] = rates.second;
@@ -200,8 +200,8 @@ pair<double, double> ViolaJones::computeRates(){
 	}
 	output.first = (double) fp / (fp + tn);
 	output.second = (double) tp / (tp + fn);
-
-	cout << "FP " << fp << " FN " << fn << " TN " << tn << " TP " << tp << "\n" <<  endl;
+	cout << "FPR: " << output.first << ", DR: " << output.second << endl;
+	cout << "FP " << fp << " FN " << fn << " TN " << tn << " TP " << tp <<  endl;
 	return output;
 }
 

@@ -20,6 +20,7 @@
 #include "classifiers/WeakClassifier.h"
 
 using namespace std;
+using namespace chrono;
 
 class AdaBoost {
 
