@@ -39,7 +39,6 @@ AdaBoost::AdaBoost(): iterations(0),
  */
 StrongClassifier* AdaBoost::train(vector<WeakClassifier> classifiers){
 	cout << "Training AdaBoost with " << iterations << " iterations" << endl;
-	clock_t c_start = clock();
 	auto t_start = chrono::high_resolution_clock::now();
 
 	//Iterate for the specified iterations
@@ -68,13 +67,9 @@ StrongClassifier* AdaBoost::train(vector<WeakClassifier> classifiers){
 	//Create strong classifier
 	strongClassifier->setClassifiers(classifiers);
 
-    clock_t c_end = clock();
     auto t_end = chrono::high_resolution_clock::now();
 
-    cout << std::fixed << "CPU time used: "
-         << (c_end - c_start) / CLOCKS_PER_SEC << " s"
-         << ", Time: "
-         << (chrono::duration<double, milli>(t_end - t_start).count())/1000
+    cout << "Time: " << (chrono::duration<double, milli>(t_end - t_start).count())/1000
          << " s" << endl;
     return strongClassifier;
 }
