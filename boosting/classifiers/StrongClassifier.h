@@ -15,7 +15,7 @@
 
 class StrongClassifier {
 
-private:
+protected:
 	vector<WeakClassifier> classifiers;
 
 public:

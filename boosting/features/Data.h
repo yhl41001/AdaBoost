@@ -18,11 +18,13 @@ class Data {
 private:
 	vector<double> features;
 	int label;
+	int clas;
 	double weight;
 
 public:
 	Data(vector<double> features);
 	Data(vector<double> features, int label);
+	Data(vector<double> features, int label, int clas);
 	~Data();
 	void print();
 	const vector<double>& getFeatures() const;
@@ -31,6 +33,8 @@ public:
 	void setLabel(int label);
 	double getWeight() const;
 	void setWeight(double weight);
+	int getClas() const;
+	void setClas(int clas);
 };
 
 #endif /* FEATURES_FEATURE_H_ */

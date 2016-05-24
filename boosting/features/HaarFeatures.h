@@ -20,7 +20,7 @@
 #include "../utils/IntegralImage.h"
 #include "Haar.h"
 
-#define TOT_FEATURES 162336
+#define TOT_FEATURES 105106
 
 using namespace cv;
 using namespace std;

@@ -20,6 +20,7 @@
 #include "boosting/utils/IntegralImage.h"
 #include "facedetector/FaceDetector.h"
 #include "facedetector/utils/Utils.hpp"
+#include "digitclassifier/DigitsClassifier.h"
 
 using namespace std;
 using namespace cv;
@@ -35,8 +36,8 @@ int main( int argc, char** argv ){
 
 	//Loading training positive images
 	vector<string> positive = Utils::open(imagePath + "face");
-	//int positiveExamples = positive.size();
-	int positiveExamples = 200;
+	int positiveExamples = positive.size();
+	//int positiveExamples = 300;
 	for(int k = 0; k < positiveExamples; ++k){
 		Mat img = imread(imagePath + "face/" + positive[k]);
 		Mat dest;
@@ -47,8 +48,8 @@ int main( int argc, char** argv ){
 
 	//Loading training negative images
 	vector<string> negativeImages = Utils::open(imagePath + "non-face");
-	//int negativeExamples = negativeImages.size();
-	int negativeExamples = 200;
+	int negativeExamples = negativeImages.size();
+	//int negativeExamples = 300;
 	for(int k = 0; k < negativeExamples; ++k){
 		Mat img = imread(imagePath + "non-face/" + negativeImages[k]);
 		Mat dest;
@@ -65,6 +66,15 @@ int main( int argc, char** argv ){
 
 	//FaceDetector* detector = new FaceDetector("trainedData.txt");
 	//detector->detect(test, true);
+
+
+	/*
+	string digitsPath = imagePath + "digits/train-images-idx3-ubyte";
+	string digitsLabelsPath = imagePath + "digits/train-labels-idx1-ubyte";
+	DigitsClassifier* digitsClassifier = new DigitsClassifier(digitsPath, digitsLabelsPath, 100);
+	digitsClassifier->train();
+	*/
+
 
 	/*
 	vector<Data*> features = {

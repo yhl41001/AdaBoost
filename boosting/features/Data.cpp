@@ -10,12 +10,20 @@
 Data::Data(vector<double> features, int label):
 	features(features),
 	label(label),
-	weight(0.){}
+	weight(0.),
+	clas(1){}
+
+Data::Data(vector<double> features, int label, int clas):
+	features(features),
+	label(label),
+	weight(0.),
+	clas(clas){}
 
 Data::Data(vector<double> features):
 	features(features),
 	label(0),
-	weight(0.){}
+	weight(0.),
+	clas(1){}
 
 Data::~Data() {
 	features.clear();
@@ -57,4 +65,12 @@ void Data::setWeight(double weight) {
 
 void Data::setLabel(int label) {
 	this->label = label;
+}
+
+int Data::getClas() const {
+	return clas;
+}
+
+void Data::setClas(int clas) {
+	this->clas = clas;
 }
