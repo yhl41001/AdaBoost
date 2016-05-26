@@ -130,7 +130,6 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 		double errorPos, errorNeg;
 		double threshold;
 		int index;
-		double percent = 0;
 
 		//Evaluating total sum of negative and positive weights
 		for (unsigned int i = 0; i < features.size(); ++i) {
@@ -203,7 +202,6 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 				bestWeakClass->setSign(signs[index]);
 			}
 
-			percent = (double) j * 100 / (dimensions - 1) ;
 			cout << "\rEvaluated: " << j + 1 << "/" << dimensions << " features" << flush;
 		}
 	}
