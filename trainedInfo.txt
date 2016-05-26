@@ -2,12 +2,12 @@ Stage 0
 
 FPR: 0.19635
 DR: 0.923425
-Threshold: 0.922494
+Threshold: -0.158027
 Classifiers:
 
 WeakClassifier 0
 Error: 0.136462
-Dimension: 54752
+Dimension: 30160
 Threshold: -208
 Alpha: 1.84499
 Beta: 0.158027
@@ -18,14 +18,14 @@ Misclassified: 1079
 
 Stage 1
 
-FPR: 0
-DR: 0
-Threshold: 5.97294
+FPR: 0.119821
+DR: 0.56937
+Threshold: -0.106533
 Classifiers:
 
 WeakClassifier 0
 Error: 0.0721876
-Dimension: 70495
+Dimension: 39870
 Threshold: 38
 Alpha: 2.55356
 Beta: 0.0778041
@@ -33,22 +33,40 @@ Sign: NEGATIVE
 Misclassified: 613
 
 WeakClassifier 1
-Error: 0.0274142
-Dimension: 24048
-Threshold: -33
-Alpha: 3.5689
-Beta: 0.0281869
+Error: 0.027927
+Dimension: 14329
+Threshold: -78
+Alpha: 3.54984
+Beta: 0.0287293
 Sign: POSITIVE
-Misclassified: 986
+Misclassified: 1047
 
-WeakClassifier 2
-Error: 0.00241555
-Dimension: 24048
-Threshold: -33
-Alpha: 6.02341
-Beta: 0.00242139
+---------------
+
+Stage 2
+
+FPR: 0
+DR: 0.005352
+Threshold: 0.0064809
+Classifiers:
+
+WeakClassifier 0
+Error: 0.00923483
+Dimension: 18414
+Threshold: 31
+Alpha: 4.6755
+Beta: 0.00932091
 Sign: NEGATIVE
-Misclassified: 2336
+Misclassified: 84
+
+WeakClassifier 1
+Error: 0.00283196
+Dimension: 14329
+Threshold: -80
+Alpha: 5.86395
+Beta: 0.00284
+Sign: NEGATIVE
+Misclassified: 1476
 
 ---------------
 
