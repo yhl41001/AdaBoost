@@ -36,8 +36,8 @@ int main( int argc, char** argv ){
 
 	//Loading training positive images
 	vector<string> positive = Utils::open(imagePath + "face");
-	int positiveExamples = positive.size();
-	//int positiveExamples = 300;
+	//int positiveExamples = positive.size();
+	int positiveExamples = 100;
 	for(int k = 0; k < positiveExamples; ++k){
 		Mat img = imread(imagePath + "face/" + positive[k]);
 		Mat dest;
@@ -48,8 +48,8 @@ int main( int argc, char** argv ){
 
 	//Loading training negative images
 	vector<string> negativeImages = Utils::open(imagePath + "non-face");
-	int negativeExamples = negativeImages.size();
-	//int negativeExamples = 300;
+	//int negativeExamples = negativeImages.size();
+	int negativeExamples = 200;
 	for(int k = 0; k < negativeExamples; ++k){
 		Mat img = imread(imagePath + "non-face/" + negativeImages[k]);
 		Mat dest;
@@ -61,11 +61,11 @@ int main( int argc, char** argv ){
 	Mat test = imread(imagePath + "test/test.jpg", 0);
 	//Mat test = imread(imagePath + "s1/1.pgm", 0);
 
-	FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 12);
-	detector->train();
+	//FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 8);
+	//detector->train();
 
-	//FaceDetector* detector = new FaceDetector("trainedData.txt");
-	//detector->detect(test, true);
+	FaceDetector* detector = new FaceDetector("trainedData.txt");
+	detector->detect(test, true);
 
 
 	/*
