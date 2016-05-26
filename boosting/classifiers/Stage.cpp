@@ -36,9 +36,31 @@ int Stage::predict(vector<Haar> values){
 	return sum >= threshold ? 1 : -1;
 }
 
-void Stage::decreaseThreshold(double value){
+void Stage::optimizeThreshold(vector<Data*> &positiveSet, double maxfnr){
+	int wf;
+	float thr;
+    float *scores = new float[positiveSet.size()];
+	for (int i=0; i< positiveSet.size(); i++) {
+		scores[i] = 0;
+	    wf = 0;
+	    for (vector<WeakClassifier>::iterator it = classifiers.begin(); it != classifiers.end(); ++it, wf++)
+	      scores[i] += (*it).getBeta() * ((*it).predict(positiveSet[i]));
+	  }
+	  sort(scores, scores + positiveSet.size());
+	  int maxfnrind = maxfnr * positiveSet.size();
+	  if (maxfnrind >= 0 && maxfnrind < positiveSet.size()) {
+	    thr = scores[maxfnrind];
+	    while (maxfnrind > 0 && scores[maxfnrind] == thr) maxfnrind--;
+	    threshold = scores[maxfnrind];
+	  }
+	  delete[] scores;
+}
+
+void Stage::decreaseThreshold(){
+	double value = 1;
 	threshold -= value;
-	cout << "Threshold decreased to " << this->threshold << endl;
+
+	cout << "Decrease threshold to " << threshold << endl;
 }
 
 double Stage::getThreshold() const {

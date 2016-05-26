@@ -27,7 +27,8 @@ public:
 	Stage(int number, vector<WeakClassifier> weaks);
 	int predict(vector<Haar> values);
 	int predict(vector<double> x);
-	void decreaseThreshold(double value);
+	void optimizeThreshold(vector<Data*> &positiveSet, double maxfnr);
+	void decreaseThreshold();
 	~Stage();
 	void printInfo();
 	double getThreshold() const;
