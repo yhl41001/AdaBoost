@@ -91,87 +91,91 @@ void ViolaJones::updateWeights(WeakClassifier* weakClassifier){
 void ViolaJones::train(){
 	cout << "Training Cascade Classifier" << endl;
 
-	double targetFPR = 0.0001;
-	double maxFPRlayer = 0.1;
-	double minDRlayer = 0.8;
-
+	double f = 0.5;
+	double d = 0.9;
+	double Ftarget = 0.00001;
 	double* F = new double[maxStages + 1];
 	double* D = new double[maxStages + 1];
-
-	F[0] = 1.0;
-	D[0] = 1.0;
-	F[1] = 1.0;
-	D[1] = 1.0;
+	double fpr, dr;
+	pair<double, double> rates;
 
 	vector<Data*> negativeSamples (negatives);
 	vector<Data*> positiveSamples (positives);
 	vector<WeakClassifier> classifiers;
 
-	int i = 1;
+	F[0] = 1.;
+	D[0] = 1.;
+
+	int i = 0;
 	int n;
-	while(F[i] > targetFPR && i <= maxStages){
+
+	while(F[i] > Ftarget && i < maxStages){
 		if(negativeSamples.size() == 0){
 			cout << "All training negative samples classified correctly. Could not achieve validation target FPR for this stage." << endl;
 			break;
 		}
+
 		i++;
 		n = 0;
+
+		if(i > 0){
+			F[i] = F[i - 1];
+		}
+
 		classifiers.clear();
+
+		//Rearrange features
+		features.clear();
+		features.reserve(positiveSamples.size() + negativeSamples.size());
+		features.insert(features.end(), positiveSamples.begin(), positiveSamples.end());
+		features.insert(features.end(), negativeSamples.begin(), negativeSamples.end());
+
 		initializeWeights();
 
-		F[i] = F[i - 1];
-
-		Stage* stage = new Stage(i - 1);
-		cout << "\n*** Stage n. " << i - 1 << " ***\n" << endl;
+		cout << "\n*** Stage n. " << i << " ***\n" << endl;
+		cout << "  -Training size: " << features.size() << endl;
+		Stage* stage = new Stage(i);
 		classifier.addStage(stage);
 
-		while(F[i] > maxFPRlayer * F[i - 1]){
+		fpr = i > 0 ? F[i - 1] : 1;
+		while(F[i] > f * fpr){
 			n++;
 			this->iterations = n;
-
-			//Rearrange features
-			features.clear();
-			features.reserve(positiveSamples.size() + negativeSamples.size());
-			features.insert(features.end(), positiveSamples.begin(), positiveSamples.end());
-			features.insert(features.end(), negativeSamples.begin(), negativeSamples.end());
-
-			cout << "  -Training size: " << features.size() << endl;
+			normalizeWeights();
 
 			//Train the current classifier
-
 			StrongClassifier* strongClassifier = AdaBoost::train(classifiers);
 			stage->setClassifiers(strongClassifier->getClassifiers());
 			classifiers = strongClassifier->getClassifiers();
 
-		    //Evaluate current cascaded classifier on validation set to determine F(i) & D(i)
-			pair<double, double> rates = computeRates();
+			rates = computeRates();
 			F[i] = rates.first;
 			D[i] = rates.second;
-			stage->setFpr(F[i]);
-			stage->setDetectionRate(D[i]);
 
-			//until the current cascaded classifier has a detection rate of at least d x D(i-1) (this also affects F(i))
-			while(D[i] < minDRlayer * D[i - 1]){
-				//decrease threshold for the ith classifier
-				stage->decreaseThreshold(1.);
+			//Optimizing stage threshold
+			//Evaluate current cascaded classifier on validation set to determine fpr & dr
+			dr = i > 0 ? D[i - 1] : 1;
+
+			while(D[i] < d * dr){
+				stage->decreaseThreshold();
 				rates = computeRates();
 				F[i] = rates.first;
 				D[i] = rates.second;
-				stage->setFpr(F[i]);
-				stage->setDetectionRate(D[i]);
 			}
+
+			stage->setFpr(F[i]);
+			stage->setDetectionRate(D[i]);
 		}
 
 		//N = ∅
 		negativeSamples.clear();
 
-		if(F[i] > targetFPR){
+		if(F[i] > Ftarget){
 			//if F(i) > Ftarget then
 			//evaluate the current cascaded detector on the set of non-face images
 			//and put any false detections into the set N.
 			negativeSamples = falseDetections;
 		}
-
 		stage->printInfo();
 	}
 	store();
@@ -200,8 +204,8 @@ pair<double, double> ViolaJones::computeRates(){
 	}
 	output.first = (double) fp / (fp + tn);
 	output.second = (double) tp / (tp + fn);
-	cout << "FPR: " << output.first << ", DR: " << output.second << endl;
-	cout << "FP " << fp << " FN " << fn << " TN " << tn << " TP " << tp <<  endl;
+	cout << "FPR: " << output.first << ", DR: " << output.second;
+	cout << " (FP: " << fp << " FN: " << fn << " TN: " << tn << " TP: " << tp << ")" << endl;
 	return output;
 }
 
@@ -331,6 +335,34 @@ const vector<Haar>& ViolaJones::getSelectedFeatures() const {
 void ViolaJones::setSelectedFeatures(
 		const vector<Haar>& selectedFeatures) {
 	this->selectedFeatures = selectedFeatures;
+}
+
+
+vector<Rect> ViolaJones::mergeDetections(vector<Rect> detections){
+	vector<Rect> output;
+	double cxi, cyi, cxj, cyj;
+	double distance;
+	double th = 4;
+
+	for(unsigned int j = 0; j < detections.size(); ++j){
+		cxj = (detections[j].x + detections[j].width) / 2;
+		cyj = (detections[j].y + detections[j].height) / 2;
+		if(output.size() == 0){
+			output.push_back(detections[j]);
+		} else {
+			for(unsigned int i = 0; i < output.size(); ++i){
+				cxi = (output[i].x + output[i].width) / 2;
+				cyi = (output[i].y + output[i].height) / 2;
+				distance = sqrt(pow(cxi - cxj, 2) + pow(cyi - cyj, 2));
+				if(distance < th){
+
+				}
+			}
+		}
+	}
+
+
+	return output;
 }
 
 ViolaJones::~ViolaJones(){}

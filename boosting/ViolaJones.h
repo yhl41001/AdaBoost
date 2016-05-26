@@ -42,6 +42,7 @@ protected:
 	double updateBeta(double error);
 	void normalizeWeights();
 	void updateWeights(WeakClassifier* weakClassifier);
+	vector<Rect> mergeDetections(vector<Rect> detections);
 
 public:
 	ViolaJones();
