@@ -39,8 +39,8 @@ int main( int argc, char** argv ){
 	vector<string> positiveImages = Utils::open(imagePath + "lfwcrop/faces");
 	vector<string> negativeImages = Utils::open(imagePath + "negatives");
 
-	int positiveExamples = 3000;
-	int negativeExamples = 8000;
+	int positiveExamples = 1;
+	int negativeExamples = 1;
 
 	for(int k = 0; k < positiveExamples; ++k){
 		Mat img = imread(imagePath + "lfwcrop/faces/" + positiveImages[k]);
@@ -62,14 +62,14 @@ int main( int argc, char** argv ){
 		}
 	}
 
-//	Mat test = imread(imagePath + "test/tammy.jpg", 0);
-	Mat test = imread(imagePath + "lfwcrop/faces/Stockard_Channing_0001.pgm");
+	Mat test = imread(imagePath + "test/tammy.jpg", 0);
+//	Mat test = imread(imagePath + "lfwcrop/faces/Stockard_Channing_0001.pgm");
 
-	FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 8);
-	detector->train();
+	//FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 8);
+	//detector->train();
 
-	//FaceDetector* detector = new FaceDetector("trainedData.txt");
-	//detector->detect(test, true);
+	FaceDetector* detector = new FaceDetector("trainedData.txt");
+	detector->detect(test, true);
 
 
 	/*

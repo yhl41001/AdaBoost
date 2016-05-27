@@ -348,40 +348,91 @@ void ViolaJones::setSelectedFeatures(
 
 vector<Rect> ViolaJones::mergeDetections(vector<Rect> &detections){
 	vector<Rect> output;
-	vector<int> compare;
-	double cxi, cyi, cxj, cyj, wk, cyk;
+	vector<int> indexes;
+	double ci, cj;
 	double distance;
-	bool found;
+	bool insert;
 	double th = 6;
 	int size;
 	for(unsigned int j = 0; j < detections.size(); ++j){
 		size = output.size();
+		insert = false;
 		if(size == 0){
-			output.push_back(detections[j]);
+			insert = true;
 		} else {
-			cxj = (detections[j].x + detections[j].width) / 2;
-			cyj = (detections[j].y + detections[j].height) / 2;
-			compare.clear();
+			cj = (detections[j].x + detections[j].width) / 2;
+			indexes.clear();
 			for(unsigned int i = 0; i < size; ++i){
-				cxi = (output[i].x + output[i].width) / 2;
-				cyi = (output[i].y + output[i].height) / 2;
-				distance = sqrt(pow(cxi - cxj, 2) + pow(cyi - cyj, 2));
+				ci = (output[i].x + output[i].width) / 2;
+				distance = sqrt(2 * pow(ci - cj, 2));
 				if(distance < th){
-					compare.push_back(i);
+					indexes.push_back(i);
 				}
 			}
-
-			found = false;
-			if(compare.size() == 0){
-				/*for(unsigned int k = 0; k < compare.size(); ++k){
-					if(output[compare[k]].width > detections[j].width && output[compare[k]].height > detections[j].height){
-
+			if(indexes.size() > 0){
+				for(unsigned int k = 0; k < indexes.size(); ++k){
+					if(output[indexes[k]].width < detections[j].width){
+						output.erase(remove(output.begin(), output.end(), output[indexes[k]]), output.end());
+						insert = true;
 					}
-				}*/
-
-				output.push_back(detections[j]);
+				}
+			} else {
+				insert = true;
 			}
 		}
+		if(insert){
+			output.push_back(detections[j]);
+		}
+
+
+	}
+
+	cout << "remained " << output.size() << endl;
+	indexes.clear();
+	for(int h = 0; h < output.size(); ++h){
+			cout << "index: " << h << " - " << output[h] << endl;
+		}
+
+	output.erase(remove_if(output.begin(), output.end(), [output](const Rect& rect){
+		for(unsigned int i = 0; i < output.size(); ++i){
+			double intersection = (output[i] & rect).area();
+			if(intersection == rect.area() && intersection != output[i].area()){
+				cout << "removing " << rect << endl;
+				 return true;
+			}
+		}
+		return false;
+	}), output.end());
+
+	//Remove overlapped rectangles
+	/*
+	for(unsigned int i = 0; i < output.size(); ++i){
+		for(unsigned int j = 0; j < output.size(); ++j){
+			cout << "comparing " << output[i] << " with " << output[j] << endl;
+			if(i != j){
+				intersection = (output[i] & output[j]).area();
+				cout << "Inters: " << intersection << endl;
+				if(intersection == output[i].area() && intersection == output[j].area()){
+					//Rect i and j are the same
+					indexes.push_back(i);
+					cout << "same rects, remove index " << i << endl;
+				} else if(intersection == output[i].area()){
+					//Rect i inside rect j, remove i
+					indexes.push_back(i);
+					cout << "i inside rect j, remove index " << i << endl;
+				} else if(intersection == output[j].area()){
+					//Rect j inside rect i, remove j
+					indexes.push_back(j);
+					cout << "j inside rect i, remove index " << j << endl;
+
+				}
+			}
+		}
+	}*/
+
+	for(unsigned int r = 0; r < indexes.size(); ++r){
+
+		//output.erase(remove(output.begin(), output.end(), output[indexes[r]]), output.end());
 	}
 
 	return output;
