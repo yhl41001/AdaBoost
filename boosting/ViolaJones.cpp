@@ -53,6 +53,9 @@ ViolaJones::ViolaJones(vector<Data*> positives, vector<Data*> negatives, int max
 }
 
 double ViolaJones::updateAlpha(double error){
+	if(error < 0.0001){
+		return 10000;
+	}
 	return  log((1 - error) / error);
 }
 
@@ -92,7 +95,7 @@ void ViolaJones::train(){
 	cout << "Training Cascade Classifier" << endl;
 
 	double f = 0.5;
-	double d = 0.9;
+	double d = 0.95;
 	double Ftarget = 0.00001;
 	double* F = new double[maxStages + 1];
 	double* D = new double[maxStages + 1];
@@ -102,6 +105,11 @@ void ViolaJones::train(){
 	vector<Data*> negativeSamples (negatives);
 	vector<Data*> positiveSamples (positives);
 	vector<WeakClassifier> classifiers;
+
+	vector<Data*> validationSet;
+	validationSet.reserve(positives.size() + negatives.size());
+	validationSet.insert(validationSet.end(), positives.begin(), positives.end());
+	validationSet.insert(validationSet.end(), negatives.begin(), negatives.end());
 
 	F[0] = 1.;
 	D[0] = 1.;
@@ -148,7 +156,7 @@ void ViolaJones::train(){
 			stage->setClassifiers(strongClassifier->getClassifiers());
 			classifiers = strongClassifier->getClassifiers();
 
-			rates = computeRates();
+			rates = computeRates(validationSet);
 			F[i] = rates.first;
 			D[i] = rates.second;
 
@@ -158,7 +166,7 @@ void ViolaJones::train(){
 
 			while(D[i] < d * dr){
 				stage->decreaseThreshold();
-				rates = computeRates();
+				rates = computeRates(validationSet);
 				F[i] = rates.first;
 				D[i] = rates.second;
 			}
@@ -181,7 +189,7 @@ void ViolaJones::train(){
 	store();
 }
 
-pair<double, double> ViolaJones::computeRates(){
+pair<double, double> ViolaJones::computeRates(vector<Data*> validationSet){
 	pair<double, double> output;
 	falseDetections.clear();
 	int tp = 0;
@@ -189,16 +197,16 @@ pair<double, double> ViolaJones::computeRates(){
 	int tn = 0;
 	int fn = 0;
 	int prediction;
-	for(int i = 0; i < features.size(); ++i){
-		prediction = classifier.predict(features[i]->getFeatures());
-		if(prediction == 1 && features[i]->getLabel() == -1){
+	for(int i = 0; i < validationSet.size(); ++i){
+		prediction = classifier.predict(validationSet[i]->getFeatures());
+		if(prediction == 1 && validationSet[i]->getLabel() == -1){
 			fp++;
-			falseDetections.push_back(features[i]);
-		} else if(prediction == -1 && features[i]->getLabel() == -1){
+			falseDetections.push_back(validationSet[i]);
+		} else if(prediction == -1 && validationSet[i]->getLabel() == -1){
 			tn++;
-		} else if(prediction == -1 && features[i]->getLabel() == 1){
+		} else if(prediction == -1 && validationSet[i]->getLabel() == 1){
 			fn++;
-		} else if(prediction == 1 && features[i]->getLabel() == 1){
+		} else if(prediction == 1 && validationSet[i]->getLabel() == 1){
 			tp++;
 		}
 	}
@@ -239,7 +247,7 @@ void ViolaJones::store(){
     	output << "Classifiers:\n" << endl;
     	//Output data
 		data << "s:" << stage->getFpr() << "," << stage->getDetectionRate()
-				<< "," << stage->getDetectionRate() << "\n";
+				<< "," << stage->getThreshold() << "\n";
 
     	for(unsigned int j = 0; j < stage->getClassifiers().size(); ++j){
     		wc = stage->getClassifiers()[j];
@@ -338,29 +346,43 @@ void ViolaJones::setSelectedFeatures(
 }
 
 
-vector<Rect> ViolaJones::mergeDetections(vector<Rect> detections){
+vector<Rect> ViolaJones::mergeDetections(vector<Rect> &detections){
 	vector<Rect> output;
-	double cxi, cyi, cxj, cyj;
+	vector<int> compare;
+	double cxi, cyi, cxj, cyj, wk, cyk;
 	double distance;
-	double th = 4;
-
+	bool found;
+	double th = 6;
+	int size;
 	for(unsigned int j = 0; j < detections.size(); ++j){
-		cxj = (detections[j].x + detections[j].width) / 2;
-		cyj = (detections[j].y + detections[j].height) / 2;
-		if(output.size() == 0){
+		size = output.size();
+		if(size == 0){
 			output.push_back(detections[j]);
 		} else {
-			for(unsigned int i = 0; i < output.size(); ++i){
+			cxj = (detections[j].x + detections[j].width) / 2;
+			cyj = (detections[j].y + detections[j].height) / 2;
+			compare.clear();
+			for(unsigned int i = 0; i < size; ++i){
 				cxi = (output[i].x + output[i].width) / 2;
 				cyi = (output[i].y + output[i].height) / 2;
 				distance = sqrt(pow(cxi - cxj, 2) + pow(cyi - cyj, 2));
 				if(distance < th){
-
+					compare.push_back(i);
 				}
+			}
+
+			found = false;
+			if(compare.size() == 0){
+				/*for(unsigned int k = 0; k < compare.size(); ++k){
+					if(output[compare[k]].width > detections[j].width && output[compare[k]].height > detections[j].height){
+
+					}
+				}*/
+
+				output.push_back(detections[j]);
 			}
 		}
 	}
-
 
 	return output;
 }

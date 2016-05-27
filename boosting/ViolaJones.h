@@ -34,7 +34,7 @@ private:
 	vector<Data*> falseDetections;
 	vector<Haar> selectedFeatures;
 	CascadeClassifier classifier;
-	pair<double, double> computeRates();
+	pair<double, double> computeRates(vector<Data*> validationSet);
 	void initializeWeights();
 
 protected:
@@ -42,7 +42,7 @@ protected:
 	double updateBeta(double error);
 	void normalizeWeights();
 	void updateWeights(WeakClassifier* weakClassifier);
-	vector<Rect> mergeDetections(vector<Rect> detections);
+
 
 public:
 	ViolaJones();
@@ -56,6 +56,7 @@ public:
 	~ViolaJones();
 	const vector<Haar>& getSelectedFeatures() const;
 	void setSelectedFeatures(const vector<Haar>& selectedFeatures);
+	vector<Rect> mergeDetections(vector<Rect> &detections);
 };
 
 #endif /* BOOSTING_VIOLAJONES_H_ */
