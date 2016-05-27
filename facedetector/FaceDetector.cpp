@@ -14,10 +14,10 @@ FaceDetector::FaceDetector(string trainedCascade){
 	cout << "FaceDetector\n************" << endl;
 	this->trainImages = {};
 	this->trainLabels = {};
-	this->scales = 12;
+	this->scales = 8;
 	this->detectionWindowSize = 24;
 	this->showResults = false;
-	this->delta = 1.;
+	this->delta = 2;
 	cout << "  -Scales: " << scales << "\n  -Window size: "<< detectionWindowSize << endl;
 	boost = new ViolaJones(trainedCascade);
 }
@@ -29,7 +29,7 @@ FaceDetector::FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int
 	this->trainLabels = trainLabels;
 	this->scales = scales;
 	this->showResults = false;
-	this->delta = 1.5;
+	this->delta = 2;
 	this->detectionWindowSize = detectionWindowSize;
 	boost = new ViolaJones();
 }
@@ -38,7 +38,6 @@ void FaceDetector::train(){
 	vector<Data*> positives;
 	vector<Data*> negatives;
 	double percent = 0;
-	int count = 0;
 	auto t_start = chrono::high_resolution_clock::now();
 
 	cout << "\nExtracting image features" << endl;
@@ -53,16 +52,15 @@ void FaceDetector::train(){
 		} else {
 			negatives.push_back(new Data(features, trainLabels[i]));
 		}
-		count += features.size();
 		percent = (double) i * 100 / (trainImages.size() - 1) ;
 		cout << "\rEvaluated: " << i + 1 << "/" << trainImages.size() << " images" << flush;
 	}
 
-	cout << "\nExtracted " << count << " features in ";
+	cout << "\nExtracted features in ";
 	auto t_end = chrono::high_resolution_clock::now();
 	cout << std::fixed << (chrono::duration<double, milli>(t_end - t_start).count())/1000 << " s\n";
 
-	boost = new ViolaJones(positives, negatives, 32);
+	boost = new ViolaJones(positives, negatives, 8);
 	boost->train();
 }
 
@@ -72,49 +70,57 @@ vector<Rect> FaceDetector::detect(Mat img, bool showResults){
 }
 
 vector<Rect> FaceDetector::detect(Mat img){
-	auto t_start = chrono::high_resolution_clock::now();
-	auto t_end = chrono::high_resolution_clock::now();
-
 	vector<Rect> predictions;
 	vector<double> features;
 	double scaleFactor = 0.75;
 	double scaleRefactor;
 	int prediction = 0;
 	Mat tmp = img;
-	Mat dst, window, intImg;
+	Mat dst, window, intImg, det;
+	int x, y, w;
 
 	//For each image scale
 	for(int s = 0; s < scales; ++s){
-		cout << "Try scale " << s << endl;
-		scaleRefactor = scaleFactor * (s + 1);
+		scaleRefactor = pow(scaleFactor, s);
+		cout << "Scale factor " << scaleRefactor << endl;
+
 		//Detection window slides
 		intImg = IntegralImage::computeIntegralImage(tmp);
-		for(int j = 0; j < tmp.rows - detectionWindowSize; ++j){
-			for(int i = 0; i < tmp.cols - detectionWindowSize; ++i){
+		for(int j = 0; j < tmp.rows - detectionWindowSize - delta; j += delta){
+			for(int i = 0; i < tmp.cols - detectionWindowSize - delta; i += delta){
 				window = intImg(Rect(i, j, detectionWindowSize, detectionWindowSize));
+				/*det = tmp(Rect(i, j, detectionWindowSize, detectionWindowSize));
+				resize(det, det, Size(50, 50));
+				imshow("img", det);
+				waitKey(10);*/
+
 				prediction = boost->predict(window, detectionWindowSize);
 				if(prediction == 1) {
-					predictions.push_back(Rect((int) i / scaleRefactor, (int) j / scaleRefactor,
-							(int) detectionWindowSize / scaleRefactor, (int) detectionWindowSize / scaleRefactor));
+					x = (int) i / scaleRefactor;
+					y = (int) j / scaleRefactor;
+					w = (int) detectionWindowSize / scaleRefactor;
+					if(w * w > 225){
+						predictions.push_back(Rect(x, y, w, w));
+					}
 				}
+
 			}
 		}
+
 		resize(tmp, dst, Size(), scaleFactor, scaleFactor);
-		tmp = dst;
+		dst.copyTo(tmp);
 	}
 
 	cout << "Detected: " << predictions.size() << " faces" << endl;
-	t_end = chrono::high_resolution_clock::now();
-	cout << "Detection time: " << (chrono::duration<double, milli>(t_end - t_start).count())/1000 << " s" << endl;
-
-    predictions = Utils::mergeRectangles(predictions, 0.8, 10);
+    predictions = boost->mergeDetections(predictions);
+    cout << "Merged into: " << predictions.size() << " faces" << endl;
 	if(showResults){
-		cout << "Merged: " << predictions.size() << endl;
 		for(int p = 0; p < predictions.size(); ++p){
 			rectangle(img, predictions[p], Scalar(255, 255, 255));
 		}
 		imshow("img", img);
 		waitKey(0);
+		imwrite("out.jpg", img);
 	}
 
 	return predictions;
