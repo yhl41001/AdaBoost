@@ -28,44 +28,48 @@ using namespace cv;
 int main( int argc, char** argv ){
 
 	string imagePath = "/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/dataset/";
+
+	//Utils::generateNonFacesDataset(imagePath + "backgrounds", imagePath + "negatives", 6000, 24);
 	string path;
 
 	vector<Mat> trainImages;
 	vector<int> trainLabels;
 
-
 	//Loading training positive images
-	vector<string> positive = Utils::open(imagePath + "face");
-	//int positiveExamples = positive.size();
-	int positiveExamples = 100;
+	vector<string> positiveImages = Utils::open(imagePath + "lfwcrop/faces");
+	vector<string> negativeImages = Utils::open(imagePath + "negatives");
+
+	int positiveExamples = 3000;
+	int negativeExamples = 8000;
+
 	for(int k = 0; k < positiveExamples; ++k){
-		Mat img = imread(imagePath + "face/" + positive[k]);
-		Mat dest;
-		resize(img, dest, Size(24, 24));
-		trainImages.push_back(dest);
-		trainLabels.push_back(1);
+		Mat img = imread(imagePath + "lfwcrop/faces/" + positiveImages[k]);
+		if(img.rows != 0 && img.cols != 0){
+			Mat dest;
+			resize(img, dest, Size(24, 24));
+			trainImages.push_back(dest);
+			trainLabels.push_back(1);
+		}
 	}
 
-	//Loading training negative images
-	vector<string> negativeImages = Utils::open(imagePath + "non-face");
-	//int negativeExamples = negativeImages.size();
-	int negativeExamples = 200;
 	for(int k = 0; k < negativeExamples; ++k){
-		Mat img = imread(imagePath + "non-face/" + negativeImages[k]);
-		Mat dest;
-		resize(img, dest, Size(24, 24));
-		trainImages.push_back(dest);
-		trainLabels.push_back(-1);
+		Mat img = imread(imagePath + "negatives/" + negativeImages[k]);
+		if(img.rows != 0 && img.cols != 0){
+			Mat dest;
+			resize(img, dest, Size(24, 24));
+			trainImages.push_back(dest);
+			trainLabels.push_back(-1);
+		}
 	}
 
-	Mat test = imread(imagePath + "test/test.jpg", 0);
-	//Mat test = imread(imagePath + "s1/1.pgm", 0);
+//	Mat test = imread(imagePath + "test/tammy.jpg", 0);
+	Mat test = imread(imagePath + "lfwcrop/faces/Stockard_Channing_0001.pgm");
 
-	//FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 8);
-	//detector->train();
+	FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 8);
+	detector->train();
 
-	FaceDetector* detector = new FaceDetector("trainedData.txt");
-	detector->detect(test, true);
+	//FaceDetector* detector = new FaceDetector("trainedData.txt");
+	//detector->detect(test, true);
 
 
 	/*
