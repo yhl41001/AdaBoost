@@ -72,7 +72,7 @@ double Haar::evaluate(Mat intImg){
 	for(int w = 0; w < whites.size(); ++w){
 		white += IntegralImage::computeArea(intImg, whites[w]);
 	}
-	for(int b = 0; b < whites.size(); ++b){
+	for(int b = 0; b < blacks.size(); ++b){
 		black += IntegralImage::computeArea(intImg, blacks[b]);
 	}
 	value = white - black;
