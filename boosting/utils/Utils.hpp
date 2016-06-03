@@ -5,9 +5,12 @@
  *      Author: lorenzocioni
  */
 
-#ifndef FACEDETECTOR_UTILS_UTILS_HPP_
-#define FACEDETECTOR_UTILS_UTILS_HPP_
+#ifndef BOOSTING_UTILS_UTILS_HPP_
+#define BOOSTING_UTILS_UTILS_HPP_
 
+#include <opencv2/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include <dirent.h>
 #include <string>
 #include <sstream>
@@ -15,6 +18,14 @@
 #include <iostream>
 
 using namespace std;
+using namespace cv;
+
+enum example {POSITIVE, NEGATIVE};
+
+//Sign function
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
 
 class Utils {
 public:
@@ -38,7 +49,7 @@ public:
 		vector<string> images = open(path);
 		int counter = 0;
 		int k = 0;
-		int delta = 20;
+		int delta = 10;
 		stringstream ss;
 		Mat window;
 		while(k < images.size() && counter < number){
@@ -58,10 +69,17 @@ public:
 			}
 			k++;
 		}
+	}
 
+	static Mat rotate(Mat src, double angle){
+	    Mat dst;
+	    Point2f pt(src.cols/2., src.rows/2.);
+	    Mat r = getRotationMatrix2D(pt, angle, 1.0);
+	    warpAffine(src, dst, r, Size(src.cols, src.rows));
+	    return dst;
 	}
 };
 
 
 
-#endif /* FACEDETECTOR_UTILS_UTILS_HPP_ */
+#endif /* BOOSTING_UTILS_UTILS_HPP_ */

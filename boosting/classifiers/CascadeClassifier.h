@@ -21,7 +21,7 @@ public:
 	CascadeClassifier();
 	void addStage(Stage* stage);
 	void train();
-	int predict(vector<Haar> values);
+	int predict(Mat img);
 	int predict(vector<double> x);
 	~CascadeClassifier();
 	const vector<Stage*>& getStages() const;

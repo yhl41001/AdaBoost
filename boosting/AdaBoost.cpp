@@ -51,6 +51,7 @@ StrongClassifier* AdaBoost::train(vector<WeakClassifier> classifiers){
 			double beta = updateBeta(error);
 			weakClassifier->setAlpha(alpha);
 			weakClassifier->setBeta(beta);
+			cout << "Updating features weights" << endl;
 			updateWeights(weakClassifier);
 			weakClassifier->printInfo();
 			classifiers.push_back(*weakClassifier);

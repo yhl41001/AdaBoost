@@ -10,12 +10,12 @@
 
 #include <iostream>
 #include <vector>
-
+#include <opencv2/core.hpp>
 #include "../features/Data.h"
-#include "../features/Haar.h"
-#include "../utils/utils.h"
+#include "../utils/Utils.hpp"
 
 using namespace std;
+using namespace cv;
 
 class WeakClassifier {
 
@@ -28,11 +28,15 @@ private:
 	example sign;
 	int misclassified;
 
+	//ViolaJones attributes
+	vector<Rect> whites;
+	vector<Rect> blacks;
+
 public:
 	WeakClassifier();
 	int predict(Data* x);
+	int predict(double value);
 	int predict(vector<double> x);
-	int predict(vector<Haar> values);
 	double evaluateError(vector<Data*>& features);
 	void printInfo();
 	double getError() const;
@@ -50,6 +54,10 @@ public:
 	void setMisclassified(int misclassified);
 	double getBeta() const;
 	void setBeta(double beta);
+	const vector<Rect>& getBlacks() const;
+	void setBlacks(const vector<Rect>& blacks);
+	const vector<Rect>& getWhites() const;
+	void setWhites(const vector<Rect>& whites);
 };
 
 #endif /* BOOSTING_CLASSIFIERS_WEAKCLASSIFIER_H_ */

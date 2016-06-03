@@ -18,23 +18,8 @@ int WeakClassifier::predict(Data* x){
 	return predict(x->getFeatures());
 }
 
-int WeakClassifier::predict(vector<Haar> values){
-	for(int i = 0; i < values.size(); ++i){
-		if(values[i].getDimension() == dimension){
-			if(values[i].getValue() <= threshold){
-				if (sign == POSITIVE) return 1;
-				else return -1;
-			} else {
-				if (sign == POSITIVE) return -1;
-				else return 1;
-			}
-		}
-	}
-	return -1;
-}
-
-int WeakClassifier::predict(vector<double> x){
-	if(x[dimension] <= threshold){
+int WeakClassifier::predict(double value){
+	if(value <= threshold){
 		if (sign == POSITIVE)
 			return 1;
 		else
@@ -45,6 +30,10 @@ int WeakClassifier::predict(vector<double> x){
 		else
 			return 1;
 	}
+}
+
+int WeakClassifier::predict(vector<double> x){
+	return predict(x[dimension]);
 }
 
 /**
@@ -128,6 +117,22 @@ void WeakClassifier::setMisclassified(int misclassified) {
 
 double WeakClassifier::getBeta() const {
 	return beta;
+}
+
+const vector<Rect>& WeakClassifier::getBlacks() const {
+	return blacks;
+}
+
+void WeakClassifier::setBlacks(const vector<Rect>& blacks) {
+	this->blacks = blacks;
+}
+
+const vector<Rect>& WeakClassifier::getWhites() const {
+	return whites;
+}
+
+void WeakClassifier::setWhites(const vector<Rect>& whites) {
+	this->whites = whites;
 }
 
 void WeakClassifier::setBeta(double beta) {

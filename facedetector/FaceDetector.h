@@ -19,7 +19,8 @@
 #include "../boosting/features/HaarFeatures.h"
 #include "../boosting/utils/IntegralImage.h"
 #include "../boosting/ViolaJones.h"
-#include "utils/Utils.hpp"
+#include "../boosting/utils/Face.h"
+#include "../boosting/utils/Utils.hpp"
 
 using namespace std;
 using namespace cv;
@@ -31,17 +32,17 @@ private:
 	vector<int> trainLabels;
 	int detectionWindowSize;
 	int scales;
+	int stages;
 	float delta;
 	vector<Mat> scaledImages;
 	ViolaJones* boost;
-	bool showResults;
 
 public:
-	FaceDetector(string trainedCascade);
-	FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int scales, int detectionWindowSize = 24);
+	FaceDetector(string trainedCascade, int scales = 12);
+	FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int stages, int detectionWindowSize = 24);
 	void train();
-	vector<Rect> detect(Mat img, bool showResults);
-	vector<Rect> detect(Mat img);
+	vector<Face> detect(Mat img, bool showResults = false, bool showScores = false);
+	void displaySelectedFeatures(Mat img);
 	~FaceDetector();
 
 };

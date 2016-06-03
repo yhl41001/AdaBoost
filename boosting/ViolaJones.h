@@ -22,6 +22,7 @@
 #include "classifiers/StrongClassifier.h"
 #include "classifiers/CascadeClassifier.h"
 #include "features/HaarFeatures.h"
+#include "utils/Face.h"
 
 using namespace std;
 using namespace cv;
@@ -32,10 +33,11 @@ private:
 	vector<Data*> positives;
 	vector<Data*> negatives;
 	vector<Data*> falseDetections;
-	vector<Haar> selectedFeatures;
 	CascadeClassifier classifier;
+	int negativeSetLayer;
 	pair<double, double> computeRates(vector<Data*> validationSet);
 	void initializeWeights();
+	void generateNegativeSet();
 
 protected:
 	double updateAlpha(double error);
@@ -43,20 +45,16 @@ protected:
 	void normalizeWeights();
 	void updateWeights(WeakClassifier* weakClassifier);
 
-
 public:
 	ViolaJones();
 	ViolaJones(string trainedPath);
 	ViolaJones(vector<Data*> positives, vector<Data*> negatives, int maxStages);
 	void train();
-	int predict(Mat img, int size);
-	int predict(vector<double> x);
+	int predict(Mat img);
 	void loadTrainedData(string filename);
 	void store();
 	~ViolaJones();
-	const vector<Haar>& getSelectedFeatures() const;
-	void setSelectedFeatures(const vector<Haar>& selectedFeatures);
-	vector<Rect> mergeDetections(vector<Rect> &detections);
+	vector<Face> mergeDetections(vector<Face> &detections);
 };
 
 #endif /* BOOSTING_VIOLAJONES_H_ */

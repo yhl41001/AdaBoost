@@ -16,7 +16,7 @@
 #include <vector>
 #include <iostream>
 #include <vector>
-
+#include "../classifiers/WeakClassifier.h"
 #include "../utils/IntegralImage.h"
 #include "Haar.h"
 
@@ -27,11 +27,10 @@ using namespace std;
 
 class HaarFeatures {
 public:
-	static void getFeature(int size, int dimension, Haar& haar);
+	static void getFeature(int size, WeakClassifier* wc);
 	static vector<double> extractFeatures(Mat img, int size, int r, int c);
-	static vector<double> extractFeatures(Mat integralImage, int size, int r, int c, Haar& haar, bool store, int dimension);
-	static vector<double> extractSelectedFeatures(Mat img, int size, int r, int c, vector<Haar> selected);
-
+	static vector<double> extractFeatures(Mat integralImage, int size, int r, int c, bool store, WeakClassifier* wc);
+	static double evaluate(Mat intImg, vector<Rect> whites, vector<Rect> blacks);
 };
 
 #endif /* FEATURES_HAARFEATURE_H_ */

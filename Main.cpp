@@ -18,8 +18,8 @@
 #include "boosting/features/Data.h"
 #include "boosting/features/HaarFeatures.h"
 #include "boosting/utils/IntegralImage.h"
+#include "boosting/utils/Utils.hpp"
 #include "facedetector/FaceDetector.h"
-#include "facedetector/utils/Utils.hpp"
 #include "digitclassifier/DigitsClassifier.h"
 
 using namespace std;
@@ -29,7 +29,7 @@ int main( int argc, char** argv ){
 
 	string imagePath = "/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/dataset/";
 
-	//Utils::generateNonFacesDataset(imagePath + "backgrounds", imagePath + "negatives", 6000, 24);
+	//Utils::generateNonFacesDataset(imagePath + "backgrounds", imagePath + "negatives", 10000, 24);
 	string path;
 
 	vector<Mat> trainImages;
@@ -39,8 +39,8 @@ int main( int argc, char** argv ){
 	vector<string> positiveImages = Utils::open(imagePath + "lfwcrop/faces");
 	vector<string> negativeImages = Utils::open(imagePath + "negatives");
 
-	int positiveExamples = 1;
-	int negativeExamples = 1;
+	int positiveExamples = 0;
+	int negativeExamples = 0;
 
 	for(int k = 0; k < positiveExamples; ++k){
 		Mat img = imread(imagePath + "lfwcrop/faces/" + positiveImages[k]);
@@ -62,13 +62,14 @@ int main( int argc, char** argv ){
 		}
 	}
 
-	Mat test = imread(imagePath + "test/tammy.jpg", 0);
-//	Mat test = imread(imagePath + "lfwcrop/faces/Stockard_Channing_0001.pgm");
+	Mat test = imread(imagePath + "test/tammytest.jpg", 0);
 
-	//FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 8);
+	//Mat test = imread(imagePath + "lfwcrop/faces/Ana_Isabel_Sanchez_0001.pgm", 0);
+
+	//FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 24);
 	//detector->train();
 
-	FaceDetector* detector = new FaceDetector("trainedData.txt");
+	FaceDetector* detector = new FaceDetector("trainedDataOld.txt", 8);
 	detector->detect(test, true);
 
 

@@ -28,10 +28,12 @@ int Stage::predict(vector<double> x){
 	return sum >= threshold ? 1 : -1;
 }
 
-int Stage::predict(vector<Haar> values){
+int Stage::predict(Mat img){
 	double sum = 0;
+	double value;
 	for (int i = 0; i < classifiers.size(); ++i) {
-		sum += classifiers[i].getAlpha() * classifiers[i].predict(values);
+		value = HaarFeatures::evaluate(img, classifiers[i].getWhites(), classifiers[i].getBlacks());
+		sum += classifiers[i].getAlpha() * classifiers[i].predict(value);
 	}
 	return sum >= threshold ? 1 : -1;
 }

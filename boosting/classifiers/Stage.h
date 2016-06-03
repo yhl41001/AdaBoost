@@ -11,6 +11,7 @@
 #include "WeakClassifier.h"
 #include <vector>
 #include <iostream>
+#include "../features/HaarFeatures.h"
 
 using namespace std;
 
@@ -25,8 +26,8 @@ private:
 public:
 	Stage(int number);
 	Stage(int number, vector<WeakClassifier> weaks);
-	int predict(vector<Haar> values);
 	int predict(vector<double> x);
+	int predict(Mat img);
 	void optimizeThreshold(vector<Data*> &positiveSet, double maxfnr);
 	void decreaseThreshold();
 	~Stage();

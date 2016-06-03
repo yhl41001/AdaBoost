@@ -24,9 +24,9 @@ int CascadeClassifier::predict(vector<double> x){
 	return 1;
 }
 
-int CascadeClassifier::predict(vector<Haar> values){
+int CascadeClassifier::predict(Mat img){
 	for(int i = 0; i < stages.size(); ++i){
-		if (stages[i]->predict(values) != 1) {
+		if (stages[i]->predict(img) != 1) {
 			return -1;
 		}
 	}
