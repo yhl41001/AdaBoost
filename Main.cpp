@@ -62,7 +62,7 @@ int main( int argc, char** argv ){
 		}
 	}
 
-	Mat test = imread(imagePath + "test/tammytest.jpg", 0);
+	Mat test = imread(imagePath + "test/tammy.jpg", 0);
 
 	//Mat test = imread(imagePath + "lfwcrop/faces/Ana_Isabel_Sanchez_0001.pgm", 0);
 

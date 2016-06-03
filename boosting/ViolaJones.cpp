@@ -337,8 +337,58 @@ void ViolaJones::loadTrainedData(string filename){
 	cout << "Trained data loaded correctly" << endl;
 }
 
+vector<Face> ViolaJones::mergeDetections(vector<Face>& detections){
+	vector<Face> cluster, output;
+	vector<int> indexes;
+	double score;
+	int padding = 5;
+	Rect a, b;
+
+	for(unsigned int i = 0; i < detections.size(); ++i){
+		cluster.clear();
+
+		a = detections[i].getRect();
+		for(unsigned int j = 0; j < detections.size(); ++j){
+			if(i != j && !detections[j].isEvaluated()){
+				b = detections[j].getRect();
+				score = (double) (a & b).area() / (a | b).area();
+				if(score > 0.5){
+					detections[j].setEvaluated(true);
+					cluster.push_back(detections[j]);
+				}
+			}
+		}
+
+		if(cluster.size() > 0){
+			Rect result (0, 0, 0, 0);
+			cluster.push_back(detections[i]);
+			detections[i].setEvaluated(true);
+
+			for(unsigned int k = 0; k < cluster.size(); ++k){
+				result.x += cluster[k].getRect().x;
+				result.y += cluster[k].getRect().y;
+				result.width += cluster[k].getRect().width;
+				result.height += cluster[k].getRect().height;
+			}
+
+			result.x = result.x/cluster.size() - padding;
+			result.y = result.y/cluster.size() - padding;
+			result.width = result.width/cluster.size() + 2 * padding;
+			result.height = result.height/cluster.size() + 2 * padding;
+
+			output.push_back(Face(result));
+		}
+	}
+
+	for(int h = 0; h < output.size(); ++h){
+			cout << "index: " << h << " - " << output[h].getRect() << " value: " << output[h].getScore() <<  endl;
+			}
+
+	return output;
+}
 
 
+/*
 vector<Face> ViolaJones::mergeDetections(vector<Face> &detections){
 	vector<Face> output;
 	vector<int> indexes;
@@ -439,6 +489,6 @@ vector<Face> ViolaJones::mergeDetections(vector<Face> &detections){
 			}
 
 	return output;
-}
+}*/
 
 ViolaJones::~ViolaJones(){}

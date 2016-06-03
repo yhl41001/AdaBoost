@@ -54,6 +54,7 @@ public:
 	void setMisclassified(int misclassified);
 	double getBeta() const;
 	void setBeta(double beta);
+
 	const vector<Rect>& getBlacks() const;
 	void setBlacks(const vector<Rect>& blacks);
 	const vector<Rect>& getWhites() const;

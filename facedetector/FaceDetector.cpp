@@ -106,13 +106,13 @@ vector<Face> FaceDetector::detect(Mat img, bool showResults, bool showScores){
 	}
 
 	cout << "Detected: " << predictions.size() << " faces" << endl;
-    //predictions = boost->mergeDetections(predictions);
+    predictions = boost->mergeDetections(predictions);
     cout << "Merged into: " << predictions.size() << " faces" << endl;
 	if(showResults){
-		double norm;
-		for_each(predictions.begin(), predictions.end(), [&norm] (const Face& face) {
+		//double norm;
+		/*for_each(predictions.begin(), predictions.end(), [&norm] (const Face& face) {
 			norm += face.getScore();
-		});
+		});*/
 		for(unsigned int i = 0; i < predictions.size(); ++i){
 			if(showScores){
 				string text = to_string(predictions[i].getScore());
@@ -121,13 +121,16 @@ vector<Face> FaceDetector::detect(Mat img, bool showResults, bool showScores){
 				putText(img, text, textOrg, fontFace, fontScale,
 							        Scalar::all(255), thickness, 8);
 			}
-			if(predictions[i].getScore() / norm > 0.5){
+			/*if(predictions[i].getScore() / norm > 0.5){
 				thickness = 2;
-			}
+			}*/
 			rectangle(img, predictions[i].getRect(), Scalar::all(255), thickness);
+			/*cout << "Score: " << predictions[i].getScore() << endl;
+			imshow("img", img);
+					waitKey(0);*/
 		}
 		imshow("img", img);
-		waitKey(0);
+				waitKey(0);
 		imwrite("out.jpg", img);
 	}
 

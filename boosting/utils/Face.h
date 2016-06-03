@@ -18,6 +18,7 @@ class Face {
 private:
 	Rect rect;
 	double score;
+	bool evaluated;
 
 public:
 	Face(Rect rect);
@@ -25,6 +26,8 @@ public:
 	const Rect& getRect() const;
 	void setRect(const Rect& rect);
 	double getScore() const;
+	bool isEvaluated() const;
+	void setEvaluated(bool evaluated);
 	void setScore(double score);
 };
 

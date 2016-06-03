@@ -18,7 +18,6 @@
 #include <string>
 #include <vector>
 #include "AdaBoost.h"
-#include "features/Haar.h"
 #include "classifiers/StrongClassifier.h"
 #include "classifiers/CascadeClassifier.h"
 #include "features/HaarFeatures.h"

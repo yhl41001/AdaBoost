@@ -7,7 +7,7 @@
 
 #include "Face.h"
 
-Face::Face(Rect rect): rect(rect), score(0.){}
+Face::Face(Rect rect): rect(rect), score(0.), evaluated(false){}
 
 const Rect& Face::getRect() const {
 	return rect;
@@ -17,13 +17,22 @@ void Face::setRect(const Rect& rect) {
 	this->rect = rect;
 }
 
-double Face::getScore() const {
-	return score;
+bool Face::isEvaluated() const {
+	return evaluated;
 }
 
 void Face::setScore(double score) {
 	this->score = score;
 }
+
+void Face::setEvaluated(bool evaluated) {
+	this->evaluated = evaluated;
+}
+
+double Face::getScore() const {
+	return score;
+}
+
 
 Face::~Face() {
 }

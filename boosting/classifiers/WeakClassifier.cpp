@@ -18,6 +18,10 @@ int WeakClassifier::predict(Data* x){
 	return predict(x->getFeatures());
 }
 
+int WeakClassifier::predict(vector<double> x){
+	return predict(x[dimension]);
+}
+
 int WeakClassifier::predict(double value){
 	if(value <= threshold){
 		if (sign == POSITIVE)
@@ -32,9 +36,7 @@ int WeakClassifier::predict(double value){
 	}
 }
 
-int WeakClassifier::predict(vector<double> x){
-	return predict(x[dimension]);
-}
+
 
 /**
  * Evaluate error base on weights and misclassified samples

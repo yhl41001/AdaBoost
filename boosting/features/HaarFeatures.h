@@ -18,7 +18,6 @@
 #include <vector>
 #include "../classifiers/WeakClassifier.h"
 #include "../utils/IntegralImage.h"
-#include "Haar.h"
 
 #define TOT_FEATURES 105106
 

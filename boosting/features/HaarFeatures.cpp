@@ -13,7 +13,6 @@ void HaarFeatures::getFeature(int size, WeakClassifier* wc){
 }
 
 vector<double> HaarFeatures::extractFeatures(Mat img, int size, int r, int c){
-	Haar haar;
 	return extractFeatures(img, size, r, c, false, NULL);
 }
 
