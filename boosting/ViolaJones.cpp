@@ -9,30 +9,34 @@
 
 ViolaJones::ViolaJones(): AdaBoost(){
 	this->maxStages = 0;
-	this->negativeSetLayer = 0;
+	this->negativesPerLayer = 0;
+	this->detectionWindowSize = 24;
 }
 
 ViolaJones::ViolaJones(string trainedPath): AdaBoost(){
 	this->maxStages = 0;
 	this->iterations = 0;
 	this->classifier = *(new CascadeClassifier());
-	this->negativeSetLayer = 0;
+	this->negativesPerLayer = 0;
 	loadTrainedData(trainedPath);
 }
 
-ViolaJones::ViolaJones(vector<Data*> positives, vector<Data*> negatives, int maxStages):
+ViolaJones::ViolaJones(string positivePath, string negativePath, int maxStages, int numPositives, int numNegatives, int detectionWindowSize, int negativesPerLayer):
 	AdaBoost(){
+	cout << "\nInitializing ViolaJones face detector" << endl;
 	this->iterations = 0;
 	this->maxStages = maxStages;
 	this->classifier = *(new CascadeClassifier());
-	this->positives = positives;
-	this->negatives = negatives;
-	cout << "\nInitializing ViolaJones AdaBoost with " << iterations << " iterations" << endl;
-	cout << "Training size: " << (positives.size() + negatives.size()) << endl;
-	cout << "  -Positive samples: " << positives.size() << endl;
-	cout << "  -Negative samples: " << negatives.size() << endl;
+	this->positivePath = positivePath;
+	this->negativePath = negativePath;
+	this->detectionWindowSize = detectionWindowSize;
 	this->features = {};
-	this->negativeSetLayer = positives.size();
+
+	if(negativesPerLayer == 0){
+		this->negativesPerLayer = 3000;
+	} else {
+		this->negativesPerLayer = negativesPerLayer;
+	}
 }
 
 double ViolaJones::updateAlpha(double error){
@@ -74,11 +78,65 @@ void ViolaJones::updateWeights(WeakClassifier* weakClassifier){
 	}
 }
 
+void ViolaJones::extractFeatures(){
+	//Loading training positive images
+	double percent;
+	int count = 0;
+	vector<string> positiveImages = Utils::open(positivePath);
+	vector<string> negativeImages = Utils::open(negativePath);
+
+	int totalExamples = positiveImages.size() + negativeImages.size();
+
+	Mat img, intImg;
+
+	cout << "Extracting image features" << endl;
+	auto t_start = chrono::high_resolution_clock::now();
+
+	for (int k = 0; k < positiveImages.size(); ++k) {
+		img = imread(positivePath + positiveImages[k]);
+		if (img.rows != 0 && img.cols != 0) {
+			Mat dest;
+			resize(img, dest, Size(detectionWindowSize, detectionWindowSize));
+			intImg = IntegralImage::computeIntegralImage(dest);
+			vector<double> features = HaarFeatures::extractFeatures(intImg,
+					detectionWindowSize, 0, 0);
+			positives.push_back(new Data(features, 1));
+			percent = (double) count * 100 / (totalExamples - 1);
+			count++;
+		}
+	}
+
+	for (int k = 0; k < negativeImages.size(); ++k) {
+		Mat img = imread(negativePath + negativeImages[k]);
+		if (img.rows != 0 && img.cols != 0) {
+			Mat dest;
+			resize(img, dest, Size(detectionWindowSize, detectionWindowSize));
+			intImg = IntegralImage::computeIntegralImage(dest);
+			vector<double> features = HaarFeatures::extractFeatures(intImg,
+					detectionWindowSize, 0, 0);
+			negatives.push_back(new Data(features, -1));
+			percent = (double) count * 100 / (totalExamples - 1);
+			count++;
+		}
+	}
+	cout << "\nExtracted features in ";
+	auto t_end = chrono::high_resolution_clock::now();
+	cout << std::fixed
+			<< (chrono::duration<double, milli>(t_end - t_start).count()) / 1000
+			<< " s\n" << endl;
+
+	cout << "Training size: " << (positives.size() + negatives.size()) << endl;
+	cout << "  -Positive samples: " << positives.size() << endl;
+	cout << "  -Negative samples: " << negatives.size() << endl;
+}
+
 void ViolaJones::train(){
 	cout << "Training Cascade Classifier" << endl;
 
+	extractFeatures();
+
 	double f = 0.5;
-	double d = 0.95;
+	double d = 0.995;
 	double Ftarget = 0.00001;
 	double* F = new double[maxStages + 1];
 	double* D = new double[maxStages + 1];
@@ -89,7 +147,11 @@ void ViolaJones::train(){
 	vector<Data*> validationSet;
 	validationSet.reserve(positives.size() + negatives.size());
 	validationSet.insert(validationSet.end(), positives.begin(), positives.end());
-	validationSet.insert(validationSet.end(), negatives.begin(), negatives.end());
+	validationSet.insert(validationSet.end(), negatives.begin(), negatives.begin() + 3000);
+
+	vector<Data*> tmp(negatives.begin() + 3001, negatives.end());
+	negatives = tmp;
+
 
 	F[0] = 1.;
 	D[0] = 1.;
@@ -135,9 +197,7 @@ void ViolaJones::train(){
 			stage->setClassifiers(strongClassifier->getClassifiers());
 			classifiers = strongClassifier->getClassifiers();
 
-			rates = computeRates(validationSet);
-			F[i] = rates.first;
-			D[i] = rates.second;
+			D[i] = evaluateDR(positives);
 
 			//Optimizing stage threshold
 			//Evaluate current cascaded classifier on validation set to determine fpr & dr
@@ -145,11 +205,10 @@ void ViolaJones::train(){
 
 			while(D[i] < d * dr){
 				stage->decreaseThreshold();
-				rates = computeRates(validationSet);
-				F[i] = rates.first;
-				D[i] = rates.second;
+				D[i] = evaluateDR(positives);
 			}
 
+			F[i] = evaluateFPR(validationSet);
 			stage->setFpr(F[i]);
 			stage->setDetectionRate(D[i]);
 		}
@@ -169,41 +228,50 @@ void ViolaJones::train(){
 	store();
 }
 
-pair<double, double> ViolaJones::computeRates(vector<Data*> validationSet){
-	falseDetections.clear();
+double ViolaJones::evaluateFPR(vector<Data*> validationSet){
 	pair<double, double> output;
-	int tp = 0;
 	int fp = 0;
 	int tn = 0;
-	int fn = 0;
 	int prediction;
 	for(int i = 0; i < validationSet.size(); ++i){
 		prediction = classifier.predict(validationSet[i]->getFeatures());
 		if(prediction == 1 && validationSet[i]->getLabel() == -1){
 			fp++;
-			falseDetections.push_back(validationSet[i]);
 		} else if(prediction == -1 && validationSet[i]->getLabel() == -1){
 			tn++;
-		} else if(prediction == -1 && validationSet[i]->getLabel() == 1){
+		}
+	}
+	double fpr = (double) fp / (fp + tn);
+	cout << "FPR: " << fpr;
+	cout << " (FP: " << fp << " TN: " << tn << ")" << endl;
+	return fpr;
+}
+
+double ViolaJones::evaluateDR(vector<Data*> validationSet){
+	int tp = 0;
+	int fn = 0;
+	int prediction;
+	for(int i = 0; i < validationSet.size(); ++i){
+		prediction = classifier.predict(validationSet[i]->getFeatures());
+		if(prediction == -1 && validationSet[i]->getLabel() == 1){
 			fn++;
 		} else if(prediction == 1 && validationSet[i]->getLabel() == 1){
 			tp++;
 		}
 	}
-	output.first = (double) fp / (fp + tn);
-	output.second = (double) tp / (tp + fn);
-	cout << "FPR: " << output.first << ", DR: " << output.second;
-	cout << " (FP: " << fp << " FN: " << fn << " TN: " << tn << " TP: " << tp << ")" << endl;
-	return output;
+	double dr = (double) tp / (tp + fn);
+	cout << "DR: " << dr;
+	cout << " (TP: " << tp << " FN: " << fn << ")" << endl;
+	return dr;
 }
 
 
 void ViolaJones::generateNegativeSet(){
-	cout << "\nGenerating negative set for layer: max " << negativeSetLayer << endl;
+	cout << "\nGenerating negative set for layer: max " << negativesPerLayer << endl;
 	string negativePath = "/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/dataset/negatives";
 	vector<string> negativeImages = Utils::open(negativePath);
 	int count = 0;
-	for(int k = 0; k < negativeImages.size() && count < negativeSetLayer; ++k){
+	for(int k = 0; k < negativeImages.size() && count < negativesPerLayer; ++k){
 		Mat img = imread(negativePath + "/" + negativeImages[k]);
 		Mat dest;
 		if(img.rows > 0 && img.cols > 0){

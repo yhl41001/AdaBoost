@@ -30,7 +30,11 @@ int main( int argc, char** argv ){
 	string imagePath = "/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/dataset/";
 
 	//Utils::generateNonFacesDataset(imagePath + "backgrounds", imagePath + "negatives", 10000, 24);
-	string path;
+	string positivePath = imagePath + "lfwcrop/faces/";
+	string negativePath = imagePath + "negatives/";
+	string validationPath = imagePath + "validation/";
+
+	/*
 
 	vector<Mat> trainImages;
 	vector<int> trainLabels;
@@ -39,8 +43,8 @@ int main( int argc, char** argv ){
 	vector<string> positiveImages = Utils::open(imagePath + "lfwcrop/faces");
 	vector<string> negativeImages = Utils::open(imagePath + "negatives");
 
-	int positiveExamples = 0;
-	int negativeExamples = 0;
+	int positiveExamples = 2000;
+	int negativeExamples = 7000;
 
 	for(int k = 0; k < positiveExamples; ++k){
 		Mat img = imread(imagePath + "lfwcrop/faces/" + positiveImages[k]);
@@ -60,17 +64,16 @@ int main( int argc, char** argv ){
 			trainImages.push_back(dest);
 			trainLabels.push_back(-1);
 		}
-	}
+	}*/
 
 	Mat test = imread(imagePath + "test/tammy.jpg", 0);
-
+	//Mat test = imread(imagePath + "test/knex0.jpg", 0);
 	//Mat test = imread(imagePath + "lfwcrop/faces/Ana_Isabel_Sanchez_0001.pgm", 0);
+	FaceDetector* detector = new FaceDetector(positivePath, negativePath, 24, 2000, 6000);
+	detector->train();
 
-	//FaceDetector* detector = new FaceDetector(trainImages, trainLabels, 24);
-	//detector->train();
-
-	FaceDetector* detector = new FaceDetector("trainedDataOld.txt", 8);
-	detector->detect(test, true);
+//	FaceDetector* detector = new FaceDetector("trainedDataOld.txt", 8);
+//	detector->detect(test, true);
 
 
 	/*

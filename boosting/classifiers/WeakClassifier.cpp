@@ -36,8 +36,6 @@ int WeakClassifier::predict(double value){
 	}
 }
 
-
-
 /**
  * Evaluate error base on weights and misclassified samples
  */

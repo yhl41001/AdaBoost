@@ -47,18 +47,17 @@ public:
 	void setThreshold(double threshold);
 	double getAlpha() const;
 	void setAlpha(double alpha);
-	~WeakClassifier() {}
 	example getSign() const;
 	void setSign(example sign);
 	int getMisclassified() const;
 	void setMisclassified(int misclassified);
 	double getBeta() const;
 	void setBeta(double beta);
-
 	const vector<Rect>& getBlacks() const;
 	void setBlacks(const vector<Rect>& blacks);
 	const vector<Rect>& getWhites() const;
 	void setWhites(const vector<Rect>& whites);
+	~WeakClassifier() {}
 };
 
 #endif /* BOOSTING_CLASSIFIERS_WEAKCLASSIFIER_H_ */

@@ -28,18 +28,20 @@ using namespace cv;
 class FaceDetector {
 
 private:
-	vector<Mat> trainImages;
-	vector<int> trainLabels;
+	string positivePath;
+	string negativePath;
 	int detectionWindowSize;
 	int scales;
 	int stages;
 	float delta;
+	int numPositives;
+	int numNegatives;
 	vector<Mat> scaledImages;
 	ViolaJones* boost;
 
 public:
 	FaceDetector(string trainedCascade, int scales = 12);
-	FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int stages, int detectionWindowSize = 24);
+	FaceDetector(string positivePath, string negativePath, int stages, int numPositives, int numNegatives, int detectionWindowSize = 24);
 	void train();
 	vector<Face> detect(Mat img, bool showResults = false, bool showScores = false);
 	void displaySelectedFeatures(Mat img);

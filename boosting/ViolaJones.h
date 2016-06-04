@@ -22,6 +22,7 @@
 #include "classifiers/CascadeClassifier.h"
 #include "features/HaarFeatures.h"
 #include "utils/Face.h"
+#include "utils/Utils.hpp"
 
 using namespace std;
 using namespace cv;
@@ -31,12 +32,18 @@ private:
 	int maxStages;
 	vector<Data*> positives;
 	vector<Data*> negatives;
-	vector<Data*> falseDetections;
+	vector<Data*> validation;
+	string positivePath;
+	string negativePath;
+	string validationPath;
 	CascadeClassifier classifier;
-	int negativeSetLayer;
-	pair<double, double> computeRates(vector<Data*> validationSet);
+	int negativesPerLayer;
+	int detectionWindowSize;
+	double evaluateFPR(vector<Data*> validationSet);
+	double evaluateDR(vector<Data*> validationSet);
 	void initializeWeights();
 	void generateNegativeSet();
+	void extractFeatures();
 
 
 protected:
@@ -48,7 +55,8 @@ protected:
 public:
 	ViolaJones();
 	ViolaJones(string trainedPath);
-	ViolaJones(vector<Data*> positives, vector<Data*> negatives, int maxStages);
+	ViolaJones(string positivePath, string negativePath, int maxStages, int numPositives,
+			int numNegatives, int detectionWindowSize = 24, int negativesPerLayer = 0);
 	vector<Face> mergeDetections(vector<Face> detections, int padding = 6, double th = 0.5);
 	void train();
 	int predict(Mat img);

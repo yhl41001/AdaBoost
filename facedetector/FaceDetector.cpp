@@ -12,24 +12,26 @@
 
 FaceDetector::FaceDetector(string trainedCascade, int scales){
 	cout << "FaceDetector\n************" << endl;
-	this->trainImages = {};
-	this->trainLabels = {};
 	this->scales = scales;
 	this->detectionWindowSize = 24;
 	this->delta = 2;
 	this->stages = 24;
+	this->numNegatives = 0;
+	this->numPositives = 0;
 	cout << "  -Scales: " << scales << "\n  -Window size: "<< detectionWindowSize << endl;
 	boost = new ViolaJones(trainedCascade);
 }
 
-FaceDetector::FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int stages, int detectionWindowSize){
+FaceDetector::FaceDetector(string positivePath, string negativePath, int stages, int numPositives, int numNegatives, int detectionWindowSize){
 	cout << "FaceDetector\n************" << endl;
-	this->trainImages = trainImages;
-	this->trainLabels = trainLabels;
+	this->positivePath = positivePath;
+	this->negativePath = negativePath;
 	this->scales = 12;
 	this->delta = 2;
 	this->stages = stages;
 	this->detectionWindowSize = detectionWindowSize;
+	this->numNegatives = numNegatives;
+	this->numPositives = numPositives;
 	boost = new ViolaJones();
 	cout << "  -Scales: " << scales << "\n  -Window size: "<< detectionWindowSize << endl;
 
@@ -37,31 +39,7 @@ FaceDetector::FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int
 
 void FaceDetector::train(){
 	cout << "Traing ViolaJones face detector\n" << endl;
-	vector<Data*> positives;
-	vector<Data*> negatives;
-	double percent = 0;
-	auto t_start = chrono::high_resolution_clock::now();
-
-	cout << "Extracting image features" << endl;
-
-	for(int i = 0; i < trainImages.size(); ++i){
-		Mat intImg = IntegralImage::computeIntegralImage(trainImages[i]);
-		//Extracting haar like features
-		vector<double> features = HaarFeatures::extractFeatures(intImg, detectionWindowSize, 0, 0);
-		if(trainLabels[i] == 1){
-			positives.push_back(new Data(features, trainLabels[i]));
-		} else {
-			negatives.push_back(new Data(features, trainLabels[i]));
-		}
-		percent = (double) i * 100 / (trainImages.size() - 1) ;
-		cout << "\rEvaluated: " << i + 1 << "/" << trainImages.size() << " images" << flush;
-	}
-
-	cout << "\nExtracted features in ";
-	auto t_end = chrono::high_resolution_clock::now();
-	cout << std::fixed << (chrono::duration<double, milli>(t_end - t_start).count())/1000 << " s\n";
-
-	boost = new ViolaJones(positives, negatives, stages);
+	boost = new ViolaJones(positivePath, negativePath, stages, numPositives, numNegatives, detectionWindowSize);
 	boost->train();
 }
 
@@ -134,7 +112,4 @@ void FaceDetector::displaySelectedFeatures(Mat img){
 	resize(img, img, Size(24, 24));
 }
 
-FaceDetector::~FaceDetector(){
-	trainImages.clear();
-	trainLabels.clear();
-}
+FaceDetector::~FaceDetector(){}
