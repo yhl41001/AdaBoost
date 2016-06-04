@@ -324,11 +324,7 @@ void ViolaJones::loadTrainedData(string filename){
 			}
 			getline(iss, read, ',');
 			wc->setMisclassified(stoi(read));
-			vector<Rect> whites;
-			vector<Rect> blacks;
-			//Haar haar;
 			HaarFeatures::getFeature(24, wc);
-//			selectedFeatures.push_back(haar);
 			stage->addClassifier(wc);
 		}
 	}
@@ -337,158 +333,53 @@ void ViolaJones::loadTrainedData(string filename){
 	cout << "Trained data loaded correctly" << endl;
 }
 
-vector<Face> ViolaJones::mergeDetections(vector<Face>& detections){
-	vector<Face> cluster, output;
-	vector<int> indexes;
+vector<Face> ViolaJones::mergeDetections(vector<Face> detections, int padding, double th){
+	vector<Face> output, cluster;
 	double score;
-	int padding = 5;
 	Rect a, b;
 
-	for(unsigned int i = 0; i < detections.size(); ++i){
-		cluster.clear();
+	sort(detections.begin(), detections.end(),
+			[](Face const &a, Face const &b) {return a.getRect().area() > b.getRect().area();});
 
-		a = detections[i].getRect();
-		for(unsigned int j = 0; j < detections.size(); ++j){
-			if(i != j && !detections[j].isEvaluated()){
-				b = detections[j].getRect();
-				score = (double) (a & b).area() / (a | b).area();
-				if(score > 0.5){
-					detections[j].setEvaluated(true);
-					cluster.push_back(detections[j]);
-				}
-			}
-		}
-
-		if(cluster.size() > 0){
-			Rect result (0, 0, 0, 0);
+	for (unsigned int i = 0; i < detections.size(); ++i) {
+		if (!detections[i].isEvaluated()) {
+			cluster.clear();
 			cluster.push_back(detections[i]);
 			detections[i].setEvaluated(true);
+			a = detections[i].getRect();
 
-			for(unsigned int k = 0; k < cluster.size(); ++k){
-				result.x += cluster[k].getRect().x;
-				result.y += cluster[k].getRect().y;
-				result.width += cluster[k].getRect().width;
-				result.height += cluster[k].getRect().height;
-			}
-
-			result.x = result.x/cluster.size() - padding;
-			result.y = result.y/cluster.size() - padding;
-			result.width = result.width/cluster.size() + 2 * padding;
-			result.height = result.height/cluster.size() + 2 * padding;
-
-			output.push_back(Face(result));
-		}
-	}
-
-	for(int h = 0; h < output.size(); ++h){
-			cout << "index: " << h << " - " << output[h].getRect() << " value: " << output[h].getScore() <<  endl;
-			}
-
-	return output;
-}
-
-
-/*
-vector<Face> ViolaJones::mergeDetections(vector<Face> &detections){
-	vector<Face> output;
-	vector<int> indexes;
-	double ci, cj;
-	double distance;
-	bool insert;
-	double score;
-	double th = 6;
-	int padding = 4;
-	int size;
-	for(unsigned int j = 0; j < detections.size(); ++j){
-		size = output.size();
-		insert = false;
-		score = 1;
-		if(size == 0){
-			insert = true;
-		} else {
-			cj = (detections[j].getRect().x + detections[j].getRect().width) / 2;
-			indexes.clear();
-			for(unsigned int i = 0; i < output.size(); ++i){
-				ci = (output[i].getRect().x + output[i].getRect().width) / 2;
-				distance = sqrt(2 * pow(ci - cj, 2));
-				if(distance < th){
-					output.erase(output.begin() + i);
-					score += output[i].getScore();
-					i--;
-
-					//indexes.push_back(i);
-				}
-			}
-			if(indexes.size() > 0){
-				cout << "indexes: "<< indexes.size() << endl;
-				for(unsigned int k = 0; k < indexes.size(); ++k){
-					if(output[indexes[k]].getRect().width < detections[j].getRect().width){
-						output.erase(output.begin() + indexes[k]);
-						score += output[indexes[k]].getScore();
-						insert = true;
+			for (unsigned int j = 0; j < detections.size(); ++j) {
+				if (i != j && !detections[j].isEvaluated()) {
+					b = detections[j].getRect();
+					score = (double) (a & b).area() / (a | b).area();
+					if (score > th) {
+						detections[j].setEvaluated(true);
+						cluster.push_back(detections[j]);
 					}
 				}
-			} else {
-				insert = true;
 			}
-		}
-		if(insert){
-			detections[j].setScore(score);
-			output.push_back(detections[j]);
+
+			if(cluster.size() > 3){
+				Rect result(0, 0, 0, 0);
+
+				for (unsigned int k = 0; k < cluster.size(); ++k) {
+					result.x += cluster[k].getRect().x;
+					result.y += cluster[k].getRect().y;
+					result.width += cluster[k].getRect().width;
+					result.height += cluster[k].getRect().height;
+				}
+
+				result.x = result.x / cluster.size() - padding;
+				result.y = result.y / cluster.size() - padding;
+				result.width = result.width / cluster.size() + 2*padding;
+				result.height = result.height / cluster.size() + 2*padding;
+
+				output.push_back(Face(result, (double) cluster.size()));
+			}
+
 		}
 	}
-
-	cout << "size: " << output.size() << endl;
-
-	cout << "remained " << output.size() << endl;
-	indexes.clear();
-	for(int h = 0; h < output.size(); ++h){
-		cout << "index: " << h << " - " << output[h].getRect() << " value: " << output[h].getScore() <<  endl;
-		}
-
-	output.erase(remove_if(output.begin(), output.end(), [output](Face& face){
-		for(unsigned int i = 0; i < output.size(); ++i){
-			double intersection = (output[i].getRect() & face.getRect()).area();
-			if(intersection == face.getRect().area() && intersection != output[i].getRect().area()){
-				 return true;
-			}
-		}
-		return false;
-	}), output.end());
-
-	cout << "size: " << output.size() << endl;
-
-	double norm;
-	for_each(output.begin(), output.end(), [&norm] (const Face& face) {
-		norm += face.getScore();
-	});
-	double max = 0;
-	for_each(output.begin(), output.end(), [&norm, &max] (Face& face) {
-		double s = face.getScore()/norm;
-		face.setScore(s);
-		if(s > max) max = s;
-	});
-	th = max * 60 / 100;
-	for(unsigned int i = 0; i < output.size(); ++i){
-		if(output[i].getScore() < th){
-			//output.erase(output.begin() + i);
-			//i--;
-		} else {
-			Rect r = output[i].getRect();
-			r.x -= padding;
-			r.y -= padding;
-			r.width += 2*padding;
-			r.height += 2*padding;
-			output[i].setRect(r);
-		}
-	}
-
-	cout << "end " << endl;
-	for(int h = 0; h < output.size(); ++h){
-			cout << "index: " << h << " - " << output[h].getRect() << " value: " << output[h].getScore() <<  endl;
-			}
-
 	return output;
-}*/
+}
 
 ViolaJones::~ViolaJones(){}

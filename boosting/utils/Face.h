@@ -22,6 +22,7 @@ private:
 
 public:
 	Face(Rect rect);
+	Face(Rect rect, double score);
 	~Face();
 	const Rect& getRect() const;
 	void setRect(const Rect& rect);

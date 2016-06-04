@@ -36,18 +36,18 @@ FaceDetector::FaceDetector(vector<Mat> trainImages, vector<int> trainLabels, int
 }
 
 void FaceDetector::train(){
+	cout << "Traing ViolaJones face detector\n" << endl;
 	vector<Data*> positives;
 	vector<Data*> negatives;
 	double percent = 0;
 	auto t_start = chrono::high_resolution_clock::now();
 
-	cout << "\nExtracting image features" << endl;
+	cout << "Extracting image features" << endl;
 
 	for(int i = 0; i < trainImages.size(); ++i){
 		Mat intImg = IntegralImage::computeIntegralImage(trainImages[i]);
 		//Extracting haar like features
 		vector<double> features = HaarFeatures::extractFeatures(intImg, detectionWindowSize, 0, 0);
-		/*	Initialize weights */
 		if(trainLabels[i] == 1){
 			positives.push_back(new Data(features, trainLabels[i]));
 		} else {
@@ -76,13 +76,13 @@ vector<Face> FaceDetector::detect(Mat img, bool showResults, bool showScores){
 	int x, y, w;
 	int fontFace = FONT_HERSHEY_SCRIPT_SIMPLEX;
 	double fontScale = 0.5;
-	int thickness = 1;
+
+	//Evaluating computation time
+	auto t_start = chrono::high_resolution_clock::now();
 
 	//For each image scale
 	for(int s = 0; s < scales; ++s){
 		scaleRefactor = pow(scaleFactor, s);
-		cout << "Scale factor " << scaleRefactor << endl;
-
 		//Detection window slides
 		intImg = IntegralImage::computeIntegralImage(tmp);
 		for(int j = 0; j < tmp.rows - detectionWindowSize - delta; j += delta){
@@ -105,32 +105,25 @@ vector<Face> FaceDetector::detect(Mat img, bool showResults, bool showScores){
 		dst.copyTo(tmp);
 	}
 
-	cout << "Detected: " << predictions.size() << " faces" << endl;
     predictions = boost->mergeDetections(predictions);
-    cout << "Merged into: " << predictions.size() << " faces" << endl;
+    cout << "Detected " << predictions.size() << " faces" << endl;
+
+	auto t_end = high_resolution_clock::now();
+	cout << "Time: " << (duration<double, milli>(t_end - t_start).count())/1000 << " s" << endl;
+
 	if(showResults){
-		//double norm;
-		/*for_each(predictions.begin(), predictions.end(), [&norm] (const Face& face) {
-			norm += face.getScore();
-		});*/
 		for(unsigned int i = 0; i < predictions.size(); ++i){
 			if(showScores){
 				string text = to_string(predictions[i].getScore());
 				Point textOrg(predictions[i].getRect().x + 5,
 						predictions[i].getRect().y + 15);
 				putText(img, text, textOrg, fontFace, fontScale,
-							        Scalar::all(255), thickness, 8);
+							        Scalar::all(255), 1, 8);
 			}
-			/*if(predictions[i].getScore() / norm > 0.5){
-				thickness = 2;
-			}*/
-			rectangle(img, predictions[i].getRect(), Scalar::all(255), thickness);
-			/*cout << "Score: " << predictions[i].getScore() << endl;
-			imshow("img", img);
-					waitKey(0);*/
+			rectangle(img, predictions[i].getRect(), Scalar::all(255));
 		}
 		imshow("img", img);
-				waitKey(0);
+		waitKey(0);
 		imwrite("out.jpg", img);
 	}
 

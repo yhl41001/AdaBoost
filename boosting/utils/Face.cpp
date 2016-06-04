@@ -9,6 +9,8 @@
 
 Face::Face(Rect rect): rect(rect), score(0.), evaluated(false){}
 
+Face::Face(Rect rect, double score): rect(rect), score(score), evaluated(false){}
+
 const Rect& Face::getRect() const {
 	return rect;
 }

@@ -38,6 +38,7 @@ private:
 	void initializeWeights();
 	void generateNegativeSet();
 
+
 protected:
 	double updateAlpha(double error);
 	double updateBeta(double error);
@@ -48,12 +49,13 @@ public:
 	ViolaJones();
 	ViolaJones(string trainedPath);
 	ViolaJones(vector<Data*> positives, vector<Data*> negatives, int maxStages);
+	vector<Face> mergeDetections(vector<Face> detections, int padding = 6, double th = 0.5);
 	void train();
 	int predict(Mat img);
 	void loadTrainedData(string filename);
 	void store();
 	~ViolaJones();
-	vector<Face> mergeDetections(vector<Face> &detections);
+
 };
 
 #endif /* BOOSTING_VIOLAJONES_H_ */
