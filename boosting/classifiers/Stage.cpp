@@ -73,9 +73,6 @@ void Stage::setThreshold(double threshold) {
 	this->threshold = threshold;
 }
 
-Stage::~Stage() {
-}
-
 double Stage::getDetectionRate() const {
 	return detectionRate;
 }
@@ -119,5 +116,8 @@ const vector<WeakClassifier>& Stage::getClassifiers() const {
 
 void Stage::addClassifier(WeakClassifier* wc){
 	classifiers.push_back(*wc);
+}
+
+Stage::~Stage() {
 }
 

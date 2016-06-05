@@ -36,6 +36,8 @@ private:
 	string positivePath;
 	string negativePath;
 	string validationPath;
+	int numPositives;
+	int numNegatives;
 	CascadeClassifier classifier;
 	int negativesPerLayer;
 	int detectionWindowSize;
@@ -61,9 +63,12 @@ public:
 	void train();
 	int predict(Mat img);
 	void loadTrainedData(string filename);
+	const string& getValidationPath() const;
+	void setValidationPath(const string& validationPath);
 	void store();
 	~ViolaJones();
-
+	const CascadeClassifier& getClassifier() const;
+	void setClassifier(const CascadeClassifier& classifier);
 };
 
 #endif /* BOOSTING_VIOLAJONES_H_ */

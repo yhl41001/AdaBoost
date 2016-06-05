@@ -30,6 +30,7 @@ class FaceDetector {
 private:
 	string positivePath;
 	string negativePath;
+	string validationPath;
 	int detectionWindowSize;
 	int scales;
 	int stages;
@@ -44,7 +45,8 @@ public:
 	FaceDetector(string positivePath, string negativePath, int stages, int numPositives, int numNegatives, int detectionWindowSize = 24);
 	void train();
 	vector<Face> detect(Mat img, bool showResults = false, bool showScores = false);
-	void displaySelectedFeatures(Mat img);
+	void displaySelectedFeatures(Mat img, int index);
+	void setValidationPath(string validationPath);
 	~FaceDetector();
 
 };

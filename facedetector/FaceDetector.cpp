@@ -37,9 +37,15 @@ FaceDetector::FaceDetector(string positivePath, string negativePath, int stages,
 
 }
 
+void FaceDetector::setValidationPath(string validationPath){
+	this->validationPath = validationPath;
+}
+
 void FaceDetector::train(){
-	cout << "Traing ViolaJones face detector\n" << endl;
 	boost = new ViolaJones(positivePath, negativePath, stages, numPositives, numNegatives, detectionWindowSize);
+	if(validationPath != ""){
+		boost->setValidationPath(validationPath);
+	}
 	boost->train();
 }
 
@@ -108,8 +114,27 @@ vector<Face> FaceDetector::detect(Mat img, bool showResults, bool showScores){
 	return predictions;
 }
 
-void FaceDetector::displaySelectedFeatures(Mat img){
-	resize(img, img, Size(24, 24));
+void FaceDetector::displaySelectedFeatures(Mat img, int index){
+	resize(img, img, Size(detectionWindowSize, detectionWindowSize));
+	vector<Stage*> stages = boost->getClassifier().getStages();
+	int count = 0;
+	for(unsigned int i = 0; i < stages.size(); ++i){
+		for(unsigned int j = 0; j < stages[i]->getClassifiers().size(); ++j){
+			if(count == index){
+				for(unsigned int w = 0; w < stages[i]->getClassifiers()[j].getWhites().size(); ++w){
+					rectangle(img, stages[i]->getClassifiers()[j].getWhites()[w], Scalar::all(255), CV_FILLED);
+				}
+				for(unsigned int b = 0; b < stages[i]->getClassifiers()[j].getBlacks().size(); ++b){
+					rectangle(img, stages[i]->getClassifiers()[j].getBlacks()[b], Scalar::all(0), CV_FILLED);
+				}
+				imshow("feature", img);
+				waitKey(0);
+				imwrite("feature.jpg", img);
+				return;
+			}
+			count++;
+		}
+	}
 }
 
 FaceDetector::~FaceDetector(){}
