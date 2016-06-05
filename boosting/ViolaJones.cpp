@@ -40,7 +40,7 @@ ViolaJones::ViolaJones(string positivePath, string negativePath, int maxStages, 
 	this->numPositives = numPositives;
 	this->numNegatives = numNegatives;
 	if(negativesPerLayer == 0){
-		this->negativesPerLayer = 3000;
+		this->negativesPerLayer = numPositives;
 	} else {
 		this->negativesPerLayer = negativesPerLayer;
 	}
@@ -48,7 +48,7 @@ ViolaJones::ViolaJones(string positivePath, string negativePath, int maxStages, 
 
 double ViolaJones::updateAlpha(double error){
 	if(error < 0.0001){
-		return 10000;
+		return 1000;
 	}
 	return  log((1 - error) / error);
 }
@@ -174,7 +174,7 @@ void ViolaJones::train(){
 	extractFeatures();
 
 	double f = 0.5;
-	double d = 0.995;
+	double d = 0.98;
 	double Ftarget = 0.00001;
 	double* F = new double[maxStages + 1];
 	double* D = new double[maxStages + 1];
@@ -220,6 +220,9 @@ void ViolaJones::train(){
 		classifier.addStage(stage);
 
 		fpr = i > 0 ? F[i - 1] : 1;
+		cout << "  -Target FPR: " << (f * fpr) << endl;
+		cout << "  -Target DR: " << (d * dr) << "\n" << endl;
+
 		while(F[i] > f * fpr){
 			n++;
 			this->iterations = n;
@@ -253,7 +256,6 @@ void ViolaJones::train(){
 			//if F(i) > Ftarget then
 			//evaluate the current cascaded detector on the set of non-face images
 			//and put any false detections into the set N.
-			//negatives = falseDetections;
 			generateNegativeSet();
 		}
 		stage->printInfo();
@@ -276,7 +278,7 @@ double ViolaJones::evaluateFPR(vector<Data*> validationSet){
 	}
 	double fpr = (double) fp / (fp + tn);
 	cout << "FPR: " << fpr;
-	cout << " (FP: " << fp << " TN: " << tn << ")" << endl;
+	cout << " (FP: " << fp << " TN: " << tn << ")\n" << endl;
 	return fpr;
 }
 
@@ -303,6 +305,7 @@ void ViolaJones::generateNegativeSet(){
 	cout << "\nGenerating negative set for layer: max " << negativesPerLayer << endl;
 	vector<string> negativeImages = Utils::open(negativePath);
 	int count = 0;
+	int evaluated = 0;
 	for(int k = 0; k < negativeImages.size() && count < negativesPerLayer; ++k){
 		Mat img = imread(negativePath + negativeImages[k]);
 		Mat dest;
@@ -313,12 +316,13 @@ void ViolaJones::generateNegativeSet(){
 				} else {
 					dest = img;
 				}
+				evaluated++;
 				Mat intImg = IntegralImage::computeIntegralImage(dest);
 				vector<double> features = HaarFeatures::extractFeatures(intImg, 24, 0, 0);
 				if(classifier.predict(features) == 1){
 					negatives.push_back(new Data(features, -1));
 					count++;
-					cout << "\rAdded " << count << " images to the negative set" << flush;
+					cout << "\rAdded " << count << " (" << evaluated << " tested) images to the negative set" << flush;
 				}
 			}
 		}

@@ -40,12 +40,12 @@ int main( int argc, char** argv ){
 	Mat test = imread(imagePath + "lfwcrop/faces/Ana_Isabel_Sanchez_0001.pgm", 0);
 
 
-//	FaceDetector* detector = new FaceDetector(positivePath, negativePath, 24, 2000, 3000);
-//	detector->setValidationPath(validationPath);
-//	detector->train();
+	FaceDetector* detector = new FaceDetector(positivePath, negativePath, 24, 2000, 4000);
+	detector->setValidationPath(validationPath);
+	detector->train();
 
-	FaceDetector* detector = new FaceDetector("trainedDataOld.txt", 8);
-	detector->displaySelectedFeatures(test, 3);
+//	FaceDetector* detector = new FaceDetector("trainedDataOld.txt", 8);
+//	detector->displaySelectedFeatures(test, 2);
 
 //	detector->detect(test, true);
 
