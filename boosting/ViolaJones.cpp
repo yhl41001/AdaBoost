@@ -174,7 +174,7 @@ void ViolaJones::train(){
 	extractFeatures();
 
 	double f = 0.5;
-	double d = 0.98;
+	double d = 0.97;
 	double Ftarget = 0.00001;
 	double* F = new double[maxStages + 1];
 	double* D = new double[maxStages + 1];
@@ -220,6 +220,7 @@ void ViolaJones::train(){
 		classifier.addStage(stage);
 
 		fpr = i > 0 ? F[i - 1] : 1;
+		dr = i > 0 ? D[i - 1] : 1;
 		cout << "  -Target FPR: " << (f * fpr) << endl;
 		cout << "  -Target DR: " << (d * dr) << "\n" << endl;
 
