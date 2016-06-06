@@ -53,14 +53,14 @@ public:
 		stringstream ss;
 		Mat window;
 		while(k < images.size() && counter < number){
-			Mat img = imread(path + "/" + images[k]);
+			Mat img = imread(path + "/" + images[k], CV_LOAD_IMAGE_GRAYSCALE);
 			if (img.cols != 0 && img.rows != 0) {
 				resize(img, img, Size(200, 100));
 				for (int j = 0; j < img.rows - size - delta && counter < number; j += delta) {
 					for (int i = 0; i < img.cols - size - delta && counter < number; i += delta) {
 						window = img(Rect(i, j, size, size));
 						ss.str("");
-						ss << outputDir << "/image_" << counter << ".pgm";
+						ss << outputDir << "/image_iccv_" << counter << ".pgm";
 						imwrite(ss.str(), window);
 						counter++;
 						cout << "\rGenerated: " << counter << "/" << number << " images" << flush;
