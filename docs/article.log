@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2014.4.22)  6 JUN 2016 18:06
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2014.4.22)  6 JUN 2016 18:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -283,30 +283,91 @@ Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no ¨ in font ptmr7t!
 Missing character: There is no Ã in font ptmr7t!
 Missing character: There is no   in font ptmr7t!
-) (./method.tex) (./features.tex) (./boosting.tex)
-(./classification.tex) (./results.tex) (./conclusions.tex) (./article.bbl)
+) (./method.tex
+Underfull \hbox (badness 1237) in paragraph at lines 5--6
+\OT1/ptm/m/n/12 toin-sieme uti-liz-zando una ver-sione mod-i-fi-cata
+ []
+
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no ¹ in font ptmr7t!
+) (./features.tex
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no ¨ in font ptmr7t!
+
+Underfull \hbox (badness 4739) in paragraph at lines 5--6
+\OT1/ptm/m/n/12 x 24) e si fa scor-rere quest'ultima lungo
+ []
+
 [1{/usr/local/texlive/2013/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 
 ]
-[2] (./article.aux) ) 
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no ¹ in font ptmr7t!
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no ¨ in font ptmr7t!
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no ¨ in font ptmr7t!
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no   in font ptmr7t!
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no ¨ in font ptmr7t!
+
+Underfull \hbox (badness 1052) in paragraph at lines 11--12
+\OT1/ptm/m/n/12 dei pixel sot-tostanti una re-gione \OT1/ptm/m/it/12 bianca \OT
+1/ptm/m/n/12 e $\OML/cmm/m/it/12 B$
+ []
+
+<images/haar.png, id=10, 417.56pt x 269.005pt>
+File: images/haar.png Graphic file (type png)
+ <use images/haar.png>
+Package pdftex.def Info: images/haar.png used on input line 21.
+(pdftex.def)             Requested size: 173.90271pt x 112.03314pt.
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no ¨ in font ptmr7t!
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no ² in font ptmr7t!
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no ¨ in font ptmr7t!
+
+Underfull \hbox (badness 2469) in paragraph at lines 31--32
+\OT1/ptm/m/n/12 hanno in-trodotto una nuova rap-p-re-sen-tazione
+ []
+
+Missing character: There is no Ã in font ptmr7t!
+Missing character: There is no ¨ in font ptmr7t!
+Missing character: There is no â in font cmr12!
+Missing character: There is no ˆ in font cmr12!
+Missing character: There is no ’ in font cmr12!
+Missing character: There is no â in font cmr12!
+Missing character: There is no ˆ in font cmr12!
+Missing character: There is no ’ in font cmr12!
+) (./boosting.tex) (./classification.tex) (./results.tex) (./conclusions.tex)
+(./article.bbl) [2 <./images/haar.png>] (./article.aux) ) 
 Here is how much of TeX's memory you used:
- 2808 strings out of 493315
- 37458 string characters out of 6137904
+ 2815 strings out of 493315
+ 37555 string characters out of 6137904
  98555 words of memory out of 5000000
- 6166 multiletter control sequences out of 15000+600000
+ 6170 multiletter control sequences out of 15000+600000
  23809 words of font info for 54 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 38i,9n,26p,436b,314s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2013/texmf-dist/fonts/enc/dvips/base/8
-r.enc}</usr/local/texlive/2013/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></
-usr/local/texlive/2013/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/
-texlive/2013/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/20
-13/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on article.pdf (2 pages, 51047 bytes).
+ 38i,9n,26p,529b,314s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/20
+13/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/texlive/2013/texmf-dist/f
+onts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2013/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2013/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2013/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2013/texmf-dist/fonts/t
+ype1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2013/texmf-dist/fonts/ty
+pe1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2013/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/
+urw/courier/ucrr8a.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/urw/time
+s/utmb8a.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/urw/times/utmr8a.p
+fb></usr/local/texlive/2013/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on article.pdf (2 pages, 118215 bytes).
 PDF statistics:
- 28 PDF objects out of 1000 (max. 8388607)
- 19 compressed objects within 1 object stream
+ 59 PDF objects out of 1000 (max. 8388607)
+ 41 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 6 words of extra memory for PDF output out of 10000 (max. 10000000)
 
