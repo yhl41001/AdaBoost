@@ -319,8 +319,8 @@ void ViolaJones::generateNegativeSet(){
 				if(classifier.predict(features) == 1){
 					negatives.push_back(new Data(features, -1));
 					count++;
-					cout << "\rAdded " << count << " (" << evaluated << " tested) images to the negative set" << flush;
 				}
+				cout << "\rAdded " << count << " (" << evaluated << " tested) images to the negative set" << flush;
 			}
 		}
 	}
