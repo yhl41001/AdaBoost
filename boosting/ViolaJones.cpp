@@ -46,135 +46,26 @@ ViolaJones::ViolaJones(string positivePath, string negativePath, int maxStages, 
 	}
 }
 
-double ViolaJones::updateAlpha(double error){
-	if(error < 0.0001){
-		return 1000;
-	}
-	return  log((1 - error) / error);
+/**
+ * Prediction function based on cascade classifier
+ */
+int ViolaJones::predict(Mat img){
+	return classifier.predict(img);
 }
 
-double ViolaJones::updateBeta(double error){
-	return error / (1 - error);
-}
-
-void ViolaJones::normalizeWeights(){
-	double norm = 0;
-	for (int i = 0; i < features.size(); ++i) {
-		norm += features[i]->getWeight();
-	}
-	for (int i = 0; i < features.size(); ++i) {
-		features[i]->setWeight((double) features[i]->getWeight() / norm);
-	}
-}
-
-void ViolaJones::initializeWeights(){
-	for(int i = 0; i < positives.size(); ++i){
-		positives[i]->setWeight((double) 1 / (2 * positives.size()));
-	}
-	for(int i = 0; i < negatives.size(); ++i){
-		negatives[i]->setWeight((double) 1 / (2 * negatives.size()));
-	}
-}
-
-void ViolaJones::updateWeights(WeakClassifier* weakClassifier){
-	for(int i = 0; i < features.size(); ++i){
-		int e = (features[i]->getLabel()
-				* weakClassifier->predict(this->features[i]) > 0) ? 0 : 1;
-		double num = features[i]->getWeight() * (pow(weakClassifier->getBeta(), (double) (1 - e)));
-		features[i]->setWeight(num);
-	}
-}
-
-void ViolaJones::setValidationPath(const string& validationPath) {
-	this->validationPath = validationPath;
-}
-
-void ViolaJones::extractFeatures(){
-	//Loading training positive images
-	double percent;
-	int count = 0;
-	Mat img, intImg;
-
-	cout << "Extracting image features" << endl;
-	auto t_start = chrono::high_resolution_clock::now();
-
-	vector<string> positiveImages = Utils::open(positivePath);
-	vector<string> negativeImages = Utils::open(negativePath);
-
-	int totalExamples = numPositives + numNegatives;
-	cout << "Training size: " << totalExamples << endl;
-	if (numPositives > positiveImages.size())
-		numPositives = positiveImages.size();
-	cout << "  -Positive samples: " << numPositives << endl;
-	if (numNegatives > negativeImages.size())
-		numNegatives = negativeImages.size();
-	cout << "  -Negative samples: " << numNegatives << endl;
-
-	if(validationPath != ""){
-		vector<string> validationImages = Utils::open(validationPath);
-		cout << "  -Validation set size: " << validationImages.size() << endl;
-		totalExamples += validationImages.size();
-		for (int k = 0; k < validationImages.size(); ++k) {
-			img = imread(validationPath + validationImages[k]);
-			if (img.rows != 0 && img.cols != 0) {
-				Mat dest;
-				resize(img, dest, Size(detectionWindowSize, detectionWindowSize));
-				intImg = IntegralImage::computeIntegralImage(dest);
-				vector<double> features = HaarFeatures::extractFeatures(intImg,
-						detectionWindowSize, 0, 0);
-				validation.push_back(new Data(features, -1));
-				percent = (double) count * 100 / totalExamples;
-				count++;
-				cout << "\rEvaluated: " << count << "/" << totalExamples << " images" << flush;
-			}
-		}
-	}
-
-
-	for (int k = 0; k < numPositives; ++k) {
-		img = imread(positivePath + positiveImages[k]);
-		if (img.rows != 0 && img.cols != 0) {
-			Mat dest;
-			resize(img, dest, Size(detectionWindowSize, detectionWindowSize));
-			intImg = IntegralImage::computeIntegralImage(dest);
-			vector<double> features = HaarFeatures::extractFeatures(intImg,
-					detectionWindowSize, 0, 0);
-			positives.push_back(new Data(features, 1));
-			percent = (double) count * 100 / totalExamples;
-			count++;
-			cout << "\rEvaluated: " << count << "/" << totalExamples << " images" << flush;
-
-		}
-	}
-
-
-	for (int k = 0; k < numNegatives; ++k) {
-		Mat img = imread(negativePath + negativeImages[k]);
-		if (img.rows != 0 && img.cols != 0) {
-			Mat dest;
-			resize(img, dest, Size(detectionWindowSize, detectionWindowSize));
-			intImg = IntegralImage::computeIntegralImage(dest);
-			vector<double> features = HaarFeatures::extractFeatures(intImg,
-					detectionWindowSize, 0, 0);
-			negatives.push_back(new Data(features, -1));
-			percent = (double) count * 100 / totalExamples;
-			count++;
-			cout << "\rEvaluated: " << count << "/" << totalExamples << " images" << flush;
-		}
-	}
-	cout << "\nExtracted features in ";
-	auto t_end = chrono::high_resolution_clock::now();
-	cout << std::fixed
-			<< (chrono::duration<double, milli>(t_end - t_start).count()) / 1000
-			<< " s\n" << endl;
-}
-
+/**
+ * Training Viola&Jones cascade classifiers. The cascade design process is driven from a set of detection
+ * and performance goals. For the face detection task, past systems have achieved good detection rates
+ * (between 85 and 95 percent) and extremely low false positive rates (on the order of 10−5 or 10−6).
+ * The number of cascade stages and the size of each stage must be sufficient to achieve similar
+ * detection performance while minimizing computation.
+ */
 void ViolaJones::train(){
-	cout << "Traing ViolaJones face detector\n" << endl;
+	cout << "Training ViolaJones face detector\n" << endl;
 	extractFeatures();
 
 	double f = 0.5;
-	double d = 0.97;
+	double d = 0.95;
 	double Ftarget = 0.00001;
 	double* F = new double[maxStages + 1];
 	double* D = new double[maxStages + 1];
@@ -189,7 +80,8 @@ void ViolaJones::train(){
 
 	while(F[i] > Ftarget && i < maxStages){
 		if(negatives.size() == 0){
-			cout << "All training negative samples classified correctly. Could not achieve validation target FPR for this stage." << endl;
+			cout << "All training negative samples classified correctly. "
+					"Could not achieve validation target FPR for this stage." << endl;
 			break;
 		}
 
@@ -231,6 +123,10 @@ void ViolaJones::train(){
 
 			//Train the current classifier
 			StrongClassifier* strongClassifier = AdaBoost::train(classifiers);
+			if(strongClassifier->getClassifiers().size() == 0){
+				cout << "Error training weak classifiers" << endl;
+				return;
+			}
 			stage->setClassifiers(strongClassifier->getClassifiers());
 			classifiers = strongClassifier->getClassifiers();
 
@@ -264,6 +160,98 @@ void ViolaJones::train(){
 	store();
 }
 
+/**
+ * Extract examples feature given images path. Generating positive, negative and validation set
+ * for evaluating performance during training
+ */
+void ViolaJones::extractFeatures(){
+	//Loading training positive images
+	double percent;
+	int count = 0;
+	Mat img, intImg;
+
+	cout << "Extracting image features" << endl;
+	auto t_start = chrono::high_resolution_clock::now();
+
+	//Reading examples from folder
+	vector<string> positiveImages = Utils::open(positivePath);
+	vector<string> negativeImages = Utils::open(negativePath);
+	//Shuffle negative examples (for variance)
+	random_shuffle (negativeImages.begin(), negativeImages.end());
+
+	//Counting examples
+	int totalExamples = numPositives + numNegatives;
+	cout << "Training size: " << totalExamples << endl;
+	if (numPositives > positiveImages.size()) numPositives = positiveImages.size();
+	cout << "  -Positive samples: " << numPositives << endl;
+	if (numNegatives > negativeImages.size()) numNegatives = negativeImages.size();
+	cout << "  -Negative samples: " << numNegatives << endl;
+
+	//Setting validation set (if defined)
+	if(validationPath != ""){
+		vector<string> validationImages = Utils::open(validationPath);
+		cout << "  -Validation set size: " << validationImages.size() << endl;
+		totalExamples += validationImages.size();
+		//for (int k = 0; k < 100; ++k) {
+		for (int k = 0; k < validationImages.size(); ++k) {
+			img = imread(validationPath + validationImages[k]);
+			if (img.rows != 0 && img.cols != 0) {
+				Mat dest;
+				resize(img, dest, Size(detectionWindowSize, detectionWindowSize));
+				intImg = IntegralImage::computeIntegralImage(dest);
+				vector<double> features = HaarFeatures::extractFeatures(intImg,
+						detectionWindowSize, 0, 0);
+				validation.push_back(new Data(features, -1));
+				percent = (double) count * 100 / totalExamples;
+				count++;
+				cout << "\rEvaluated: " << count << "/" << totalExamples << " images" << flush;
+			}
+		}
+	}
+
+	//Generating positive set
+	for (int k = 0; k < numPositives; ++k) {
+		img = imread(positivePath + positiveImages[k]);
+		if (img.rows != 0 && img.cols != 0) {
+			Mat dest;
+			resize(img, dest, Size(detectionWindowSize, detectionWindowSize));
+			intImg = IntegralImage::computeIntegralImage(dest);
+			vector<double> features = HaarFeatures::extractFeatures(intImg,
+					detectionWindowSize, 0, 0);
+			positives.push_back(new Data(features, 1));
+			percent = (double) count * 100 / totalExamples;
+			count++;
+			cout << "\rEvaluated: " << count << "/" << totalExamples << " images" << flush;
+
+		}
+	}
+
+	//Generating negative set
+	for (int k = 0; k < numNegatives; ++k) {
+		Mat img = imread(negativePath + negativeImages[k]);
+		if (img.rows != 0 && img.cols != 0) {
+			Mat dest;
+			resize(img, dest, Size(detectionWindowSize, detectionWindowSize));
+			intImg = IntegralImage::computeIntegralImage(dest);
+			vector<double> features = HaarFeatures::extractFeatures(intImg,
+					detectionWindowSize, 0, 0);
+			negatives.push_back(new Data(features, -1));
+			percent = (double) count * 100 / totalExamples;
+			count++;
+			cout << "\rEvaluated: " << count << "/" << totalExamples << " images" << flush;
+		}
+	}
+	cout << "\nExtracted features in ";
+	auto t_end = chrono::high_resolution_clock::now();
+	cout << std::fixed
+		<< (chrono::duration<double, milli>(t_end - t_start).count()) / 1000
+		<< " s\n" << endl;
+}
+
+
+/**
+ * Evaluating False Positive Rate on the validation set
+ */
 double ViolaJones::evaluateFPR(vector<Data*> validationSet){
 	cout << "Evaluate FPR on validation set:" << endl;
 	int fp = 0;
@@ -283,6 +271,9 @@ double ViolaJones::evaluateFPR(vector<Data*> validationSet){
 	return fpr;
 }
 
+/**
+ * Evaluating Detection Rate on the validation set
+ */
 double ViolaJones::evaluateDR(vector<Data*> validationSet){
 	int tp = 0;
 	int fn = 0;
@@ -301,10 +292,15 @@ double ViolaJones::evaluateDR(vector<Data*> validationSet){
 	return dr;
 }
 
-
+/**
+ * Generating negative set for the next stage: iterates negative examples folder
+ * looking for false positive examples and add them to the negative set.
+ * Negative examples are shuffled for preventing overfitting.
+ */
 void ViolaJones::generateNegativeSet(){
 	cout << "\nGenerating negative set for layer: max " << negativesPerLayer << endl;
 	vector<string> negativeImages = Utils::open(negativePath);
+	random_shuffle (negativeImages.begin(), negativeImages.end());
 	int count = 0;
 	int evaluated = 0;
 	for(int k = 0; k < negativeImages.size() && count < negativesPerLayer; ++k){
@@ -330,114 +326,56 @@ void ViolaJones::generateNegativeSet(){
 	}
 }
 
-int ViolaJones::predict(Mat img){
-	return classifier.predict(img);
-}
-
-void ViolaJones::store(){
-	cout << "\nStoring trained face detector" << endl;
-	ofstream output, data;
-	output.open ("trainedInfo.txt");
-	data.open ("trainedData.txt");
-
-	WeakClassifier wc;
-
-    for(unsigned int i = 0; i < classifier.getStages().size(); ++i){
-    	Stage* stage = classifier.getStages()[i];
-
-    	//Outputs info
-    	output << "Stage " << i << "\n\n";
-    	output << "FPR: " << stage->getFpr() << "\n";
-    	output << "DR: " << stage->getDetectionRate() << "\n";
-    	output << "Threshold: " << stage->getThreshold() << "\n";
-    	output << "Classifiers:\n" << endl;
-    	//Output data
-		data << "s:" << stage->getFpr() << "," << stage->getDetectionRate()
-				<< "," << stage->getThreshold() << "\n";
-
-    	for(unsigned int j = 0; j < stage->getClassifiers().size(); ++j){
-    		wc = stage->getClassifiers()[j];
-    		output << "WeakClassifier " << j << "\n";
-    		output << "Error: " << wc.getError() << "\n";
-    		output << "Dimension: " << wc.getDimension() << "\n";
-    		output << "Threshold: " << wc.getThreshold() << "\n";
-    		output << "Alpha: " << wc.getAlpha() << "\n";
-    		output << "Beta: " << wc.getBeta() << "\n";
-    		if(wc.getSign() == POSITIVE){
-    			output << "Sign: POSITIVE\n";
-    		} else {
-    			output << "Sign: NEGATIVE\n";
-    		}
-    		output << "Misclassified: " << wc.getMisclassified() << "\n\n";
-    		//Outputs data
-			data << "c:" << wc.getError() << "," << wc.getDimension() << ","
-					<< wc.getThreshold() << "," << wc.getAlpha() << ","
-					<< wc.getBeta() << ",";
-			if (wc.getSign() == POSITIVE) {
-				data << "POSITIVE,";
-			} else {
-				data << "NEGATIVE,";
-			}
-			data << wc.getMisclassified() << "\n";
-    	}
-
-    	output << "---------------\n" << endl;
+/**
+ * Overwrite AdaBoost functions
+ */
+double ViolaJones::updateAlpha(double error){
+	if(error < 0.0001){
+		return 1000;
 	}
-
-    output.close();
+	return  log((1 - error) / error);
 }
 
-void ViolaJones::loadTrainedData(string filename){
-	cout << "Loading data from file: " << filename << endl;
-	string line;
-	string read;
-	ifstream readFile(filename);
-	Stage* stage;
-	WeakClassifier* wc;
+double ViolaJones::updateBeta(double error){
+	return error / (1 - error);
+}
 
-	while(getline(readFile,line)){
-		stringstream iss(line);
-		getline(iss, read, ':');
-		if (read.compare("s") == 0) {
-			//Found stage
-			stage = new Stage(classifier.getStages().size());
-			getline(iss, read, ',');
-			stage->setFpr(stod(read));
-			getline(iss, read, ',');
-			stage->setDetectionRate(stod(read));
-			getline(iss, read, ',');
-			stage->setThreshold(stod(read));
-			classifier.addStage(stage);
-		} else if (read.compare("c") == 0) {
-			//Found classifier
-			wc = new WeakClassifier();
-			getline(iss, read, ',');
-			wc->setError(stod(read));
-			getline(iss, read, ',');
-			wc->setDimension(stoi(read));
-			getline(iss, read, ',');
-			wc->setThreshold(stod(read));
-			getline(iss, read, ',');
-			wc->setAlpha(stod(read));
-			getline(iss, read, ',');
-			wc->setBeta(stod(read));
-			getline(iss, read, ',');
-			if (read.compare("POSITIVE") == 0) {
-				wc->setSign(POSITIVE);
-			} else {
-				wc->setSign(NEGATIVE);
-			}
-			getline(iss, read, ',');
-			wc->setMisclassified(stoi(read));
-			HaarFeatures::getFeature(24, wc);
-			stage->addClassifier(wc);
-		}
+void ViolaJones::normalizeWeights(){
+	double norm = 0;
+	for (int i = 0; i < features.size(); ++i) {
+		norm += features[i]->getWeight();
 	}
-
-	readFile.close();
-	cout << "Trained data loaded correctly" << endl;
+	for (int i = 0; i < features.size(); ++i) {
+		features[i]->setWeight((double) features[i]->getWeight() / norm);
+	}
 }
 
+void ViolaJones::initializeWeights(){
+	for(int i = 0; i < positives.size(); ++i){
+		positives[i]->setWeight((double) 1 / (2 * positives.size()));
+	}
+	for(int i = 0; i < negatives.size(); ++i){
+		negatives[i]->setWeight((double) 1 / (2 * negatives.size()));
+	}
+}
+
+void ViolaJones::updateWeights(WeakClassifier* weakClassifier){
+	for(int i = 0; i < features.size(); ++i){
+		int e = (features[i]->getLabel()
+				* weakClassifier->predict(this->features[i]) > 0) ? 0 : 1;
+		double num = features[i]->getWeight() * (pow(weakClassifier->getBeta(), (double) (1 - e)));
+		features[i]->setWeight(num);
+	}
+}
+
+/**
+ * Given an input set of detections (Faces with a rectangle and a score), merge detections
+ * in the way explained in Viola&Jones article.
+ * The set of detections are first partitioned into disjoint subsets. Two detections are
+ * in the same subset if their bounding regions overlap. Each partition yields a single
+ * final detection. The corners of the final bounding region are the average of the
+ * corners of all detections in the set.
+ */
 vector<Face> ViolaJones::mergeDetections(vector<Face> detections, int padding, double th){
 	vector<Face> output, cluster;
 	double score;
@@ -497,6 +435,123 @@ const CascadeClassifier& ViolaJones::getClassifier() const {
 
 void ViolaJones::setClassifier(const CascadeClassifier& classifier) {
 	this->classifier = classifier;
+}
+
+
+void ViolaJones::setValidationPath(const string& validationPath) {
+	this->validationPath = validationPath;
+}
+
+/**
+ * Storing face detector in a textual form in order to reuse it in
+ * the future without train it again.
+ */
+void ViolaJones::store(){
+	cout << "\nStoring trained face detector" << endl;
+	ofstream output, data;
+	output.open ("trainedInfo.txt");
+	data.open ("trainedData.txt");
+
+	WeakClassifier wc;
+
+    for(unsigned int i = 0; i < classifier.getStages().size(); ++i){
+    	Stage* stage = classifier.getStages()[i];
+
+    	//Outputs info
+    	output << "Stage " << i << "\n\n";
+    	output << "FPR: " << stage->getFpr() << "\n";
+    	output << "DR: " << stage->getDetectionRate() << "\n";
+    	output << "Threshold: " << stage->getThreshold() << "\n";
+    	output << "Classifiers:\n" << endl;
+    	//Output data
+		data << "s:" << stage->getFpr() << "," << stage->getDetectionRate()
+				<< "," << stage->getThreshold() << "\n";
+
+    	for(unsigned int j = 0; j < stage->getClassifiers().size(); ++j){
+    		wc = stage->getClassifiers()[j];
+    		output << "WeakClassifier " << j << "\n";
+    		output << "Error: " << wc.getError() << "\n";
+    		output << "Dimension: " << wc.getDimension() << "\n";
+    		output << "Threshold: " << wc.getThreshold() << "\n";
+    		output << "Alpha: " << wc.getAlpha() << "\n";
+    		output << "Beta: " << wc.getBeta() << "\n";
+    		if(wc.getSign() == POSITIVE){
+    			output << "Sign: POSITIVE\n";
+    		} else {
+    			output << "Sign: NEGATIVE\n";
+    		}
+    		output << "Misclassified: " << wc.getMisclassified() << "\n\n";
+    		//Outputs data
+			data << "c:" << wc.getError() << "," << wc.getDimension() << ","
+					<< wc.getThreshold() << "," << wc.getAlpha() << ","
+					<< wc.getBeta() << ",";
+			if (wc.getSign() == POSITIVE) {
+				data << "POSITIVE,";
+			} else {
+				data << "NEGATIVE,";
+			}
+			data << wc.getMisclassified() << "\n";
+    	}
+
+    	output << "---------------\n" << endl;
+	}
+
+    output.close();
+}
+
+/**
+ * Loads cascade detector from given file (the file must be correctly formatted
+ * as in the store function output
+ */
+void ViolaJones::loadTrainedData(string filename){
+	cout << "Loading data from file: " << filename << endl;
+	string line;
+	string read;
+	ifstream readFile(filename);
+	Stage* stage;
+	WeakClassifier* wc;
+
+	while(getline(readFile,line)){
+		stringstream iss(line);
+		getline(iss, read, ':');
+		if (read.compare("s") == 0) {
+			//Found stage
+			stage = new Stage(classifier.getStages().size());
+			getline(iss, read, ',');
+			stage->setFpr(stod(read));
+			getline(iss, read, ',');
+			stage->setDetectionRate(stod(read));
+			getline(iss, read, ',');
+			stage->setThreshold(stod(read));
+			classifier.addStage(stage);
+		} else if (read.compare("c") == 0) {
+			//Found classifier
+			wc = new WeakClassifier();
+			getline(iss, read, ',');
+			wc->setError(stod(read));
+			getline(iss, read, ',');
+			wc->setDimension(stoi(read));
+			getline(iss, read, ',');
+			wc->setThreshold(stod(read));
+			getline(iss, read, ',');
+			wc->setAlpha(stod(read));
+			getline(iss, read, ',');
+			wc->setBeta(stod(read));
+			getline(iss, read, ',');
+			if (read.compare("POSITIVE") == 0) {
+				wc->setSign(POSITIVE);
+			} else {
+				wc->setSign(NEGATIVE);
+			}
+			getline(iss, read, ',');
+			wc->setMisclassified(stoi(read));
+			HaarFeatures::getFeature(24, wc);
+			stage->addClassifier(wc);
+		}
+	}
+
+	readFile.close();
+	cout << "Trained data loaded correctly" << endl;
 }
 
 ViolaJones::~ViolaJones() {

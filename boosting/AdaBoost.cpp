@@ -61,6 +61,7 @@ StrongClassifier* AdaBoost::train(vector<WeakClassifier> classifiers){
 			}
 		} else {
 			cout << "Error: weak classifier with error > 0.5." << endl;
+			break;
 		}
 	}
 	//showFeatures();
