@@ -1,3 +1,31 @@
 \section{Boosting}
+Una volta estratte le features all'interno di ciascuna detection window si procede con la sua classificazione. Per questa fase vengono usati una serie di semplici classificatori binari basati su una singola feature chiamati \emph{decision stumps}. 
 
-\subsection{Selezione delle features}
+Come visto in precedenza, anche in una finestra relativamente piccola come una detection window 24 x 24, il numero di feature estratte per ciascuna di esse è molto elevato. Nonostante dunque siano molto veloci da calcolare, il tempo necessario sarebbe troppo per applicazioni in tempo reale. 
+
+Si procede dunque alla riduzione dell'insieme delle feature estratte: Viola e Jones utilizzano per questo motivo una versione modificata di AdaBoost per combinare insieme classificatori basati sulle migliori feature selezionate.
+
+\subsection{Decision stumps}
+
+I \emph{decision stumps} sono dei semplici classificatori binari lineari basati su un singolo valore di una feature. 
+
+Un generico classificatore $h$ è definito con una \emph{feature} $f$, una \emph{soglia} $\theta$ ed una \emph{polarità} (\emph{positiva} o  \emph{negativa}). La classificazione è data da:
+$$
+h(x, f, \theta, p) =
+\left\{
+\begin{array}{ll}
+1 & \mbox{se } p f(x) \leq p \theta \\
+-1 & \mbox{altrimenti}
+\end{array}
+\right.
+$$
+Questi classificatori sono chiamati \emph{weak classifiers}.
+
+\subsection{AdaBoost}
+
+Gli algoritmi di Boosting combinano insieme una serie di \emph{weak classifiers} per andare a formare uno \emph{strong classifier}. Il metodo standard è l'algoritmo di \emph{AdaBoost} (\emph{Adaptive Boosting}), un algoritmo iterativo che seleziona le features migliori in base ad un errore nei singoli classificatori.
+
+Ad un generico passo dell'algoritmo, la selezione della feature migliore dipende dai risultati della precedente iterazione, dando maggiore enfasi agli esempi che causano un più elevato \emph{error rate}.
+Questo è possibile assegnando a ciascun esempio del training set un peso normalizzato (inizialmente uniforme). Ad ogni iterazione dell'algoritmo il peso viene aggiornato per fare in modo di concentrarsi sugli esempi mal classificati nella precedente iterazione. Il risultato di una singola iterazione è la costruzione di un \emph{weak learner} $h_t$. L'errore $\epsilon_t$ del classificatore così definito è dato dalla somma dei pesi degli esempi classificati erroneamente.
+
+Definiamo inizialmente il numero di iterazioni $T$. L'algoritmo di AdaBoost modificato da Viola e Jones è mostrato in .
