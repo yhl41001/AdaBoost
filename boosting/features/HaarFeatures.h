@@ -19,7 +19,7 @@
 #include "../classifiers/WeakClassifier.h"
 #include "../utils/IntegralImage.h"
 
-#define TOT_FEATURES 105106
+#define TOT_FEATURES 80960
 
 using namespace cv;
 using namespace std;
