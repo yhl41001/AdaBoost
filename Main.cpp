@@ -20,7 +20,6 @@
 #include "boosting/utils/IntegralImage.h"
 #include "boosting/utils/Utils.hpp"
 #include "facedetector/FaceDetector.h"
-#include "digitclassifier/DigitsClassifier.h"
 
 using namespace std;
 using namespace cv;
