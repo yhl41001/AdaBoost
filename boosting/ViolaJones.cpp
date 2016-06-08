@@ -78,6 +78,11 @@ void ViolaJones::train(){
 	int i = 0;
 	int n;
 
+	bool useValidation = false;
+	if(validation.size() > 0){
+		useValidation = true;
+	}
+
 	while(F[i] > Ftarget && i < maxStages){
 		if(negatives.size() == 0){
 			cout << "All training negative samples classified correctly. "
@@ -101,7 +106,8 @@ void ViolaJones::train(){
 		features.insert(features.end(), positives.begin(), positives.end());
 		features.insert(features.end(), negatives.begin(), negatives.end());
 
-		if(validation.size() == 0){
+		if(!useValidation){
+			validation.clear();
 			validation.reserve(negatives.size());
 			validation.insert(validation.end(), negatives.begin(), negatives.end());
 		}
@@ -146,14 +152,11 @@ void ViolaJones::train(){
 			stage->setDetectionRate(D[i]);
 		}
 
-		//N = ∅
-		negatives.clear();
-
 		if(F[i] > Ftarget){
 			//if F(i) > Ftarget then
 			//evaluate the current cascaded detector on the set of non-face images
 			//and put any false detections into the set N.
-			generateNegativeSet();
+			generateNegativeSet(useValidation);
 		}
 		stage->printInfo();
 	}
@@ -297,33 +300,51 @@ double ViolaJones::evaluateDR(vector<Data*> validationSet){
  * looking for false positive examples and add them to the negative set.
  * Negative examples are shuffled for preventing overfitting.
  */
-void ViolaJones::generateNegativeSet(){
-	cout << "\nGenerating negative set for layer: max " << negativesPerLayer << endl;
-	vector<string> negativeImages = Utils::open(negativePath);
-	random_shuffle (negativeImages.begin(), negativeImages.end());
-	int count = 0;
-	int evaluated = 0;
-	for(int k = 0; k < negativeImages.size() && count < negativesPerLayer; ++k){
-		Mat img = imread(negativePath + negativeImages[k]);
-		Mat dest;
-		if(img.rows > 0 && img.cols > 0){
-			for(int f = -2; f < 2; ++f){
-				if(f > -2){
-					flip(img, dest, f);
-				} else {
-					dest = img;
+void ViolaJones::generateNegativeSet(bool newExamples){
+	if(newExamples){
+		//N = ∅
+		negatives.clear();
+		cout << "\nGenerating negative set for layer: max " << negativesPerLayer << endl;
+		vector<string> negativeImages = Utils::open(negativePath);
+		random_shuffle (negativeImages.begin(), negativeImages.end());
+		int count = 0;
+		int evaluated = 0;
+		for(int k = 0; k < negativeImages.size() && count < negativesPerLayer; ++k){
+			Mat img = imread(negativePath + negativeImages[k]);
+			Mat dest;
+			if(img.rows > 0 && img.cols > 0){
+				for(int f = -2; f < 2; ++f){
+					if(f > -2){
+						flip(img, dest, f);
+					} else {
+						dest = img;
+					}
+					evaluated++;
+					Mat intImg = IntegralImage::computeIntegralImage(dest);
+					vector<double> features = HaarFeatures::extractFeatures(intImg, 24, 0, 0);
+					if(classifier.predict(features) == 1){
+						negatives.push_back(new Data(features, -1));
+						count++;
+					}
+					cout << "\rAdded " << count << " (" << evaluated << " tested) images to the negative set" << flush;
 				}
-				evaluated++;
-				Mat intImg = IntegralImage::computeIntegralImage(dest);
-				vector<double> features = HaarFeatures::extractFeatures(intImg, 24, 0, 0);
-				if(classifier.predict(features) == 1){
-					negatives.push_back(new Data(features, -1));
-					count++;
-				}
-				cout << "\rAdded " << count << " (" << evaluated << " tested) images to the negative set" << flush;
 			}
 		}
+	} else {
+		cout << "\nGenerating negative set for layer" << endl;
+		vector<Data*> fp;
+		int prediction;
+		for(int i = 0; i < negatives.size(); ++i){
+			prediction = classifier.predict(negatives[i]->getFeatures());
+			if(prediction == 1){
+				fp.push_back(negatives[i]);
+			}
+		}
+		negatives.clear();
+		negatives.reserve(fp.size());
+		negatives.insert(negatives.end(), fp.begin(), fp.end());
 	}
+
 }
 
 /**
@@ -536,7 +557,7 @@ void ViolaJones::loadTrainedData(string filename){
 			getline(iss, read, ',');
 			wc->setAlpha(stod(read));
 			getline(iss, read, ',');
-			wc->setBeta(stod(read));
+			//wc->setBeta(stod(read));
 			getline(iss, read, ',');
 			if (read.compare("POSITIVE") == 0) {
 				wc->setSign(POSITIVE);

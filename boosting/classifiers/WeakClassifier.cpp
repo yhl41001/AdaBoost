@@ -105,6 +105,7 @@ void WeakClassifier::setSign(example sign) {
 
 void WeakClassifier::setAlpha(double alpha) {
 	this->alpha = alpha;
+	this->beta = exp(-alpha);
 }
 
 int WeakClassifier::getMisclassified() const {

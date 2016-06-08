@@ -29,25 +29,25 @@ int main( int argc, char** argv ){
 
 	string imagePath = "/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/dataset/";
 
-	Utils::generateNonFacesDataset(imagePath + "backgrounds/", imagePath + "negatives", 9758, 24);
+	//Utils::generateNonFacesDataset(imagePath + "backgrounds/", imagePath + "negatives", 9758, 24);
 	string positivePath = imagePath + "lfwcrop/faces/";
 	string negativePath = imagePath + "negatives/";
 	string validationPath = imagePath + "validation/";
 
 
-	//Mat test = imread(imagePath + "test/tammy.jpg", 0);
+	Mat test = imread(imagePath + "test/tammy.jpg", 0);
 	//Mat test = imread(imagePath + "test/knex0.jpg", 0);
 	//Mat test = imread(imagePath + "lfwcrop/faces/Ana_Isabel_Sanchez_0001.pgm", 0);
 
 
-	//FaceDetector* detector = new FaceDetector(positivePath, negativePath, 24, 2000, 3000);
+	//FaceDetector* detector = new FaceDetector(positivePath, negativePath, 24, 2500, 15000);
 	//detector->setValidationPath(validationPath);
 	//detector->train();
 
-//	FaceDetector* detector = new FaceDetector("trainedDataOld.txt", 8);
+	FaceDetector* detector = new FaceDetector("trainedData.txt", 8);
 //	detector->displaySelectedFeatures(test, 2);
 
-//	detector->detect(test, true);
+	detector->detect(test, true);
 
 
 	/*
@@ -56,26 +56,6 @@ int main( int argc, char** argv ){
 	DigitsClassifier* digitsClassifier = new DigitsClassifier(digitsPath, digitsLabelsPath, 100);
 	digitsClassifier->train();
 	*/
-
-
-	/*
-	vector<Data*> features = {
-		new Data(vector<double>{2, 2}, 1),
-		new Data(vector<double>{2, 4}, 1),
-		new Data(vector<double>{3, 8}, -1),
-		new Data(vector<double>{2, 3}, -1),
-		new Data(vector<double>{4, 9}, -1),
-		new Data(vector<double>{6, 10}, -1),
-		new Data(vector<double>{4, 5}, 1)
-	};*/
-
-	//AdaBoost* boost = new AdaBoost(features, 3);
-	//boost->train();
-
-	//int p = boost->predict(*(new Data(vector<double>{4.5, 3.5})));
-
-	//cout << p << endl;
-	//delete boost;
 
     return 0;
 }

@@ -44,7 +44,7 @@ private:
 	double evaluateFPR(vector<Data*> validationSet);
 	double evaluateDR(vector<Data*> validationSet);
 	void initializeWeights();
-	void generateNegativeSet();
+	void generateNegativeSet(bool newExamples);
 	void extractFeatures();
 
 
