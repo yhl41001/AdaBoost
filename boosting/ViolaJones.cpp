@@ -184,6 +184,7 @@ void ViolaJones::extractFeatures(){
 	if(validationPath != ""){
 		vector<string> validationImages = Utils::open(validationPath);
 		int validationSize = validationImages.size();
+		validationSize = 1000;
 		totalExamples += validationSize;
 		cout << "  -Validation set size: " << validationSize << endl;
 		for (int k = 0; k < validationSize; ++k) {

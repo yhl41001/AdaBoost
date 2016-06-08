@@ -50,7 +50,7 @@ void Stage::optimizeThreshold(vector<Data*>& positiveSet, double dr){
 		}
 	}
 	sort(scores.begin(), scores.end());
-	int index = dr * positiveSet.size();
+	int index = positiveSet.size() - dr * positiveSet.size();
 	if(index >= 0 && index < positiveSet.size()){
 		thr = scores[index];
 		while(index >= 0 && index < positiveSet.size() - 1 && scores[index] == thr){
