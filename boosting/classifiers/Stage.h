@@ -18,15 +18,15 @@ using namespace std;
 class Stage {
 private:
 	int number;
-	vector<WeakClassifier> classifiers;
+	vector<WeakClassifier*> classifiers;
 	double fpr;
 	double detectionRate;
 	double threshold;
 
 public:
 	Stage(int number);
-	Stage(int number, vector<WeakClassifier> weaks);
-	int predict(vector<double> x);
+	Stage(int number, vector<WeakClassifier*> weaks);
+	int predict(const vector<double>& x);
 	int predict(Mat img);
 	void optimizeThreshold(vector<Data*> &positiveSet, double maxfnr);
 	void decreaseThreshold();
@@ -40,8 +40,8 @@ public:
 	void setFpr(double fpr);
 	int getNumber() const;
 	void setNumber(int number);
-	const vector<WeakClassifier>& getClassifiers() const;
-	void setClassifiers(const vector<WeakClassifier>& classifiers);
+	const vector<WeakClassifier*>& getClassifiers() const;
+	void setClassifiers(const vector<WeakClassifier*>& classifiers);
 	void addClassifier(WeakClassifier* wc);
 };
 

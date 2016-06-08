@@ -49,7 +49,7 @@ public:
 		vector<string> images = open(path);
 		int counter = 0;
 		int k = 0;
-		int delta = 10;
+		int delta = 2;
 		stringstream ss;
 		Mat window;
 		while(k < images.size() && counter < number){
@@ -60,7 +60,7 @@ public:
 					for (int i = 0; i < img.cols - size - delta && counter < number; i += delta) {
 						window = img(Rect(i, j, size, size));
 						ss.str("");
-						ss << outputDir << "/image_iccv_" << counter << ".pgm";
+						ss << outputDir << "/image_val_" << counter << ".pgm";
 						imwrite(ss.str(), window);
 						counter++;
 						cout << "\rGenerated: " << counter << "/" << number << " images" << flush;

@@ -20,7 +20,6 @@
 #include "boosting/utils/IntegralImage.h"
 #include "boosting/utils/Utils.hpp"
 #include "facedetector/FaceDetector.h"
-#include "digitclassifier/DigitsClassifier.h"
 
 using namespace std;
 using namespace cv;
@@ -29,7 +28,7 @@ int main( int argc, char** argv ){
 
 	string imagePath = "/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/dataset/";
 
-	//Utils::generateNonFacesDataset(imagePath + "backgrounds/", imagePath + "negatives", 9758, 24);
+	//Utils::generateNonFacesDataset(imagePath + "backgrounds/", imagePath + "validation", 5000, 24);
 	string positivePath = imagePath + "lfwcrop/faces/";
 	string negativePath = imagePath + "negatives/";
 	string validationPath = imagePath + "validation/";
@@ -40,14 +39,14 @@ int main( int argc, char** argv ){
 	//Mat test = imread(imagePath + "lfwcrop/faces/Ana_Isabel_Sanchez_0001.pgm", 0);
 
 
-	//FaceDetector* detector = new FaceDetector(positivePath, negativePath, 24, 2500, 15000);
-	//detector->setValidationPath(validationPath);
-	//detector->train();
+	FaceDetector* detector = new FaceDetector(positivePath, negativePath, 24, 2500, 2000);
+	detector->setValidationPath(validationPath);
+	detector->train();
 
-	FaceDetector* detector = new FaceDetector("trainedData.txt", 8);
+	//FaceDetector* detector = new FaceDetector("trainedData.txt", 8);
 //	detector->displaySelectedFeatures(test, 2);
 
-	detector->detect(test, true);
+	//detector->detect(test, true);
 
 
 	/*

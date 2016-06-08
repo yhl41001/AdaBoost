@@ -36,7 +36,7 @@ public:
 	WeakClassifier();
 	int predict(Data* x);
 	int predict(double value);
-	int predict(vector<double> x);
+	int predict(const vector<double>& x);
 	double evaluateError(vector<Data*>& features);
 	void printInfo();
 	double getError() const;

@@ -15,10 +15,10 @@ using namespace std;
  * Initialize a new adaboost object with a vector of training samples (features)
  * and a given number of iterations
  */
-AdaBoost::AdaBoost(vector<Data*> data, int iterations) :
+AdaBoost::AdaBoost(vector<Data*>& data, int iterations) :
 	iterations(iterations),
 	features(data),
-	strongClassifier(new StrongClassifier(vector<WeakClassifier>{})){
+	strongClassifier(new StrongClassifier(vector<WeakClassifier*>{})){
 	int size = features.size();
 	cout << "Initializing AdaBoost with " << iterations << " iterations" << endl;
 	cout << "Training size: " << size << "\n" << endl;
@@ -30,14 +30,14 @@ AdaBoost::AdaBoost(vector<Data*> data, int iterations) :
 }
 
 AdaBoost::AdaBoost(): iterations(0),
-		strongClassifier(new StrongClassifier(vector<WeakClassifier> {})) {
+		strongClassifier(new StrongClassifier(vector<WeakClassifier*> {})) {
 }
 
 /**
  * Train the AdaBoost classifier with a number of weak classifier specified
  * with the iteration attribute.
  */
-StrongClassifier* AdaBoost::train(vector<WeakClassifier> classifiers){
+StrongClassifier* AdaBoost::train(vector<WeakClassifier*>& classifiers){
 	cout << "Training AdaBoost with " << iterations << " iterations" << endl;
 	auto t_start = chrono::high_resolution_clock::now();
 
@@ -53,8 +53,7 @@ StrongClassifier* AdaBoost::train(vector<WeakClassifier> classifiers){
 			weakClassifier->setBeta(beta);
 			updateWeights(weakClassifier);
 			weakClassifier->printInfo();
-			classifiers.push_back(*weakClassifier);
-			delete weakClassifier;
+			classifiers.push_back(weakClassifier);
 			//If error is 0, classification is perfect (linearly separable data)
 			if(error == 0){
 				break;
@@ -75,7 +74,7 @@ StrongClassifier* AdaBoost::train(vector<WeakClassifier> classifiers){
 
 StrongClassifier* AdaBoost::train(){
 	//The vector of weak classifiers
-	vector<WeakClassifier> classifiers;
+	vector<WeakClassifier*> classifiers;
 	return train(classifiers);
 }
 
@@ -154,6 +153,7 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 			signs.clear();
 			errors.clear();
 			misclassifies.clear();
+
 			posWeights = 0;
 			negWeights = 0;
 			cumNegative = 0;
@@ -177,17 +177,20 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 					if (errorPos > errorNeg) {
 						errors.push_back(errorNeg);
 						signs.push_back(POSITIVE);
-						misclassifies.push_back(cumNegative + (totPositive - cumPositive));
+						misclassifies.push_back(
+								cumNegative + (totPositive - cumPositive));
 					} else {
 						errors.push_back(errorPos);
 						signs.push_back(NEGATIVE);
-						misclassifies.push_back(cumPositive + (totNegative - cumNegative));
+						misclassifies.push_back(
+								cumPositive + (totNegative - cumNegative));
 					}
 				} else {
 					errors.push_back(1.);
 					signs.push_back(POSITIVE);
 					misclassifies.push_back(0);
 				}
+
 			}
 
 			auto errorMin = min_element(begin(errors), end(errors));

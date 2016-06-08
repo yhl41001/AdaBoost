@@ -16,14 +16,14 @@
 class StrongClassifier {
 
 protected:
-	vector<WeakClassifier> classifiers;
+	vector<WeakClassifier*> classifiers;
 
 public:
-	StrongClassifier(vector<WeakClassifier> classifiers);
+	StrongClassifier(vector<WeakClassifier*> classifiers);
 	int predict(Data* x);
 	~StrongClassifier();
-	const vector<WeakClassifier>& getClassifiers() const;
-	void setClassifiers(const vector<WeakClassifier>& classifiers);
+	const vector<WeakClassifier*>& getClassifiers() const;
+	void setClassifiers(const vector<WeakClassifier*>& classifiers);
 };
 
 

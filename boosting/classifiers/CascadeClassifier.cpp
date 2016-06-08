@@ -15,7 +15,7 @@ void CascadeClassifier::addStage(Stage* stage){
 	stages.push_back(stage);
 }
 
-int CascadeClassifier::predict(vector<double> x){
+int CascadeClassifier::predict(const vector<double>& x){
 	for(int i = 0; i < stages.size(); ++i){
 		if(stages[i]->predict(x) != 1){
 			return -1;

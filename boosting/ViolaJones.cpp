@@ -40,7 +40,7 @@ ViolaJones::ViolaJones(string positivePath, string negativePath, int maxStages, 
 	this->numPositives = numPositives;
 	this->numNegatives = numNegatives;
 	if(negativesPerLayer == 0){
-		this->negativesPerLayer = numPositives;
+		this->negativesPerLayer = numNegatives;
 	} else {
 		this->negativesPerLayer = negativesPerLayer;
 	}
@@ -70,7 +70,7 @@ void ViolaJones::train(){
 	double* F = new double[maxStages + 1];
 	double* D = new double[maxStages + 1];
 	double fpr, dr;
-	vector<WeakClassifier> classifiers;
+	vector<WeakClassifier*> classifiers;
 
 	F[0] = 1.;
 	D[0] = 1.;
@@ -169,7 +169,6 @@ void ViolaJones::train(){
  */
 void ViolaJones::extractFeatures(){
 	//Loading training positive images
-	double percent;
 	int count = 0;
 	Mat img, intImg;
 
@@ -193,10 +192,10 @@ void ViolaJones::extractFeatures(){
 	//Setting validation set (if defined)
 	if(validationPath != ""){
 		vector<string> validationImages = Utils::open(validationPath);
-		cout << "  -Validation set size: " << validationImages.size() << endl;
-		totalExamples += validationImages.size();
-		//for (int k = 0; k < 100; ++k) {
-		for (int k = 0; k < validationImages.size(); ++k) {
+		int validationSize = validationImages.size();
+		totalExamples += validationSize;
+		cout << "  -Validation set size: " << validationSize << endl;
+		for (int k = 0; k < validationSize; ++k) {
 			img = imread(validationPath + validationImages[k]);
 			if (img.rows != 0 && img.cols != 0) {
 				Mat dest;
@@ -205,9 +204,8 @@ void ViolaJones::extractFeatures(){
 				vector<double> features = HaarFeatures::extractFeatures(intImg,
 						detectionWindowSize, 0, 0);
 				validation.push_back(new Data(features, -1));
-				percent = (double) count * 100 / totalExamples;
 				count++;
-				cout << "\rEvaluated: " << count << "/" << totalExamples << " images" << flush;
+				cout << "\rEvaluated: " << count + 1 << "/" << totalExamples << " images" << flush;
 			}
 		}
 	}
@@ -222,9 +220,8 @@ void ViolaJones::extractFeatures(){
 			vector<double> features = HaarFeatures::extractFeatures(intImg,
 					detectionWindowSize, 0, 0);
 			positives.push_back(new Data(features, 1));
-			percent = (double) count * 100 / totalExamples;
 			count++;
-			cout << "\rEvaluated: " << count << "/" << totalExamples << " images" << flush;
+			cout << "\rEvaluated: " << count + 1 << "/" << totalExamples << " images" << flush;
 
 		}
 	}
@@ -239,9 +236,8 @@ void ViolaJones::extractFeatures(){
 			vector<double> features = HaarFeatures::extractFeatures(intImg,
 					detectionWindowSize, 0, 0);
 			negatives.push_back(new Data(features, -1));
-			percent = (double) count * 100 / totalExamples;
 			count++;
-			cout << "\rEvaluated: " << count << "/" << totalExamples << " images" << flush;
+			cout << "\rEvaluated: " << count + 1 << "/" << totalExamples << " images" << flush;
 		}
 	}
 	cout << "\nExtracted features in ";
@@ -255,7 +251,7 @@ void ViolaJones::extractFeatures(){
 /**
  * Evaluating False Positive Rate on the validation set
  */
-double ViolaJones::evaluateFPR(vector<Data*> validationSet){
+double ViolaJones::evaluateFPR(vector<Data*> &validationSet){
 	cout << "Evaluate FPR on validation set:" << endl;
 	int fp = 0;
 	int tn = 0;
@@ -277,7 +273,7 @@ double ViolaJones::evaluateFPR(vector<Data*> validationSet){
 /**
  * Evaluating Detection Rate on the validation set
  */
-double ViolaJones::evaluateDR(vector<Data*> validationSet){
+double ViolaJones::evaluateDR(vector<Data*> &validationSet){
 	int tp = 0;
 	int fn = 0;
 	int prediction;
@@ -301,8 +297,15 @@ double ViolaJones::evaluateDR(vector<Data*> validationSet){
  * Negative examples are shuffled for preventing overfitting.
  */
 void ViolaJones::generateNegativeSet(bool newExamples){
+	WeakClassifier* wc;
+	for(int i = 0; i < classifier.getStages().size(); ++i){
+		for(int j = 0; j < classifier.getStages()[i]->getClassifiers().size(); ++j){
+			wc = classifier.getStages()[i]->getClassifiers()[j];
+			HaarFeatures::getFeature(detectionWindowSize, wc);
+		}
+	}
+
 	if(newExamples){
-		//N = ∅
 		negatives.clear();
 		cout << "\nGenerating negative set for layer: max " << negativesPerLayer << endl;
 		vector<string> negativeImages = Utils::open(negativePath);
@@ -321,8 +324,8 @@ void ViolaJones::generateNegativeSet(bool newExamples){
 					}
 					evaluated++;
 					Mat intImg = IntegralImage::computeIntegralImage(dest);
-					vector<double> features = HaarFeatures::extractFeatures(intImg, 24, 0, 0);
-					if(classifier.predict(features) == 1){
+					if(classifier.predict(intImg) == 1){
+						vector<double> features = HaarFeatures::extractFeatures(intImg, 24, 0, 0);
 						negatives.push_back(new Data(features, -1));
 						count++;
 					}
@@ -397,7 +400,7 @@ void ViolaJones::updateWeights(WeakClassifier* weakClassifier){
  * final detection. The corners of the final bounding region are the average of the
  * corners of all detections in the set.
  */
-vector<Face> ViolaJones::mergeDetections(vector<Face> detections, int padding, double th){
+vector<Face> ViolaJones::mergeDetections(vector<Face>& detections, int padding, double th){
 	vector<Face> output, cluster;
 	double score;
 	Rect a, b;
@@ -473,7 +476,7 @@ void ViolaJones::store(){
 	output.open ("trainedInfo.txt");
 	data.open ("trainedData.txt");
 
-	WeakClassifier wc;
+	WeakClassifier* wc;
 
     for(unsigned int i = 0; i < classifier.getStages().size(); ++i){
     	Stage* stage = classifier.getStages()[i];
@@ -491,27 +494,27 @@ void ViolaJones::store(){
     	for(unsigned int j = 0; j < stage->getClassifiers().size(); ++j){
     		wc = stage->getClassifiers()[j];
     		output << "WeakClassifier " << j << "\n";
-    		output << "Error: " << wc.getError() << "\n";
-    		output << "Dimension: " << wc.getDimension() << "\n";
-    		output << "Threshold: " << wc.getThreshold() << "\n";
-    		output << "Alpha: " << wc.getAlpha() << "\n";
-    		output << "Beta: " << wc.getBeta() << "\n";
-    		if(wc.getSign() == POSITIVE){
+    		output << "Error: " << wc->getError() << "\n";
+    		output << "Dimension: " << wc->getDimension() << "\n";
+    		output << "Threshold: " << wc->getThreshold() << "\n";
+    		output << "Alpha: " << wc->getAlpha() << "\n";
+    		output << "Beta: " << wc->getBeta() << "\n";
+    		if(wc->getSign() == POSITIVE){
     			output << "Sign: POSITIVE\n";
     		} else {
     			output << "Sign: NEGATIVE\n";
     		}
-    		output << "Misclassified: " << wc.getMisclassified() << "\n\n";
+    		output << "Misclassified: " << wc->getMisclassified() << "\n\n";
     		//Outputs data
-			data << "c:" << wc.getError() << "," << wc.getDimension() << ","
-					<< wc.getThreshold() << "," << wc.getAlpha() << ","
-					<< wc.getBeta() << ",";
-			if (wc.getSign() == POSITIVE) {
+			data << "c:" << wc->getError() << "," << wc->getDimension() << ","
+					<< wc->getThreshold() << "," << wc->getAlpha() << ","
+					<< wc->getBeta() << ",";
+			if (wc->getSign() == POSITIVE) {
 				data << "POSITIVE,";
 			} else {
 				data << "NEGATIVE,";
 			}
-			data << wc.getMisclassified() << "\n";
+			data << wc->getMisclassified() << "\n";
     	}
 
     	output << "---------------\n" << endl;
@@ -566,7 +569,7 @@ void ViolaJones::loadTrainedData(string filename){
 			}
 			getline(iss, read, ',');
 			wc->setMisclassified(stoi(read));
-			HaarFeatures::getFeature(24, wc);
+			HaarFeatures::getFeature(detectionWindowSize, wc);
 			stage->addClassifier(wc);
 		}
 	}

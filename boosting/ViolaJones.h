@@ -41,8 +41,8 @@ private:
 	CascadeClassifier classifier;
 	int negativesPerLayer;
 	int detectionWindowSize;
-	double evaluateFPR(vector<Data*> validationSet);
-	double evaluateDR(vector<Data*> validationSet);
+	double evaluateFPR(vector<Data*>& validationSet);
+	double evaluateDR(vector<Data*>& validationSet);
 	void initializeWeights();
 	void generateNegativeSet(bool newExamples);
 	void extractFeatures();
@@ -59,7 +59,7 @@ public:
 	ViolaJones(string trainedPath);
 	ViolaJones(string positivePath, string negativePath, int maxStages, int numPositives,
 			int numNegatives, int detectionWindowSize = 24, int negativesPerLayer = 0);
-	vector<Face> mergeDetections(vector<Face> detections, int padding = 6, double th = 0.5);
+	vector<Face> mergeDetections(vector<Face>& detections, int padding = 6, double th = 0.5);
 	void train();
 	int predict(Mat img);
 	void loadTrainedData(string filename);

@@ -15,10 +15,10 @@ WeakClassifier::WeakClassifier(): error(1.), dimension(0),
  * Predict feature label
  */
 int WeakClassifier::predict(Data* x){
-	return predict(x->getFeatures());
+	return predict(x->getFeatures()[dimension]);
 }
 
-int WeakClassifier::predict(vector<double> x){
+int WeakClassifier::predict(const vector<double>& x){
 	return predict(x[dimension]);
 }
 

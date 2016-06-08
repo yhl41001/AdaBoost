@@ -121,11 +121,11 @@ void FaceDetector::displaySelectedFeatures(Mat img, int index){
 	for(unsigned int i = 0; i < stages.size(); ++i){
 		for(unsigned int j = 0; j < stages[i]->getClassifiers().size(); ++j){
 			if(count == index){
-				for(unsigned int w = 0; w < stages[i]->getClassifiers()[j].getWhites().size(); ++w){
-					rectangle(img, stages[i]->getClassifiers()[j].getWhites()[w], Scalar::all(255), CV_FILLED);
+				for(unsigned int w = 0; w < stages[i]->getClassifiers()[j]->getWhites().size(); ++w){
+					rectangle(img, stages[i]->getClassifiers()[j]->getWhites()[w], Scalar::all(255), CV_FILLED);
 				}
-				for(unsigned int b = 0; b < stages[i]->getClassifiers()[j].getBlacks().size(); ++b){
-					rectangle(img, stages[i]->getClassifiers()[j].getBlacks()[b], Scalar::all(0), CV_FILLED);
+				for(unsigned int b = 0; b < stages[i]->getClassifiers()[j]->getBlacks().size(); ++b){
+					rectangle(img, stages[i]->getClassifiers()[j]->getBlacks()[b], Scalar::all(0), CV_FILLED);
 				}
 				imshow("feature", img);
 				waitKey(0);
