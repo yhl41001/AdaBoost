@@ -23,6 +23,7 @@ public:
 	void train();
 	int predict(Mat img);
 	int predict(const vector<double>& x);
+	double score(const vector<double>& x);
 	~CascadeClassifier();
 	const vector<Stage*>& getStages() const;
 	void setStages(const vector<Stage*>& stages);

@@ -28,9 +28,8 @@ public:
 	Stage(int number, vector<WeakClassifier*> weaks);
 	int predict(const vector<double>& x);
 	int predict(Mat img);
-	void optimizeThreshold(vector<Data*> &positiveSet, double maxfnr);
 	void decreaseThreshold();
-	~Stage();
+	void optimizeThreshold(vector<Data*>& positiveSet, double dr);
 	void printInfo();
 	double getThreshold() const;
 	void setThreshold(double threshold);
@@ -43,6 +42,7 @@ public:
 	const vector<WeakClassifier*>& getClassifiers() const;
 	void setClassifiers(const vector<WeakClassifier*>& classifiers);
 	void addClassifier(WeakClassifier* wc);
+	~Stage();
 };
 
 #endif /* BOOSTING_CLASSIFIERS_STAGE_H_ */

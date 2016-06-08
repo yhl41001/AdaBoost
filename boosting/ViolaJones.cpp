@@ -68,12 +68,11 @@ void ViolaJones::train(){
 	double d = 0.95;
 	double Ftarget = 0.00001;
 	double* F = new double[maxStages + 1];
-	double* D = new double[maxStages + 1];
-	double fpr, dr;
+	double D = d;
+	double fpr;
 	vector<WeakClassifier*> classifiers;
 
 	F[0] = 1.;
-	D[0] = 1.;
 
 	int i = 0;
 	int n;
@@ -118,9 +117,8 @@ void ViolaJones::train(){
 		classifier.addStage(stage);
 
 		fpr = i > 0 ? F[i - 1] : 1;
-		dr = i > 0 ? D[i - 1] : 1;
 		cout << "  -Target FPR: " << (f * fpr) << endl;
-		cout << "  -Target DR: " << (d * dr) << "\n" << endl;
+		cout << "  -Target DR: " << (d) << "\n" << endl;
 
 		while(F[i] > f * fpr){
 			n++;
@@ -136,20 +134,13 @@ void ViolaJones::train(){
 			stage->setClassifiers(strongClassifier->getClassifiers());
 			classifiers = strongClassifier->getClassifiers();
 
-			D[i] = evaluateDR(positives);
-
 			//Optimizing stage threshold
+			stage->optimizeThreshold(positives, d);
 			//Evaluate current cascaded classifier on validation set to determine fpr & dr
-			dr = i > 0 ? D[i - 1] : 1;
-
-			while(D[i] < d * dr){
-				stage->decreaseThreshold();
-				D[i] = evaluateDR(positives);
-			}
-
+			D = evaluateDR(positives);
 			F[i] = evaluateFPR(validation);
 			stage->setFpr(F[i]);
-			stage->setDetectionRate(D[i]);
+			stage->setDetectionRate(D);
 		}
 
 		if(F[i] > Ftarget){
@@ -203,7 +194,7 @@ void ViolaJones::extractFeatures(){
 				intImg = IntegralImage::computeIntegralImage(dest);
 				vector<double> features = HaarFeatures::extractFeatures(intImg,
 						detectionWindowSize, 0, 0);
-				validation.push_back(new Data(features, -1));
+				validation.push_back(new Data(features, 0));
 				count++;
 				cout << "\rEvaluated: " << count + 1 << "/" << totalExamples << " images" << flush;
 			}
@@ -235,9 +226,9 @@ void ViolaJones::extractFeatures(){
 			intImg = IntegralImage::computeIntegralImage(dest);
 			vector<double> features = HaarFeatures::extractFeatures(intImg,
 					detectionWindowSize, 0, 0);
-			negatives.push_back(new Data(features, -1));
+			negatives.push_back(new Data(features, 0));
 			count++;
-			cout << "\rEvaluated: " << count + 1 << "/" << totalExamples << " images" << flush;
+			cout << "\rEvaluated: " << count << "/" << totalExamples << " images" << flush;
 		}
 	}
 	cout << "\nExtracted features in ";
@@ -258,9 +249,9 @@ double ViolaJones::evaluateFPR(vector<Data*> &validationSet){
 	int prediction;
 	for(int i = 0; i < validationSet.size(); ++i){
 		prediction = classifier.predict(validationSet[i]->getFeatures());
-		if(prediction == 1 && validationSet[i]->getLabel() == -1){
+		if(prediction == 1 && validationSet[i]->getLabel() == 0){
 			fp++;
-		} else if(prediction == -1 && validationSet[i]->getLabel() == -1){
+		} else if(prediction == 0 && validationSet[i]->getLabel() == 0){
 			tn++;
 		}
 	}
@@ -279,7 +270,7 @@ double ViolaJones::evaluateDR(vector<Data*> &validationSet){
 	int prediction;
 	for(int i = 0; i < validationSet.size(); ++i){
 		prediction = classifier.predict(validationSet[i]->getFeatures());
-		if(prediction == -1 && validationSet[i]->getLabel() == 1){
+		if(prediction == 0 && validationSet[i]->getLabel() == 1){
 			fn++;
 		} else if(prediction == 1 && validationSet[i]->getLabel() == 1){
 			tp++;
@@ -290,6 +281,7 @@ double ViolaJones::evaluateDR(vector<Data*> &validationSet){
 	cout << " (TP: " << tp << " FN: " << fn << ")" << endl;
 	return dr;
 }
+
 
 /**
  * Generating negative set for the next stage: iterates negative examples folder
@@ -326,7 +318,7 @@ void ViolaJones::generateNegativeSet(bool newExamples){
 					Mat intImg = IntegralImage::computeIntegralImage(dest);
 					if(classifier.predict(intImg) == 1){
 						vector<double> features = HaarFeatures::extractFeatures(intImg, 24, 0, 0);
-						negatives.push_back(new Data(features, -1));
+						negatives.push_back(new Data(features, 0));
 						count++;
 					}
 					cout << "\rAdded " << count << " (" << evaluated << " tested) images to the negative set" << flush;

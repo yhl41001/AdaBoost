@@ -43,6 +43,7 @@ private:
 	int detectionWindowSize;
 	double evaluateFPR(vector<Data*>& validationSet);
 	double evaluateDR(vector<Data*>& validationSet);
+	void optimizeThreshold(vector<Data*>& positiveSet, double dr);
 	void initializeWeights();
 	void generateNegativeSet(bool newExamples);
 	void extractFeatures();

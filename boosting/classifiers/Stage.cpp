@@ -25,7 +25,7 @@ int Stage::predict(const vector<double>& x){
 	for (int i = 0; i < classifiers.size(); ++i) {
 		sum += classifiers[i]->getAlpha() * classifiers[i]->predict(x);
 	}
-	return sum >= threshold ? 1 : -1;
+	return sum >= threshold ? 1 : 0;
 }
 
 int Stage::predict(Mat img){
@@ -35,33 +35,36 @@ int Stage::predict(Mat img){
 		value = HaarFeatures::evaluate(img, classifiers[i]->getWhites(), classifiers[i]->getBlacks());
 		sum += classifiers[i]->getAlpha() * classifiers[i]->predict(value);
 	}
-	return sum >= threshold ? 1 : -1;
+	return sum >= threshold ? 1 : 0;
 }
 
-void Stage::optimizeThreshold(vector<Data*> &positiveSet, double maxfnr){
-	int wf;
-	float thr;
-    float *scores = new float[positiveSet.size()];
-	for (int i=0; i< positiveSet.size(); i++) {
+
+void Stage::optimizeThreshold(vector<Data*>& positiveSet, double dr){
+	cout << "Optimizing threshold for stage" << endl;
+	vector<double> scores(positiveSet.size());
+	double thr;
+	for(int i = 0; i < positiveSet.size(); ++i){
 		scores[i] = 0;
-	    wf = 0;
-	    for (vector<WeakClassifier*>::iterator it = classifiers.begin(); it != classifiers.end(); ++it, wf++)
-	      scores[i] += (*it)->getBeta() * ((*it)->predict(positiveSet[i]));
-	  }
-	  sort(scores, scores + positiveSet.size());
-	  int maxfnrind = maxfnr * positiveSet.size();
-	  if (maxfnrind >= 0 && maxfnrind < positiveSet.size()) {
-	    thr = scores[maxfnrind];
-	    while (maxfnrind > 0 && scores[maxfnrind] == thr) maxfnrind--;
-	    threshold = scores[maxfnrind];
-	  }
-	  delete[] scores;
+		for(int j = 0; j < classifiers.size(); ++j){
+			scores[i] += classifiers[j]->getAlpha() * classifiers[j]->predict(positiveSet[i]);
+		}
+	}
+	sort(scores.begin(), scores.end());
+	int index = dr * positiveSet.size();
+	if(index >= 0 && index < positiveSet.size()){
+		thr = scores[index];
+		while(index >= 0 && index < positiveSet.size() - 1 && scores[index] == thr){
+			index++;
+		}
+		threshold = scores[index];
+	}
+	cout << "Setting threshold to " << threshold << endl;
+	scores.clear();
 }
 
 void Stage::decreaseThreshold(){
 	double value = 1;
 	threshold -= value;
-
 	cout << "Decrease threshold to " << threshold << endl;
 }
 

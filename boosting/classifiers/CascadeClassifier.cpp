@@ -18,7 +18,7 @@ void CascadeClassifier::addStage(Stage* stage){
 int CascadeClassifier::predict(const vector<double>& x){
 	for(int i = 0; i < stages.size(); ++i){
 		if(stages[i]->predict(x) != 1){
-			return -1;
+			return 0;
 		}
 	}
 	return 1;
@@ -27,13 +27,10 @@ int CascadeClassifier::predict(const vector<double>& x){
 int CascadeClassifier::predict(Mat img){
 	for(int i = 0; i < stages.size(); ++i){
 		if (stages[i]->predict(img) != 1) {
-			return -1;
+			return 0;
 		}
 	}
 	return 1;
-}
-
-CascadeClassifier::~CascadeClassifier() {
 }
 
 const vector<Stage*>& CascadeClassifier::getStages() const {
@@ -42,4 +39,7 @@ const vector<Stage*>& CascadeClassifier::getStages() const {
 
 void CascadeClassifier::setStages(const vector<Stage*>& stages) {
 	this->stages = stages;
+}
+
+CascadeClassifier::~CascadeClassifier() {
 }
