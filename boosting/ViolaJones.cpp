@@ -64,15 +64,15 @@ void ViolaJones::train(){
 	cout << "Training ViolaJones face detector\n" << endl;
 	extractFeatures();
 
+
 	double f = 0.5;
 	double d = 0.95;
 	double Ftarget = 0.00001;
-	double* F = new double[maxStages + 1];
-	double D = d;
-	double fpr;
+	vector<int> featuresLayer {2, 8, 15, 15, 25, 25};
+	double FPR = 1.;
+	double DR = d;
+	double oldFPR = 1.;
 	vector<WeakClassifier*> classifiers;
-
-	F[0] = 1.;
 
 	int i = 0;
 	int n;
@@ -82,19 +82,14 @@ void ViolaJones::train(){
 		useValidation = true;
 	}
 
-	while(F[i] > Ftarget && i < maxStages){
+	while(FPR > Ftarget && i < maxStages){
 		if(negatives.size() == 0){
 			cout << "All training negative samples classified correctly. "
 					"Could not achieve validation target FPR for this stage." << endl;
 			break;
 		}
 
-		i++;
 		n = 0;
-
-		if(i > 0){
-			F[i] = F[i - 1];
-		}
 
 		classifiers.clear();
 		initializeWeights();
@@ -111,45 +106,57 @@ void ViolaJones::train(){
 			validation.insert(validation.end(), negatives.begin(), negatives.end());
 		}
 
-		cout << "\n*** Stage n. " << i << " ***\n" << endl;
+		cout << "\n*** Stage n. " << i + 1 << " ***\n" << endl;
 		cout << "  -Training size: " << features.size() << endl;
-		Stage* stage = new Stage(i);
+
+		Stage* stage = new Stage(i + 1);
 		classifier.addStage(stage);
 
-		fpr = i > 0 ? F[i - 1] : 1;
-		cout << "  -Target FPR: " << (f * fpr) << endl;
-		cout << "  -Target DR: " << (d) << "\n" << endl;
-
-		while(F[i] > f * fpr){
-			n++;
-			this->iterations = n;
-			normalizeWeights();
-
-			//Train the current classifier
-			StrongClassifier* strongClassifier = AdaBoost::train(classifiers);
-			if(strongClassifier->getClassifiers().size() == 0){
-				cout << "Error training weak classifiers" << endl;
-				return;
-			}
+		if(i < featuresLayer.size()){
+			this->iterations = featuresLayer[i];
+			cout << "  -Fixed number of classifiers: " << this->iterations << endl;
+			StrongClassifier* strongClassifier = AdaBoost::train();
 			stage->setClassifiers(strongClassifier->getClassifiers());
-			classifiers = strongClassifier->getClassifiers();
-
-			//Optimizing stage threshold
 			stage->optimizeThreshold(positives, d);
-			//Evaluate current cascaded classifier on validation set to determine fpr & dr
-			D = evaluateDR(positives);
-			F[i] = evaluateFPR(validation);
-			stage->setFpr(F[i]);
-			stage->setDetectionRate(D);
+			DR = evaluateDR(positives);
+			FPR = evaluateFPR(validation);
+			stage->setFpr(FPR);
+			stage->setDetectionRate(DR);
+		} else {
+			cout << "  -Target FPR: " << (f * oldFPR) << endl;
+			cout << "  -Target DR: " << (d) << "\n" << endl;
+			while(FPR > f * oldFPR){
+				n++;
+				this->iterations = n;
+				normalizeWeights();
+
+				//Train the current classifier
+				StrongClassifier* strongClassifier = AdaBoost::train(classifiers);
+				if(strongClassifier->getClassifiers().size() == 0){
+					cout << "Error training weak classifiers" << endl;
+					return;
+				}
+				stage->setClassifiers(strongClassifier->getClassifiers());
+				classifiers = strongClassifier->getClassifiers();
+
+				//Optimizing stage threshold
+				stage->optimizeThreshold(positives, d);
+				//Evaluate current cascaded classifier on validation set to determine fpr & dr
+				DR = evaluateDR(positives);
+				FPR = evaluateFPR(validation);
+				stage->setFpr(FPR);
+				stage->setDetectionRate(DR);
+			}
+			oldFPR = FPR;
 		}
 
-		if(F[i] > Ftarget){
-			//if F(i) > Ftarget then
+		if(FPR > Ftarget){
 			//evaluate the current cascaded detector on the set of non-face images
 			//and put any false detections into the set N.
 			generateNegativeSet(useValidation);
 		}
 		stage->printInfo();
+		i++;
 	}
 	store();
 }
@@ -184,7 +191,6 @@ void ViolaJones::extractFeatures(){
 	if(validationPath != ""){
 		vector<string> validationImages = Utils::open(validationPath);
 		int validationSize = validationImages.size();
-		validationSize = 1000;
 		totalExamples += validationSize;
 		cout << "  -Validation set size: " << validationSize << endl;
 		for (int k = 0; k < validationSize; ++k) {

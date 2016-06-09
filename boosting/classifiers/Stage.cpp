@@ -53,8 +53,11 @@ void Stage::optimizeThreshold(vector<Data*>& positiveSet, double dr){
 	int index = positiveSet.size() - dr * positiveSet.size();
 	if(index >= 0 && index < positiveSet.size()){
 		thr = scores[index];
-		while(index >= 0 && index < positiveSet.size() - 1 && scores[index] == thr){
-			index++;
+		if(thr == 0){
+			while(index < positiveSet.size() - 1 && scores[index] == 0){
+				index++;
+			}
+			thr = scores[index];
 		}
 		threshold = scores[index];
 	}
@@ -110,7 +113,7 @@ void Stage::setNumber(int number) {
 }
 
 void Stage::printInfo(){
-	cout << "\nStage n. " << number << ", FPR: " << fpr << ", DR: " << detectionRate << endl;
+	cout << "\nStage n. " << number << ", FPR: " << fpr << ", DR: " << detectionRate << ", Threshold: " << threshold << endl;
 }
 
 const vector<WeakClassifier*>& Stage::getClassifiers() const {
