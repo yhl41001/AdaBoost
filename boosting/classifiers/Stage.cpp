@@ -37,7 +37,7 @@ int Stage::predict(Mat img){
 	for (int i = 0; i < classifiers.size(); ++i) {
 		value = HaarFeatures::evaluate(img, classifiers[i]->getWhites(), classifiers[i]->getBlacks());
 		prediction = classifiers[i]->predict(value) == 1 ? 1 : 0;
-		sum += classifiers[i]->getAlpha() * classifiers[i]->predict(value);
+		sum += classifiers[i]->getAlpha() * prediction;
 	}
 	return sum >= threshold ? 1 : 0;
 }
@@ -52,7 +52,7 @@ void Stage::optimizeThreshold(vector<Data*>& positiveSet, float dr){
 		scores[i] = 0;
 		for(int j = 0; j < classifiers.size(); ++j){
 			prediction = classifiers[j]->predict(positiveSet[i]) == 1 ? 1 : 0;
-			scores[i] += classifiers[j]->getAlpha() * classifiers[j]->predict(positiveSet[i]);
+			scores[i] += classifiers[j]->getAlpha() * prediction;
 		}
 	}
 	sort(scores.begin(), scores.end());
