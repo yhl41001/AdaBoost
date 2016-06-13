@@ -37,6 +37,7 @@ private:
 	float delta;
 	int numPositives;
 	int numNegatives;
+	int numValidation;
 	vector<Mat> scaledImages;
 	ViolaJones* boost;
 
@@ -46,7 +47,7 @@ public:
 	void train();
 	vector<Face> detect(Mat img, bool showResults = false, bool showScores = false);
 	void displaySelectedFeatures(Mat img, int index);
-	void setValidationPath(string validationPath);
+	void setValidationSet(string validationPath, int examples = 0);
 	~FaceDetector();
 
 };

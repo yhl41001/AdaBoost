@@ -18,6 +18,7 @@ FaceDetector::FaceDetector(string trainedCascade, int scales){
 	this->stages = 24;
 	this->numNegatives = 0;
 	this->numPositives = 0;
+	this->numValidation = 0;
 	cout << "  -Scales: " << scales << "\n  -Window size: "<< detectionWindowSize << endl;
 	boost = new ViolaJones(trainedCascade);
 }
@@ -32,34 +33,36 @@ FaceDetector::FaceDetector(string positivePath, string negativePath, int stages,
 	this->detectionWindowSize = detectionWindowSize;
 	this->numNegatives = numNegatives;
 	this->numPositives = numPositives;
+	this->numValidation = 0;
 	boost = new ViolaJones();
-	cout << "  -Scales: " << scales << "\n  -Window size: "<< detectionWindowSize << endl;
+	cout << "  -Stages: " << stages << "\n  -Window size: "<< detectionWindowSize << endl;
 
 }
 
-void FaceDetector::setValidationPath(string validationPath){
+void FaceDetector::setValidationSet(string validationPath, int examples){
 	this->validationPath = validationPath;
+	this->numValidation = examples;
 }
 
 void FaceDetector::train(){
 	boost = new ViolaJones(positivePath, negativePath, stages, numPositives, numNegatives, detectionWindowSize);
 	if(validationPath != ""){
-		boost->setValidationPath(validationPath);
+		boost->setValidationSet(validationPath, numValidation);
 	}
 	boost->train();
 }
 
 vector<Face> FaceDetector::detect(Mat img, bool showResults, bool showScores){
 	vector<Face> predictions;
-	vector<double> features;
-	double scaleFactor = 0.75;
-	double scaleRefactor;
+	vector<float> features;
+	float scaleFactor = 0.75;
+	float scaleRefactor;
 	int prediction = 0;
 	Mat tmp = img;
 	Mat dst, window, intImg, det;
 	int x, y, w;
 	int fontFace = FONT_HERSHEY_SCRIPT_SIMPLEX;
-	double fontScale = 0.5;
+	float fontScale = 0.5;
 
 	//Evaluating computation time
 	auto t_start = chrono::high_resolution_clock::now();
