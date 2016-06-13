@@ -20,32 +20,38 @@ Stage::Stage(int number, vector<WeakClassifier*> weaks):
 	threshold = threshold * 0.5;
 }
 
-int Stage::predict(const vector<double>& x){
-	double sum = 0;
+int Stage::predict(const vector<float>& x){
+	float sum = 0;
+	int prediction;
 	for (int i = 0; i < classifiers.size(); ++i) {
-		sum += classifiers[i]->getAlpha() * classifiers[i]->predict(x);
+		prediction = classifiers[i]->predict(x) == 1 ? 1 : 0;
+		sum += classifiers[i]->getAlpha() * prediction;
 	}
 	return sum >= threshold ? 1 : 0;
 }
 
 int Stage::predict(Mat img){
-	double sum = 0;
-	double value;
+	float sum = 0;
+	float value;
+	int prediction;
 	for (int i = 0; i < classifiers.size(); ++i) {
 		value = HaarFeatures::evaluate(img, classifiers[i]->getWhites(), classifiers[i]->getBlacks());
+		prediction = classifiers[i]->predict(value) == 1 ? 1 : 0;
 		sum += classifiers[i]->getAlpha() * classifiers[i]->predict(value);
 	}
 	return sum >= threshold ? 1 : 0;
 }
 
 
-void Stage::optimizeThreshold(vector<Data*>& positiveSet, double dr){
+void Stage::optimizeThreshold(vector<Data*>& positiveSet, float dr){
 	cout << "Optimizing threshold for stage" << endl;
-	vector<double> scores(positiveSet.size());
-	double thr;
+	vector<float> scores(positiveSet.size());
+	float thr;
+	int prediction;
 	for(int i = 0; i < positiveSet.size(); ++i){
 		scores[i] = 0;
 		for(int j = 0; j < classifiers.size(); ++j){
+			prediction = classifiers[j]->predict(positiveSet[i]) == 1 ? 1 : 0;
 			scores[i] += classifiers[j]->getAlpha() * classifiers[j]->predict(positiveSet[i]);
 		}
 	}
@@ -66,32 +72,32 @@ void Stage::optimizeThreshold(vector<Data*>& positiveSet, double dr){
 }
 
 void Stage::decreaseThreshold(){
-	double value = 1;
+	float value = 1;
 	threshold -= value;
 	cout << "Decrease threshold to " << threshold << endl;
 }
 
-double Stage::getThreshold() const {
+float Stage::getThreshold() const {
 	return threshold;
 }
 
-void Stage::setThreshold(double threshold) {
+void Stage::setThreshold(float threshold) {
 	this->threshold = threshold;
 }
 
-double Stage::getDetectionRate() const {
+float Stage::getDetectionRate() const {
 	return detectionRate;
 }
 
-void Stage::setDetectionRate(double detectionRate) {
+void Stage::setDetectionRate(float detectionRate) {
 	this->detectionRate = detectionRate;
 }
 
-double Stage::getFpr() const {
+float Stage::getFpr() const {
 	return fpr;
 }
 
-void Stage::setFpr(double fpr) {
+void Stage::setFpr(float fpr) {
 	this->fpr = fpr;
 }
 

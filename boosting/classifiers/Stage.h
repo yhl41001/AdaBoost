@@ -19,24 +19,24 @@ class Stage {
 private:
 	int number;
 	vector<WeakClassifier*> classifiers;
-	double fpr;
-	double detectionRate;
-	double threshold;
+	float fpr;
+	float detectionRate;
+	float threshold;
 
 public:
 	Stage(int number);
 	Stage(int number, vector<WeakClassifier*> weaks);
-	int predict(const vector<double>& x);
+	int predict(const vector<float>& x);
 	int predict(Mat img);
 	void decreaseThreshold();
-	void optimizeThreshold(vector<Data*>& positiveSet, double dr);
+	void optimizeThreshold(vector<Data*>& positiveSet, float dr);
 	void printInfo();
-	double getThreshold() const;
-	void setThreshold(double threshold);
-	double getDetectionRate() const;
-	void setDetectionRate(double detectionRate);
-	double getFpr() const;
-	void setFpr(double fpr);
+	float getThreshold() const;
+	void setThreshold(float threshold);
+	float getDetectionRate() const;
+	void setDetectionRate(float detectionRate);
+	float getFpr() const;
+	void setFpr(float fpr);
 	int getNumber() const;
 	void setNumber(int number);
 	const vector<WeakClassifier*>& getClassifiers() const;
