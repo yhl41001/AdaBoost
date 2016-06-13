@@ -24,7 +24,7 @@ AdaBoost::AdaBoost(vector<Data*>& data, int iterations) :
 	cout << "Training size: " << size << "\n" << endl;
 	//Initialize weights
 	for(int m = 0; m < features.size(); ++m){
-		features[m]->setWeight((double) 1/features.size());
+		features[m]->setWeight((float) 1/features.size());
 	}
 	cout << "Initialized uniform weights\n" << endl;
 }
@@ -45,13 +45,14 @@ StrongClassifier* AdaBoost::train(vector<WeakClassifier*>& classifiers){
 	for (unsigned int i = (iterations - (iterations - classifiers.size())); i < iterations; ++i) {
 		cout << "Iteration: " << (i + 1) << endl;;
 		WeakClassifier* weakClassifier = trainWeakClassifier();
-		double error = weakClassifier->getError();
+		float error = weakClassifier->getError();
 		if(error < 0.5){
-			double alpha = updateAlpha(error);
-			double beta = updateBeta(error);
+			float alpha = updateAlpha(error);
+			float beta = updateBeta(error);
 			weakClassifier->setAlpha(alpha);
 			weakClassifier->setBeta(beta);
 			updateWeights(weakClassifier);
+			normalizeWeights();
 			weakClassifier->printInfo();
 			classifiers.push_back(weakClassifier);
 			//If error is 0, classification is perfect (linearly separable data)
@@ -89,16 +90,21 @@ int AdaBoost::predict(Data* x){
  * In this way, AdaBoost focuses on the most informative or difficult examples.
  */
 void AdaBoost::updateWeights(WeakClassifier* weakClassifier){
-	double norm = 0;
 	for(int i = 0; i < features.size(); ++i){
-		double num = (features[i]->getWeight() * exp(-weakClassifier->getAlpha()
+		float num = (features[i]->getWeight() * exp(-weakClassifier->getAlpha()
 				* features[i]->getLabel() * weakClassifier->predict(this->features[i])));
-		norm += num;
 		features[i]->setWeight(num);
+	}
+}
+
+void AdaBoost::normalizeWeights(){
+	float norm = 0;
+	for(int i = 0; i < features.size(); ++i){
+		norm += features[i]->getWeight();
 	}
 	for(int i = 0; i < features.size(); ++i){
 		//Normalize such that wt+1 is a prob. distribution
-		features[i]->setWeight((double) features[i]->getWeight()/norm);
+		features[i]->setWeight((float) features[i]->getWeight()/norm);
 	}
 }
 
@@ -113,22 +119,22 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 		int dimensions = features[0]->getFeatures().size();
 		//Error and signs vector
 		vector<example> signs;
-		vector<double> errors;
+		vector<float> errors;
 		vector<int> misclassifies;
 		//Cumulative sums of the weights
-		double posWeights = 0;
-		double negWeights = 0;
-		double totNegWeights = 0;
-		double totPosWeights = 0;
+		float posWeights = 0;
+		float negWeights = 0;
+		float totNegWeights = 0;
+		float totPosWeights = 0;
 		//Number of examples
 		int totPositive = 0;
 		int totNegative = 0;
 		int cumPositive = 0;
 		int cumNegative = 0;
 		//Errors
-		double weight, error;
-		double errorPos, errorNeg;
-		double threshold;
+		float weight, error;
+		float errorPos, errorNeg;
+		float threshold;
 		int index;
 
 		//Evaluating total sum of negative and positive weights
@@ -212,16 +218,12 @@ WeakClassifier* AdaBoost::trainWeakClassifier(){
 	return bestWeakClass;
 }
 
-double AdaBoost::updateAlpha(double error){
+float AdaBoost::updateAlpha(float error){
 	return  0.5 * log((1 - error) / error);
 }
 
-double AdaBoost::updateBeta(double error){
+float AdaBoost::updateBeta(float error){
 	return error / (1 - error);
-}
-
-void AdaBoost::normalizeWeights(){
-	//Does nothing, maybe used in extensions
 }
 
 void AdaBoost::showFeatures(){

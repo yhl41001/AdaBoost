@@ -31,8 +31,8 @@ protected:
 	StrongClassifier* strongClassifier;
 	WeakClassifier* trainWeakClassifier();
 	virtual void normalizeWeights();
-	virtual double updateAlpha(double error);
-	virtual double updateBeta(double error);
+	virtual float updateAlpha(float error);
+	virtual float updateBeta(float error);
 	virtual void updateWeights(WeakClassifier* weakClassifier);
 
 public:
