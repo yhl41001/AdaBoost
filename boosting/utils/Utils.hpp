@@ -41,6 +41,7 @@ public:
 	    		files.push_back(pdir->d_name);
 	    }
 
+	    closedir(dir);
 	    return files;
 	}
 
@@ -71,7 +72,7 @@ public:
 		}
 	}
 
-	static Mat rotate(Mat src, double angle){
+	static Mat rotate(Mat src, float angle){
 	    Mat dst;
 	    Point2f pt(src.cols/2., src.rows/2.);
 	    Mat r = getRotationMatrix2D(pt, angle, 1.0);
