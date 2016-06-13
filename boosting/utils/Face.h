@@ -17,19 +17,19 @@ class Face {
 
 private:
 	Rect rect;
-	double score;
+	float score;
 	bool evaluated;
 
 public:
 	Face(Rect rect);
-	Face(Rect rect, double score);
+	Face(Rect rect, float score);
 	~Face();
 	const Rect& getRect() const;
 	void setRect(const Rect& rect);
-	double getScore() const;
+	float getScore() const;
 	bool isEvaluated() const;
 	void setEvaluated(bool evaluated);
-	void setScore(double score);
+	void setScore(float score);
 };
 
 

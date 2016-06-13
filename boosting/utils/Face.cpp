@@ -9,7 +9,7 @@
 
 Face::Face(Rect rect): rect(rect), score(0.), evaluated(false){}
 
-Face::Face(Rect rect, double score): rect(rect), score(score), evaluated(false){}
+Face::Face(Rect rect, float score): rect(rect), score(score), evaluated(false){}
 
 const Rect& Face::getRect() const {
 	return rect;
@@ -23,7 +23,7 @@ bool Face::isEvaluated() const {
 	return evaluated;
 }
 
-void Face::setScore(double score) {
+void Face::setScore(float score) {
 	this->score = score;
 }
 
@@ -31,7 +31,7 @@ void Face::setEvaluated(bool evaluated) {
 	this->evaluated = evaluated;
 }
 
-double Face::getScore() const {
+float Face::getScore() const {
 	return score;
 }
 

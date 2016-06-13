@@ -16,23 +16,23 @@ using namespace std;
 
 class Data {
 private:
-	vector<double> features;
+	vector<float> features;
 	int label;
 	int clas;
-	double weight;
+	float weight;
 
 public:
-	Data(vector<double> features);
-	Data(vector<double> features, int label);
-	Data(vector<double> features, int label, int clas);
+	Data(vector<float> features);
+	Data(vector<float> features, int label);
+	Data(vector<float> features, int label, int clas);
 	~Data();
 	void print();
-	const vector<double>& getFeatures() const;
-	void setFeatures(const vector<double>& features);
+	const vector<float>& getFeatures() const;
+	void setFeatures(const vector<float>& features);
 	int getLabel() const;
 	void setLabel(int label);
-	double getWeight() const;
-	void setWeight(double weight);
+	float getWeight() const;
+	void setWeight(float weight);
 	int getClas() const;
 	void setClas(int clas);
 };
