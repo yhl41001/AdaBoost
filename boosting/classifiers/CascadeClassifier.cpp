@@ -16,16 +16,12 @@ void CascadeClassifier::addStage(Stage* stage){
 }
 
 int CascadeClassifier::predict(const vector<float>& x){
-	if(stages.size() > 0){
-		for(int i = 0; i < stages.size(); ++i){
-			if(stages[i]->predict(x) != 1){
-				return 0;
-			}
+	for(int i = 0; i < stages.size(); ++i){
+		if(stages[i]->predict(x) != 1){
+			return 0;
 		}
-		return 1;
-	} else {
-		return 0;
 	}
+	return 1;
 }
 
 int CascadeClassifier::predict(Mat img){
