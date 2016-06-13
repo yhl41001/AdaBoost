@@ -22,8 +22,8 @@ public:
 	void addStage(Stage* stage);
 	void train();
 	int predict(Mat img);
-	int predict(const vector<double>& x);
-	double score(const vector<double>& x);
+	int predict(const vector<float>& x);
+	float score(const vector<float>& x);
 	~CascadeClassifier();
 	const vector<Stage*>& getStages() const;
 	void setStages(const vector<Stage*>& stages);
