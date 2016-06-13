@@ -38,21 +38,23 @@ private:
 	string validationPath;
 	int numPositives;
 	int numNegatives;
+	int numValidation;
+	bool useNormalization;
 	CascadeClassifier classifier;
 	int negativesPerLayer;
 	int detectionWindowSize;
-	double evaluateFPR(vector<Data*>& validationSet);
-	double evaluateDR(vector<Data*>& validationSet);
-	void optimizeThreshold(vector<Data*>& positiveSet, double dr);
+	float evaluateFPR(vector<Data*>& validationSet);
+	float evaluateDR(vector<Data*>& validationSet);
+	void optimizeThreshold(vector<Data*>& positiveSet, float dr);
 	void initializeWeights();
-	void generateNegativeSet(bool newExamples);
+	void generateNegativeSet(int number, bool newExamples);
 	void extractFeatures();
+	void normalizeImage(Mat& img);
 
 
 protected:
-	double updateAlpha(double error);
-	double updateBeta(double error);
-	void normalizeWeights();
+	float updateAlpha(float error);
+	float updateBeta(float error);
 	void updateWeights(WeakClassifier* weakClassifier);
 
 public:
@@ -60,16 +62,30 @@ public:
 	ViolaJones(string trainedPath);
 	ViolaJones(string positivePath, string negativePath, int maxStages, int numPositives,
 			int numNegatives, int detectionWindowSize = 24, int negativesPerLayer = 0);
-	vector<Face> mergeDetections(vector<Face>& detections, int padding = 6, double th = 0.5);
+	vector<Face> mergeDetections(vector<Face>& detections, int padding = 6, float th = 0.5);
 	void train();
 	int predict(Mat img);
 	void loadTrainedData(string filename);
 	const string& getValidationPath() const;
-	void setValidationPath(const string& validationPath);
+	void setValidationSet(const string& validationPath, int examples = -1);
 	void store();
 	~ViolaJones();
 	const CascadeClassifier& getClassifier() const;
 	void setClassifier(const CascadeClassifier& classifier);
+	int getMaxStages() const;
+	void setMaxStages(int maxStages);
+	const string& getNegativePath() const;
+	void setNegativePath(const string& negativePath);
+	int getNegativesPerLayer() const;
+	void setNegativesPerLayer(int negativesPerLayer);
+	int getNumNegatives() const;
+	void setNumNegatives(int numNegatives);
+	int getNumPositives() const;
+	void setNumPositives(int numPositives);
+	const string& getPositivePath() const;
+	void setPositivePath(const string& positivePath);
+	bool isUseNormalization() const;
+	void setUseNormalization(bool useNormalization);
 };
 
 #endif /* BOOSTING_VIOLAJONES_H_ */
