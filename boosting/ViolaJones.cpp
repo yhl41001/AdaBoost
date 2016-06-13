@@ -75,7 +75,7 @@ void ViolaJones::train(){
 	float f = 0.5;
 	float d = 0.995;
 	float Ftarget = 0.00001;
-	vector<int> featuresLayer {2, 8, 15, 25};
+	vector<int> featuresLayer {2, 8, 15, 15, 25};
 	float FPR = 1.;
 	float DR = d;
 	float oldFPR = 1.;

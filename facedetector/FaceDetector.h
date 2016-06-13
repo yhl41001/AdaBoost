@@ -12,6 +12,7 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
+#include <sstream>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -46,7 +47,7 @@ public:
 	FaceDetector(string positivePath, string negativePath, int stages, int numPositives, int numNegatives, int detectionWindowSize = 24);
 	void train();
 	vector<Face> detect(Mat img, bool showResults = false, bool showScores = false);
-	void displaySelectedFeatures(Mat img, int index);
+	void displaySelectedFeatures(Mat img, int index = -1);
 	void setValidationSet(string validationPath, int examples = 0);
 	~FaceDetector();
 

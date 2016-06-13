@@ -121,19 +121,26 @@ void FaceDetector::displaySelectedFeatures(Mat img, int index){
 	resize(img, img, Size(detectionWindowSize, detectionWindowSize));
 	vector<Stage*> stages = boost->getClassifier().getStages();
 	int count = 0;
+	int number = 0;
+	stringstream ss;
 	for(unsigned int i = 0; i < stages.size(); ++i){
 		for(unsigned int j = 0; j < stages[i]->getClassifiers().size(); ++j){
-			if(count == index){
-				for(unsigned int w = 0; w < stages[i]->getClassifiers()[j]->getWhites().size(); ++w){
-					rectangle(img, stages[i]->getClassifiers()[j]->getWhites()[w], Scalar::all(255), CV_FILLED);
-				}
-				for(unsigned int b = 0; b < stages[i]->getClassifiers()[j]->getBlacks().size(); ++b){
-					rectangle(img, stages[i]->getClassifiers()[j]->getBlacks()[b], Scalar::all(0), CV_FILLED);
-				}
+			for(unsigned int w = 0; w < stages[i]->getClassifiers()[j]->getWhites().size(); ++w){
+				rectangle(img, stages[i]->getClassifiers()[j]->getWhites()[w], Scalar::all(255), CV_FILLED);
+			}
+			for(unsigned int b = 0; b < stages[i]->getClassifiers()[j]->getBlacks().size(); ++b){
+				rectangle(img, stages[i]->getClassifiers()[j]->getBlacks()[b], Scalar::all(0), CV_FILLED);
+			}
+			if(index != -1 && count == index){
+				imwrite("feature.jpg", img);
 				imshow("feature", img);
 				waitKey(0);
-				imwrite("feature.jpg", img);
 				return;
+			} else if(index == -1){
+				ss.str("");
+				ss << "feature_" << number << ".jpg";
+				imwrite(ss.str(), img);
+				number++;
 			}
 			count++;
 		}
