@@ -16,7 +16,8 @@ using namespace cv;
 class IntegralImage {
 public:
 	static Mat computeIntegralImage(Mat img);
-	static double computeArea(Mat intImg, Rect r);
+	static Mat computeIntegralSquaredImage(Mat img, float mean);
+	static float computeArea(Mat intImg, Rect r);
 };
 
 #endif /* BOOSTING_UTILS_INTEGRALIMAGE_H_ */
