@@ -18,19 +18,19 @@ int WeakClassifier::predict(Data* x){
 	return predict(x->getFeatures()[dimension]);
 }
 
-int WeakClassifier::predict(const vector<double>& x){
+int WeakClassifier::predict(const vector<float>& x){
 	return predict(x[dimension]);
 }
 
-int WeakClassifier::predict(double value){
+int WeakClassifier::predict(float value){
 	if(value <= threshold){
 		if (sign == POSITIVE)
 			return 1;
 		else
-			return 0;
+			return -1;
 	} else {
 		if (sign == POSITIVE)
-			return 0;
+			return -1;
 		else
 			return 1;
 	}
@@ -39,8 +39,8 @@ int WeakClassifier::predict(double value){
 /**
  * Evaluate error base on weights and misclassified samples
  */
-double WeakClassifier::evaluateError(vector<Data*>& features){
-	double error = 0;
+float WeakClassifier::evaluateError(vector<Data*>& features){
+	float error = 0;
 	misclassified = 0;
 	for(int i = 0; i < features.size(); ++i){
 		int pred = predict(features[i]);
@@ -67,7 +67,7 @@ void WeakClassifier::printInfo(){
 	}
 }
 
-double WeakClassifier::getError() const {
+float WeakClassifier::getError() const {
 	return error;
 }
 
@@ -79,19 +79,19 @@ void WeakClassifier::setDimension(int dimension) {
 	this->dimension = dimension;
 }
 
-double WeakClassifier::getThreshold() const {
+float WeakClassifier::getThreshold() const {
 	return threshold;
 }
 
-void WeakClassifier::setThreshold(double threshold) {
+void WeakClassifier::setThreshold(float threshold) {
 	this->threshold = threshold;
 }
 
-void WeakClassifier::setError(double error) {
+void WeakClassifier::setError(float error) {
 	this->error = error;
 }
 
-double WeakClassifier::getAlpha() const {
+float WeakClassifier::getAlpha() const {
 	return alpha;
 }
 
@@ -103,7 +103,7 @@ void WeakClassifier::setSign(example sign) {
 	this->sign = sign;
 }
 
-void WeakClassifier::setAlpha(double alpha) {
+void WeakClassifier::setAlpha(float alpha) {
 	this->alpha = alpha;
 	this->beta = exp(-alpha);
 }
@@ -116,7 +116,7 @@ void WeakClassifier::setMisclassified(int misclassified) {
 	this->misclassified = misclassified;
 }
 
-double WeakClassifier::getBeta() const {
+float WeakClassifier::getBeta() const {
 	return beta;
 }
 
@@ -136,6 +136,6 @@ void WeakClassifier::setWhites(const vector<Rect>& whites) {
 	this->whites = whites;
 }
 
-void WeakClassifier::setBeta(double beta) {
+void WeakClassifier::setBeta(float beta) {
 	this->beta = beta;
 }
