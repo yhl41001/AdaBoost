@@ -77,6 +77,8 @@ vector<Face> FaceDetector::detect(Mat img, bool showResults, bool showScores){
 				window = intImg(Rect(i, j, detectionWindowSize, detectionWindowSize));
 				prediction = boost->predict(window);
 				if(prediction == 1) {
+					//imshow("img", tmp(Rect(i, j, detectionWindowSize, detectionWindowSize)));
+					//waitKey();
 					x = (int) i / scaleRefactor;
 					y = (int) j / scaleRefactor;
 					w = (int) detectionWindowSize / scaleRefactor;
@@ -117,6 +119,9 @@ vector<Face> FaceDetector::detect(Mat img, bool showResults, bool showScores){
 	return predictions;
 }
 
+/* Display selected feature on a given images. If index is selected only the i-th features
+ * will be displayed, othwerwise every single feature is stored
+ */
 void FaceDetector::displaySelectedFeatures(Mat img, int index){
 	resize(img, img, Size(detectionWindowSize, detectionWindowSize));
 	Mat tmp;
