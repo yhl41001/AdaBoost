@@ -57,7 +57,6 @@ ViolaJones::ViolaJones(string positivePath, string negativePath, int maxStages, 
  * Prediction function based on cascade classifier
  */
 int ViolaJones::predict(Mat img){
-	if(useNormalization) normalizeImage(img);
 	return classifier.predict(img);
 }
 
@@ -230,7 +229,6 @@ void ViolaJones::extractFeatures(){
 		}
 	}
 
-	cout << "\n" << endl;
 	//Generating negative set
 	generateNegativeSet(numNegatives, true);
 
@@ -309,7 +307,7 @@ void ViolaJones::generateNegativeSet(int number, bool newExamples){
 		int evaluated = 0;
 		int delta = 2;
 		for(int k = 0; k < negativeImages.size() && count < number; ++k){
-			Mat img = imread(negativePath + negativeImages[k]);
+			Mat img = imread(negativePath + negativeImages[k], CV_LOAD_IMAGE_GRAYSCALE);
 			Mat dest, window;
 			if(img.rows > 0 && img.cols > 0){
 				for (int j = 0; j < img.rows - detectionWindowSize - delta && count < number; j += delta) {
@@ -317,11 +315,12 @@ void ViolaJones::generateNegativeSet(int number, bool newExamples){
 						window = img(Rect(i, j, detectionWindowSize, detectionWindowSize));
 						for(int f = -2; f < 2; ++f){
 							if (f > -2) {
-								flip(img, dest, f);
+								flip(window, dest, f);
 							} else {
-								dest = img;
+								dest = window;
 							}
 							evaluated++;
+							normalizeImage(dest);
 							Mat intImg = IntegralImage::computeIntegralImage(dest);
 							if (classifier.predict(intImg) == 1) {
 								vector<float> features = HaarFeatures::extractFeatures(intImg, detectionWindowSize);
