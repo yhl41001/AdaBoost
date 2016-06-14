@@ -30,24 +30,22 @@ int main( int argc, char** argv ){
 
 	//Utils::generateNonFacesDataset(imagePath + "backgrounds/", imagePath + "validation", 5000, 24);
 	string positivePath = imagePath + "lfwcrop/faces/";
-	string negativePath = imagePath + "negatives/";
+	string negativePath = imagePath + "backgrounds/";
 	string validationPath = imagePath + "validation/";
 
 
-	Mat test = imread(imagePath + "test/tammy.jpg", 0);
-	//Mat test = imread(imagePath + "test/knex0.jpg", 0);
-	//Mat test = imread(imagePath + "lfwcrop/faces/Ana_Isabel_Sanchez_0001.pgm", 0);
+	Mat test = imread(imagePath + "test/tammy.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+	//Mat test = imread(imagePath + "test/knex0.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+	//Mat test = imread(imagePath + "lfwcrop/faces/Ana_Isabel_Sanchez_0001.pgm", CV_LOAD_IMAGE_GRAYSCALE);
 
 
-	FaceDetector* detector = new FaceDetector(positivePath, negativePath, 24, 2000, 2000);
-	detector->setValidationPath(validationPath);
-	detector->train();
+	//FaceDetector* detector = new FaceDetector(positivePath, negativePath, 12, 3000, 3000);
+	//detector->setValidationSet(validationPath);
+	//detector->train();
 
-	//FaceDetector* detector = new FaceDetector("trainedData.txt", 8);
-//	detector->displaySelectedFeatures(test, 2);
-
-	//detector->detect(test, true);
-
+	FaceDetector* detector = new FaceDetector("trainedData.txt", 1);
+	//detector->displaySelectedFeatures(test);
+	detector->detect(test, true);
 
 	/*
 	string digitsPath = imagePath + "digits/train-images-idx3-ubyte";
