@@ -47,7 +47,7 @@ ViolaJones::ViolaJones(string positivePath, string negativePath, int maxStages, 
 	this->numNegatives = numNegatives;
 	this->numValidation = 0;
 	if(negativesPerLayer == 0){
-		this->negativesPerLayer = numNegatives;
+		this->negativesPerLayer = numPositives;
 	} else {
 		this->negativesPerLayer = negativesPerLayer;
 	}
@@ -74,7 +74,7 @@ void ViolaJones::train(){
 	float f = 0.5;
 	float d = 0.995;
 	float Ftarget = 0.00001;
-	vector<int> featuresLayer {2, 8, 15, 15, 25};
+	vector<int> featuresLayer {2, 8, 15, 15};
 	float FPR = 1.;
 	float DR = d;
 	float oldFPR = 1.;
@@ -156,10 +156,13 @@ void ViolaJones::train(){
 			oldFPR = FPR;
 		}
 
+		//Clear negative set
+		negatives.clear();
+
 		if(FPR > Ftarget){
 			//evaluate the current cascaded detector on the set of non-face images
 			//and put any false detections into the set N.
-			generateNegativeSet(negativesPerLayer, useValidation);
+			generateNegativeSet(negativesPerLayer, true);
 		}
 		stage->printInfo();
 		i++;
@@ -230,7 +233,7 @@ void ViolaJones::extractFeatures(){
 	}
 
 	//Generating negative set
-	generateNegativeSet(numNegatives, true);
+	generateNegativeSet(numNegatives, false);
 
 	cout << "\nExtracted features in ";
 	auto t_end = chrono::high_resolution_clock::now();
@@ -289,7 +292,7 @@ float ViolaJones::evaluateDR(vector<Data*> &validationSet){
  * looking for false positive examples and add them to the negative set.
  * Negative examples are shuffled for preventing overfitting.
  */
-void ViolaJones::generateNegativeSet(int number, bool newExamples){
+void ViolaJones::generateNegativeSet(int number, bool rotate){
 	WeakClassifier* wc;
 	for(int i = 0; i < classifier.getStages().size(); ++i){
 		for(int j = 0; j < classifier.getStages()[i]->getClassifiers().size(); ++j){
@@ -298,56 +301,43 @@ void ViolaJones::generateNegativeSet(int number, bool newExamples){
 		}
 	}
 
-	if(newExamples){
-		negatives.clear();
-		cout << "\nGenerating negative set for layer: max " << number << endl;
-		vector<string> negativeImages = Utils::open(negativePath);
-		random_shuffle (negativeImages.begin(), negativeImages.end());
-		int count = 0;
-		int evaluated = 0;
-		int delta = 2;
-		for(int k = 0; k < negativeImages.size() && count < number; ++k){
-			Mat img = imread(negativePath + negativeImages[k], CV_LOAD_IMAGE_GRAYSCALE);
-			Mat dest, window;
-			if(img.rows > 0 && img.cols > 0){
-				for (int j = 0; j < img.rows - detectionWindowSize - delta && count < number; j += delta) {
-					for (int i = 0; i < img.cols - detectionWindowSize - delta && count < number; i += delta) {
-						window = img(Rect(i, j, detectionWindowSize, detectionWindowSize));
-						for(int f = -2; f < 2; ++f){
-							if (f > -2) {
-								flip(window, dest, f);
-							} else {
-								dest = window;
-							}
-							evaluated++;
-							normalizeImage(dest);
-							Mat intImg = IntegralImage::computeIntegralImage(dest);
-							if (classifier.predict(intImg) == 1) {
-								vector<float> features = HaarFeatures::extractFeatures(intImg, detectionWindowSize);
-								negatives.push_back(new Data(features, 0));
-								count++;
-							}
-							cout << "\rAdded " << count << " (" << evaluated << " tested) images to the negative set" << flush;
+	cout << "\nGenerating negative set for layer: max " << number << endl;
+	vector<string> negativeImages = Utils::open(negativePath);
+	random_shuffle (negativeImages.begin(), negativeImages.end());
+	int count = 0;
+	int evaluated = 0;
+	int delta = 2;
+	int maxRotate = -1;
+	for(int k = 0; k < negativeImages.size() && count < number; ++k){
+		Mat img = imread(negativePath + negativeImages[k], CV_LOAD_IMAGE_GRAYSCALE);
+		Mat dest, window;
+		if(img.rows > 0 && img.cols > 0){
+			for (int j = 0; j < img.rows - detectionWindowSize - delta && count < number; j += delta) {
+				for (int i = 0; i < img.cols - detectionWindowSize - delta && count < number; i += delta) {
+					window = img(Rect(i, j, detectionWindowSize, detectionWindowSize));
+					if(rotate){
+						maxRotate = 2;
+					}
+					for(int f = -2; f < maxRotate; ++f){
+						if (f > -2) {
+							flip(window, dest, f);
+						} else {
+							dest = window;
 						}
+						evaluated++;
+						//normalizeImage(dest);
+						Mat intImg = IntegralImage::computeIntegralImage(dest);
+						if (classifier.predict(intImg) == 1) {
+							vector<float> features = HaarFeatures::extractFeatures(intImg, detectionWindowSize);
+							negatives.push_back(new Data(features, 0));
+							count++;
+						}
+						cout << "\rAdded " << count << " (" << evaluated << " tested) images to the negative set" << flush;
 					}
 				}
 			}
 		}
-	} else {
-		cout << "\nGenerating negative set for layer" << endl;
-		vector<Data*> fp;
-		int prediction;
-		for(int i = 0; i < negatives.size(); ++i){
-			prediction = classifier.predict(negatives[i]->getFeatures());
-			if(prediction == 1){
-				fp.push_back(negatives[i]);
-			}
-		}
-		negatives.clear();
-		negatives.reserve(fp.size());
-		negatives.insert(negatives.end(), fp.begin(), fp.end());
 	}
-
 }
 
 /**

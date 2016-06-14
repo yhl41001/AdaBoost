@@ -47,10 +47,8 @@ private:
 	float evaluateDR(vector<Data*>& validationSet);
 	void optimizeThreshold(vector<Data*>& positiveSet, float dr);
 	void initializeWeights();
-	void generateNegativeSet(int number, bool newExamples);
+	void generateNegativeSet(int number, bool rotate);
 	void extractFeatures();
-	void normalizeImage(Mat& img);
-
 
 protected:
 	float updateAlpha(float error);
@@ -69,7 +67,7 @@ public:
 	const string& getValidationPath() const;
 	void setValidationSet(const string& validationPath, int examples = -1);
 	void store();
-	~ViolaJones();
+	void normalizeImage(Mat& img);
 	const CascadeClassifier& getClassifier() const;
 	void setClassifier(const CascadeClassifier& classifier);
 	int getMaxStages() const;
@@ -86,6 +84,7 @@ public:
 	void setPositivePath(const string& positivePath);
 	bool isUseNormalization() const;
 	void setUseNormalization(bool useNormalization);
+	~ViolaJones();
 };
 
 #endif /* BOOSTING_VIOLAJONES_H_ */
