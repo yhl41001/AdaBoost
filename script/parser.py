@@ -1,5 +1,5 @@
-inputfile = open('/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/logs.txt')
-f = open('/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/out.txt', 'w')
+inputfile = open('/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/data/logs.txt')
+f = open('/Users/lorenzocioni/Documents/Sviluppo/Workspace/AdaBoost/data/out.txt', 'w')
 
 for line in inputfile:
     if line.startswith( 'Trained WeakClassifier:' ):

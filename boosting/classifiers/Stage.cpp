@@ -11,81 +11,92 @@ Stage::Stage(int number):
     number(number), classifiers({}), fpr(1.), detectionRate(1.), threshold(0.){
 }
 
-Stage::Stage(int number, vector<WeakClassifier> weaks):
+Stage::Stage(int number, vector<WeakClassifier*> weaks):
     number(number), classifiers(weaks), fpr(1.), detectionRate(1.){
 	threshold = 0;
 	for(int i = 0; i < classifiers.size(); ++i){
-		threshold += classifiers[i].getAlpha();
+		threshold += classifiers[i]->getAlpha();
 	}
-	threshold = threshold * 0.5;
 }
 
-int Stage::predict(vector<double> x){
-	double sum = 0;
+int Stage::predict(const vector<float>& x){
+	float sum = 0;
+	int prediction;
 	for (int i = 0; i < classifiers.size(); ++i) {
-		sum += classifiers[i].getAlpha() * classifiers[i].predict(x);
+		prediction = classifiers[i]->predict(x) == 1 ? 1 : 0;
+		sum += classifiers[i]->getAlpha() * prediction;
 	}
-	return sum >= threshold ? 1 : -1;
+	return sum >= threshold ? 1 : 0;
 }
 
 int Stage::predict(Mat img){
-	double sum = 0;
-	double value;
+	float sum = 0;
+	float value;
+	int prediction;
 	for (int i = 0; i < classifiers.size(); ++i) {
-		value = HaarFeatures::evaluate(img, classifiers[i].getWhites(), classifiers[i].getBlacks());
-		sum += classifiers[i].getAlpha() * classifiers[i].predict(value);
+		value = HaarFeatures::evaluate(img, classifiers[i]->getWhites(), classifiers[i]->getBlacks());
+		prediction = classifiers[i]->predict(value) == 1 ? 1 : 0;
+		sum += classifiers[i]->getAlpha() * prediction;
 	}
-	return sum >= threshold ? 1 : -1;
+	return sum >= threshold ? 1 : 0;
 }
 
-void Stage::optimizeThreshold(vector<Data*> &positiveSet, double maxfnr){
-	int wf;
+
+void Stage::optimizeThreshold(vector<Data*>& positiveSet, float dr){
+	cout << "Optimizing threshold for stage" << endl;
+	vector<float> scores(positiveSet.size());
 	float thr;
-    float *scores = new float[positiveSet.size()];
-	for (int i=0; i< positiveSet.size(); i++) {
+	int prediction;
+	for(int i = 0; i < positiveSet.size(); ++i){
 		scores[i] = 0;
-	    wf = 0;
-	    for (vector<WeakClassifier>::iterator it = classifiers.begin(); it != classifiers.end(); ++it, wf++)
-	      scores[i] += (*it).getBeta() * ((*it).predict(positiveSet[i]));
-	  }
-	  sort(scores, scores + positiveSet.size());
-	  int maxfnrind = maxfnr * positiveSet.size();
-	  if (maxfnrind >= 0 && maxfnrind < positiveSet.size()) {
-	    thr = scores[maxfnrind];
-	    while (maxfnrind > 0 && scores[maxfnrind] == thr) maxfnrind--;
-	    threshold = scores[maxfnrind];
-	  }
-	  delete[] scores;
+		for(int j = 0; j < classifiers.size(); ++j){
+			prediction = classifiers[j]->predict(positiveSet[i]) == 1 ? 1 : 0;
+			scores[i] += classifiers[j]->getAlpha() * prediction;
+		}
+	}
+	sort(scores.begin(), scores.end());
+	int index = positiveSet.size() - dr * positiveSet.size();
+	if(index >= 0 && index < positiveSet.size()){
+		thr = scores[index];
+		if(thr == 0){
+			while(index < positiveSet.size() - 1 && scores[index] == 0){
+				index++;
+			}
+			thr = scores[index];
+		}
+		threshold = scores[index];
+	}
+	cout << "Setting threshold to " << threshold << endl;
+	scores.clear();
 }
 
 void Stage::decreaseThreshold(){
-	double value = 1;
+	float value = 1;
 	threshold -= value;
-
 	cout << "Decrease threshold to " << threshold << endl;
 }
 
-double Stage::getThreshold() const {
+float Stage::getThreshold() const {
 	return threshold;
 }
 
-void Stage::setThreshold(double threshold) {
+void Stage::setThreshold(float threshold) {
 	this->threshold = threshold;
 }
 
-double Stage::getDetectionRate() const {
+float Stage::getDetectionRate() const {
 	return detectionRate;
 }
 
-void Stage::setDetectionRate(double detectionRate) {
+void Stage::setDetectionRate(float detectionRate) {
 	this->detectionRate = detectionRate;
 }
 
-double Stage::getFpr() const {
+float Stage::getFpr() const {
 	return fpr;
 }
 
-void Stage::setFpr(double fpr) {
+void Stage::setFpr(float fpr) {
 	this->fpr = fpr;
 }
 
@@ -93,11 +104,11 @@ int Stage::getNumber() const {
 	return number;
 }
 
-void Stage::setClassifiers(const vector<WeakClassifier>& classifiers) {
+void Stage::setClassifiers(const vector<WeakClassifier*>& classifiers) {
 	this->classifiers = classifiers;
 	threshold = 0;
 	for (int i = 0; i < classifiers.size(); ++i) {
-		threshold += classifiers[i].getAlpha();
+		threshold += classifiers[i]->getAlpha();
 	}
 	threshold = threshold * 0.5;
 }
@@ -107,15 +118,15 @@ void Stage::setNumber(int number) {
 }
 
 void Stage::printInfo(){
-	cout << "\nStage n. " << number << ", FPR: " << fpr << ", DR: " << detectionRate << endl;
+	cout << "\nStage n. " << number << ", FPR: " << fpr << ", DR: " << detectionRate << ", Threshold: " << threshold << endl;
 }
 
-const vector<WeakClassifier>& Stage::getClassifiers() const {
+const vector<WeakClassifier*>& Stage::getClassifiers() const {
 	return classifiers;
 }
 
 void Stage::addClassifier(WeakClassifier* wc){
-	classifiers.push_back(*wc);
+	classifiers.push_back(wc);
 }
 
 Stage::~Stage() {

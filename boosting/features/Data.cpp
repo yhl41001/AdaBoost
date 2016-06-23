@@ -7,19 +7,19 @@
 
 #include "Data.h"
 
-Data::Data(vector<double> features, int label):
+Data::Data(vector<float> features, int label):
 	features(features),
 	label(label),
 	weight(0.),
 	clas(1){}
 
-Data::Data(vector<double> features, int label, int clas):
+Data::Data(vector<float> features, int label, int clas):
 	features(features),
 	label(label),
 	weight(0.),
 	clas(clas){}
 
-Data::Data(vector<double> features):
+Data::Data(vector<float> features):
 	features(features),
 	label(0),
 	weight(0.),
@@ -43,11 +43,11 @@ void Data::print(){
 	cout << "] (label: " << label << ", weight: " << weight << ")" << endl;
 }
 
-const vector<double>& Data::getFeatures() const {
+const vector<float>& Data::getFeatures() const {
 	return features;
 }
 
-void Data::setFeatures(const vector<double>& features) {
+void Data::setFeatures(const vector<float>& features) {
 	this->features = features;
 }
 
@@ -55,11 +55,11 @@ int Data::getLabel() const {
 	return label;
 }
 
-double Data::getWeight() const {
+float Data::getWeight() const {
 	return weight;
 }
 
-void Data::setWeight(double weight) {
+void Data::setWeight(float weight) {
 	this->weight = weight;
 }
 

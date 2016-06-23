@@ -41,6 +41,7 @@ public:
 	    		files.push_back(pdir->d_name);
 	    }
 
+	    closedir(dir);
 	    return files;
 	}
 
@@ -49,7 +50,7 @@ public:
 		vector<string> images = open(path);
 		int counter = 0;
 		int k = 0;
-		int delta = 10;
+		int delta = 5;
 		stringstream ss;
 		Mat window;
 		while(k < images.size() && counter < number){
@@ -60,7 +61,7 @@ public:
 					for (int i = 0; i < img.cols - size - delta && counter < number; i += delta) {
 						window = img(Rect(i, j, size, size));
 						ss.str("");
-						ss << outputDir << "/image_iccv_" << counter << ".pgm";
+						ss << outputDir << "/image_val_" << counter << ".pgm";
 						imwrite(ss.str(), window);
 						counter++;
 						cout << "\rGenerated: " << counter << "/" << number << " images" << flush;
@@ -71,7 +72,7 @@ public:
 		}
 	}
 
-	static Mat rotate(Mat src, double angle){
+	static Mat rotate(Mat src, float angle){
 	    Mat dst;
 	    Point2f pt(src.cols/2., src.rows/2.);
 	    Mat r = getRotationMatrix2D(pt, angle, 1.0);

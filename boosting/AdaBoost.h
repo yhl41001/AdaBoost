@@ -31,17 +31,17 @@ protected:
 	StrongClassifier* strongClassifier;
 	WeakClassifier* trainWeakClassifier();
 	virtual void normalizeWeights();
-	virtual double updateAlpha(double error);
-	virtual double updateBeta(double error);
+	virtual float updateAlpha(float error);
+	virtual float updateBeta(float error);
 	virtual void updateWeights(WeakClassifier* weakClassifier);
 
 public:
 	AdaBoost();
-	AdaBoost(vector<Data*> data, int iterations);
+	AdaBoost(vector<Data*>& data, int iterations);
 	int getIterations() const;
 	void setIterations(int iterations);
 	StrongClassifier* train();
-	StrongClassifier* train(vector<WeakClassifier> classifiers);
+	StrongClassifier* train(vector<WeakClassifier*>& classifiers);
 	int predict(Data* x);
 	void showFeatures();
 	virtual ~AdaBoost();

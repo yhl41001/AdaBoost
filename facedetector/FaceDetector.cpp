@@ -18,6 +18,7 @@ FaceDetector::FaceDetector(string trainedCascade, int scales){
 	this->stages = 24;
 	this->numNegatives = 0;
 	this->numPositives = 0;
+	this->numValidation = 0;
 	cout << "  -Scales: " << scales << "\n  -Window size: "<< detectionWindowSize << endl;
 	boost = new ViolaJones(trainedCascade);
 }
@@ -32,34 +33,36 @@ FaceDetector::FaceDetector(string positivePath, string negativePath, int stages,
 	this->detectionWindowSize = detectionWindowSize;
 	this->numNegatives = numNegatives;
 	this->numPositives = numPositives;
+	this->numValidation = 0;
 	boost = new ViolaJones();
-	cout << "  -Scales: " << scales << "\n  -Window size: "<< detectionWindowSize << endl;
+	cout << "  -Stages: " << stages << "\n  -Window size: "<< detectionWindowSize << endl;
 
 }
 
-void FaceDetector::setValidationPath(string validationPath){
+void FaceDetector::setValidationSet(string validationPath, int examples){
 	this->validationPath = validationPath;
+	this->numValidation = examples;
 }
 
 void FaceDetector::train(){
 	boost = new ViolaJones(positivePath, negativePath, stages, numPositives, numNegatives, detectionWindowSize);
 	if(validationPath != ""){
-		boost->setValidationPath(validationPath);
+		boost->setValidationSet(validationPath, numValidation);
 	}
 	boost->train();
 }
 
 vector<Face> FaceDetector::detect(Mat img, bool showResults, bool showScores){
 	vector<Face> predictions;
-	vector<double> features;
-	double scaleFactor = 0.75;
-	double scaleRefactor;
+	vector<float> features;
+	float scaleFactor = 0.75;
+	float scaleRefactor;
 	int prediction = 0;
 	Mat tmp = img;
 	Mat dst, window, intImg, det;
 	int x, y, w;
 	int fontFace = FONT_HERSHEY_SCRIPT_SIMPLEX;
-	double fontScale = 0.5;
+	float fontScale = 0.5;
 
 	//Evaluating computation time
 	auto t_start = chrono::high_resolution_clock::now();
@@ -74,6 +77,8 @@ vector<Face> FaceDetector::detect(Mat img, bool showResults, bool showScores){
 				window = intImg(Rect(i, j, detectionWindowSize, detectionWindowSize));
 				prediction = boost->predict(window);
 				if(prediction == 1) {
+					//imshow("img", tmp(Rect(i, j, detectionWindowSize, detectionWindowSize)));
+					//waitKey();
 					x = (int) i / scaleRefactor;
 					y = (int) j / scaleRefactor;
 					w = (int) detectionWindowSize / scaleRefactor;
@@ -114,23 +119,35 @@ vector<Face> FaceDetector::detect(Mat img, bool showResults, bool showScores){
 	return predictions;
 }
 
+/* Display selected feature on a given images. If index is selected only the i-th features
+ * will be displayed, othwerwise every single feature is stored
+ */
 void FaceDetector::displaySelectedFeatures(Mat img, int index){
 	resize(img, img, Size(detectionWindowSize, detectionWindowSize));
+	Mat tmp;
 	vector<Stage*> stages = boost->getClassifier().getStages();
 	int count = 0;
+	int number = 0;
+	stringstream ss;
 	for(unsigned int i = 0; i < stages.size(); ++i){
 		for(unsigned int j = 0; j < stages[i]->getClassifiers().size(); ++j){
-			if(count == index){
-				for(unsigned int w = 0; w < stages[i]->getClassifiers()[j].getWhites().size(); ++w){
-					rectangle(img, stages[i]->getClassifiers()[j].getWhites()[w], Scalar::all(255), CV_FILLED);
-				}
-				for(unsigned int b = 0; b < stages[i]->getClassifiers()[j].getBlacks().size(); ++b){
-					rectangle(img, stages[i]->getClassifiers()[j].getBlacks()[b], Scalar::all(0), CV_FILLED);
-				}
-				imshow("feature", img);
+			img.copyTo(tmp);
+			for(unsigned int w = 0; w < stages[i]->getClassifiers()[j]->getWhites().size(); ++w){
+				rectangle(tmp, stages[i]->getClassifiers()[j]->getWhites()[w], Scalar::all(255), CV_FILLED);
+			}
+			for(unsigned int b = 0; b < stages[i]->getClassifiers()[j]->getBlacks().size(); ++b){
+				rectangle(tmp, stages[i]->getClassifiers()[j]->getBlacks()[b], Scalar::all(0), CV_FILLED);
+			}
+			if(index != -1 && count == index){
+				imwrite("feature.jpg", tmp);
+				imshow("feature", tmp);
 				waitKey(0);
-				imwrite("feature.jpg", img);
 				return;
+			} else if(index == -1){
+				ss.str("");
+				ss << "feature_" << number << ".jpg";
+				imwrite(ss.str(), tmp);
+				number++;
 			}
 			count++;
 		}

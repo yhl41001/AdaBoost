@@ -18,31 +18,31 @@ using namespace std;
 class Stage {
 private:
 	int number;
-	vector<WeakClassifier> classifiers;
-	double fpr;
-	double detectionRate;
-	double threshold;
+	vector<WeakClassifier*> classifiers;
+	float fpr;
+	float detectionRate;
+	float threshold;
 
 public:
 	Stage(int number);
-	Stage(int number, vector<WeakClassifier> weaks);
-	int predict(vector<double> x);
+	Stage(int number, vector<WeakClassifier*> weaks);
+	int predict(const vector<float>& x);
 	int predict(Mat img);
-	void optimizeThreshold(vector<Data*> &positiveSet, double maxfnr);
 	void decreaseThreshold();
-	~Stage();
+	void optimizeThreshold(vector<Data*>& positiveSet, float dr);
 	void printInfo();
-	double getThreshold() const;
-	void setThreshold(double threshold);
-	double getDetectionRate() const;
-	void setDetectionRate(double detectionRate);
-	double getFpr() const;
-	void setFpr(double fpr);
+	float getThreshold() const;
+	void setThreshold(float threshold);
+	float getDetectionRate() const;
+	void setDetectionRate(float detectionRate);
+	float getFpr() const;
+	void setFpr(float fpr);
 	int getNumber() const;
 	void setNumber(int number);
-	const vector<WeakClassifier>& getClassifiers() const;
-	void setClassifiers(const vector<WeakClassifier>& classifiers);
+	const vector<WeakClassifier*>& getClassifiers() const;
+	void setClassifiers(const vector<WeakClassifier*>& classifiers);
 	void addClassifier(WeakClassifier* wc);
+	~Stage();
 };
 
 #endif /* BOOSTING_CLASSIFIERS_STAGE_H_ */

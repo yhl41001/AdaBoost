@@ -20,11 +20,11 @@ using namespace cv;
 class WeakClassifier {
 
 private:
-	double error;
+	float error;
 	int dimension;
-	double threshold;
-	double alpha;
-	double beta;
+	float threshold;
+	float alpha;
+	float beta;
 	example sign;
 	int misclassified;
 
@@ -35,24 +35,24 @@ private:
 public:
 	WeakClassifier();
 	int predict(Data* x);
-	int predict(double value);
-	int predict(vector<double> x);
-	double evaluateError(vector<Data*>& features);
+	int predict(float value);
+	int predict(const vector<float>& x);
+	float evaluateError(vector<Data*>& features);
 	void printInfo();
-	double getError() const;
-	void setError(double error);
+	float getError() const;
+	void setError(float error);
 	int getDimension() const;
 	void setDimension(int dimension);
-	double getThreshold() const;
-	void setThreshold(double threshold);
-	double getAlpha() const;
-	void setAlpha(double alpha);
+	float getThreshold() const;
+	void setThreshold(float threshold);
+	float getAlpha() const;
+	void setAlpha(float alpha);
 	example getSign() const;
 	void setSign(example sign);
 	int getMisclassified() const;
 	void setMisclassified(int misclassified);
-	double getBeta() const;
-	void setBeta(double beta);
+	float getBeta() const;
+	void setBeta(float beta);
 	const vector<Rect>& getBlacks() const;
 	void setBlacks(const vector<Rect>& blacks);
 	const vector<Rect>& getWhites() const;

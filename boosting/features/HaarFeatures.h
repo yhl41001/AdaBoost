@@ -20,6 +20,7 @@
 #include "../utils/IntegralImage.h"
 
 #define TOT_FEATURES 105106
+//#define TOT_FEATURES 80960
 
 using namespace cv;
 using namespace std;
@@ -27,9 +28,9 @@ using namespace std;
 class HaarFeatures {
 public:
 	static void getFeature(int size, WeakClassifier* wc);
-	static vector<double> extractFeatures(Mat img, int size, int r, int c);
-	static vector<double> extractFeatures(Mat integralImage, int size, int r, int c, bool store, WeakClassifier* wc);
-	static double evaluate(Mat intImg, vector<Rect> whites, vector<Rect> blacks);
+	static vector<float> extractFeatures(Mat img, int size);
+	static vector<float> extractFeatures(Mat integralImage, int size, bool store, WeakClassifier* wc);
+	static float evaluate(Mat intImg, vector<Rect> whites, vector<Rect> blacks);
 };
 
 #endif /* FEATURES_HAARFEATURE_H_ */
