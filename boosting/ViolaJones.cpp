@@ -15,7 +15,7 @@ ViolaJones::ViolaJones(): AdaBoost(){
 	this->numPositives = 0;
 	this->numNegatives = 0;
 	this->numValidation = 0;
-	this->useNormalization = true;
+	this->useNormalization = false;
 }
 
 ViolaJones::ViolaJones(string trainedPath): AdaBoost(){
@@ -28,7 +28,7 @@ ViolaJones::ViolaJones(string trainedPath): AdaBoost(){
 	this->numPositives = 0;
 	this->numNegatives = 0;
 	this->numValidation = 0;
-	this->useNormalization = true;
+	this->useNormalization = false;
 	loadTrainedData(trainedPath);
 }
 
@@ -40,7 +40,7 @@ ViolaJones::ViolaJones(string positivePath, string negativePath, int maxStages, 
 	this->positivePath = positivePath;
 	this->negativePath = negativePath;
 	this->validationPath = "";
-	this->useNormalization = true;
+	this->useNormalization = false;
 	this->detectionWindowSize = detectionWindowSize;
 	this->features = {};
 	this->numPositives = numPositives;
@@ -72,11 +72,11 @@ void ViolaJones::train(){
 	extractFeatures();
 
 	float f = 0.5;
-	float d = 0.995;
+	float d = 0.98;
 	float Ftarget = 0.00001;
-	vector<int> featuresLayer {2, 8, 15, 15};
+	vector<int> featuresLayer {2, 5, 5, 5, 5, 5, 5, 5, 5, 5};
 	float FPR = 1.;
-	float DR = d;
+	float DR = 0;
 	float oldFPR = 1.;
 	vector<WeakClassifier*> classifiers;
 
@@ -132,7 +132,7 @@ void ViolaJones::train(){
 		} else {
 			cout << "  -Target FPR: " << (f * oldFPR) << endl;
 			cout << "  -Target DR: " << (d) << "\n" << endl;
-			while(FPR > f * oldFPR){
+			while(FPR > f * oldFPR || DR < d){
 				n++;
 				this->iterations = n;
 
@@ -325,7 +325,7 @@ void ViolaJones::generateNegativeSet(int number, bool rotate){
 							dest = window;
 						}
 						evaluated++;
-						//normalizeImage(dest);
+						if(useNormalization) normalizeImage(dest);
 						Mat intImg = IntegralImage::computeIntegralImage(dest);
 						if (classifier.predict(intImg) == 1) {
 							vector<float> features = HaarFeatures::extractFeatures(intImg, detectionWindowSize);
@@ -367,8 +367,7 @@ void ViolaJones::updateWeights(WeakClassifier* weakClassifier){
 	int e, prediction;
 	float num;
 	for(int i = 0; i < features.size(); ++i){
-		prediction = weakClassifier->predict(this->features[i]) == 1 ? 1 : 0;
-		e = prediction == features[i]->getLabel() ? 0 : 1;
+		e = (weakClassifier->predict(this->features[i]) == features[i]->getLabel()) ? 0 : 1;
 		num = features[i]->getWeight() * (pow(weakClassifier->getBeta(), (float) (1 - e)));
 		features[i]->setWeight(num);
 	}

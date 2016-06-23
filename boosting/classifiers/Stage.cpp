@@ -17,7 +17,6 @@ Stage::Stage(int number, vector<WeakClassifier*> weaks):
 	for(int i = 0; i < classifiers.size(); ++i){
 		threshold += classifiers[i]->getAlpha();
 	}
-	threshold = threshold * 0.5;
 }
 
 int Stage::predict(const vector<float>& x){

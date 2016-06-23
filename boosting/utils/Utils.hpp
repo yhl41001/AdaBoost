@@ -50,7 +50,7 @@ public:
 		vector<string> images = open(path);
 		int counter = 0;
 		int k = 0;
-		int delta = 2;
+		int delta = 5;
 		stringstream ss;
 		Mat window;
 		while(k < images.size() && counter < number){

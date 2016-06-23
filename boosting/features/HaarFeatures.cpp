@@ -25,7 +25,7 @@ vector<float> HaarFeatures::extractFeatures(Mat img, int size){
  */
 vector<float> HaarFeatures::extractFeatures(Mat integralImage, int size, bool store, WeakClassifier* wc) {
 
-	int minArea = 36; //minimum area of the haar feature (as in opencv implementation)
+	int minArea = 32; //minimum area of the haar feature (as in opencv implementation)
 	vector<float> features(TOT_FEATURES);
 	int count = 0;
 	float white, black;
@@ -96,6 +96,31 @@ vector<float> HaarFeatures::extractFeatures(Mat integralImage, int size, bool st
 						if(store && count == wc->getDimension()){
 							wc->setBlacks(vector<Rect>{Rect(x + width / 3, y, width / 3, height)});
 							wc->setWhites(vector<Rect>{Rect(x, y, width / 3, height) ,Rect(x + 2 * width / 3, y, width / 3, height)});
+							return features;
+						}
+						count++;
+					}
+				}
+			}
+		}
+	}
+	/**
+	 * Extracting feature type (1 x 3)
+	 */
+	sizeX = 1;
+	sizeY = 3;
+	for (width = sizeX; width <= size; width += sizeX) {
+		for (height = sizeY; height <= size; height += sizeY) {
+			for (x = 0; x <= size - width; ++x) {
+				for (y = 0; y <= size - height; ++y) {
+					if(width * height > minArea){
+						white = IntegralImage::computeArea(integralImage, Rect(x, y, width, height / 3));
+						black = IntegralImage::computeArea(integralImage, Rect(x, y + height / 3, width, height / 3));
+						white += IntegralImage::computeArea(integralImage, Rect(x, y + 2 * height / 3, width, height / 3));
+						features[count] = (double) (white - black);
+						if(store && count == wc->getDimension()){
+							wc->setBlacks(vector<Rect>{Rect(x + width / 3, y, width / 3, height)});
+							wc->setWhites(vector<Rect>{Rect(x, y, width, height / 3), Rect(x + 2 * width / 3, y, width / 3, height)});
 							return features;
 						}
 						count++;
